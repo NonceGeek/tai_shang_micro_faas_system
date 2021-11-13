@@ -51,7 +51,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:plug_cowboy, "~> 2.5"},
 
       # arweave
-      {:arweave_sdk_ex, "~> 0.0.1"},
+      {:arweave_sdk_ex, "~> 0.0.2"},
       {:ecto, "~> 3.7.1", override: true}
     ]
   end
