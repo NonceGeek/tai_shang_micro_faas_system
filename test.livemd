@@ -1,0 +1,7 @@
+# TestBook
+
+## Section
+
+```elixir
+RandGen.gen_hex(16)
+```
