@@ -4,8 +4,22 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   alias FunctionServerBasedOnArweave.Arweave.CodeLoader
 
   @code_text %{
-    "code1" => "code text 1",
-    "code2" => "code text 2"
+    "code1" => """
+This Is A Test
+=========
+
+This *will transform* into **markdown**!
+    """,
+    "code2" => """
+```elixir
+defp apply_action(socket, :index, _params) do
+  socket
+  |> assign(:page_title, "Code Loader")
+  |> assign(:selected_code, "")
+  |> assign(:code_loader, CodeLoader.changeset(%CodeLoader{}))
+end
+```
+    """
   }
 
   @code_methods %{
@@ -63,6 +77,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     socket
     |> assign(:page_title, "Code Loader")
     |> assign(:selected_code, "")
+    |> assign(:code_text, "")
     |> assign(:code_loader, CodeLoader.changeset(%CodeLoader{}))
   end
 
@@ -76,16 +91,14 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
     changeset =
       socket.assigns.code_loader
-      |> CodeLoader.changeset(
-        code_loader_params
-        |> Map.put("text", Map.get(@code_text, name))
-      )
+      |> CodeLoader.changeset(code_loader_params)
       |> Map.put(:action, :validate)
 
     socket =
       socket
       |> assign(:code_loader, changeset)
       |> assign(:selected_code, name)
+      |> assign(:code_text, Earmark.as_html!(Map.get(@code_text, name)))
       |> assign(:methods, Map.get(@code_methods, name))
 
     {:noreply, socket}

@@ -9,7 +9,9 @@
 
 <%= select f, :name, @codes, class: "form-field" %>
 
-<%= textarea f, :text, class: "form-field" %>
+<div>
+<%= raw(@code_text) %>
+</div>
 
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
 
