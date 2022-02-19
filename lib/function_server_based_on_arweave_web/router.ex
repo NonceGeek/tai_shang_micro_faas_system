@@ -17,7 +17,7 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", CodeLoaderLive.Index, :index
   end
 
   scope "/api/v1", FunctionServerBasedOnArweaveWeb do
