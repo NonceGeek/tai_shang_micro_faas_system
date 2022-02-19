@@ -14,7 +14,7 @@ defmodule FunctionServerBasedOnArweave.Arweave.CodeLoader do
   @doc false
   def changeset(code_loader, attrs \\ %{}) do
     code_loader
-    |> cast(attrs, [:name, :text, :output])
+    |> cast(attrs, [:name, :text, :output, :method_name])
     # |> validate_required([:name])
   end
 end
