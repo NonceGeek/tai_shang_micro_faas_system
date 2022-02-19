@@ -1,4 +1,4 @@
-<h1>Code Loader</h1>
+<center><h1>Code Loader</h1></center>
 
 <.form
         let={f}
@@ -6,6 +6,8 @@
         id="code-loader-form"
         phx_change="validate"
         phx_submit="save">
+
+<%= label f, :code_list %>
 
 <%= select f, :name, @codes, class: "form-field" %>
 

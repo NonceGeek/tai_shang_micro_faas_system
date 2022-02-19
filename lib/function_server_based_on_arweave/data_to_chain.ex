@@ -2,7 +2,7 @@ defmodule FunctionServerBasedOnArweave.DataToChain do
 
   alias FunctionServerBasedOnArweave.Coupon
   @node Application.fetch_env!(:function_server_based_on_arweave, :arweave_endpoint)
-  @jwk ArweaveSdkEx.Wallet.read_jwk_json_from_file("/Users/liaohua/arweave_study/arweave-key-riehAVqG1ihV3kwNb3IandUy2OfLnilk3cj7fSuDEPw.json")
+  @jwk ArweaveSdkEx.Wallet.read_jwk_json_from_file("priv.json.secret")
   @tags %{"Content-Type" => "data/run-record"}
   @reward_coefficient 3
   @python_path "/usr/local/bin/python3"
@@ -35,8 +35,7 @@ defmodule FunctionServerBasedOnArweave.DataToChain do
       Poison.encode!(data),
       @tags,
       @jwk,
-      @reward_coefficient,
-      @python_path
+      @reward_coefficient
     )
     {:ok, _} = ArweaveSdkEx.send(@node, tx)
     tx_id

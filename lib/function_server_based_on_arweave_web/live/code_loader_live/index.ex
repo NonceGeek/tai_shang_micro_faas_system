@@ -53,10 +53,10 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     codes = [
-      [key: "", value: ""],
       [key: "Code 1", value: "code1"],
       [key: "Code 2", value: "code2"]
     ]
+    # TODO: load funcs from acct
 
     socket =
       socket
