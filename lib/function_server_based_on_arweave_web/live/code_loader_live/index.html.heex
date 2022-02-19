@@ -1,0 +1,38 @@
+<h1>Code Loader</h1>
+
+<.form
+        let={f}
+        for={@code_loader}
+        id="code-loader-form"
+        phx_change="validate"
+        phx_submit="save">
+
+<%= select f, :name, @codes, class: "form-field" %>
+
+<div>
+<%= raw(@code_text) %>
+</div>
+
+<button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
+
+<div>
+<%= select f, :method_name, @methods, class: "form-field" %>
+</div>
+
+<%= 
+for param <- @params do
+  case param.type do
+    "number" ->
+      number_input f, param.name, class: "form-field", placeholder: param.name
+    "text" ->
+      text_input f, param.name, class: "form-field", placeholder: param.name
+  end
+end
+%>
+
+<%# <button phx-click="run_code" class="btn-primary">Run Code</button> %>
+<button type="submit" phx-disable-with="Runing...">Run Code</button>
+
+<%= textarea f, :output, class: "form-field" %>
+
+</.form>

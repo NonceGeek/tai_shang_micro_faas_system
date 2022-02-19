@@ -52,7 +52,9 @@ defmodule FunctionServerBasedOnArweave.MixProject do
 
       # arweave
       {:arweave_sdk_ex, "~> 0.1.2"},
-      {:ecto, "~> 3.7.1", override: true}
+      {:ecto, "~> 3.7.1", override: true},
+
+      {:earmark, "~> 1.4"}
     ]
   end
 
