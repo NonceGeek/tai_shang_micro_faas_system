@@ -5,20 +5,20 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
   @code_text %{
     "code1" => """
-This Is A Test
-=========
+    This Is A Test
+    =========
 
-This *will transform* into **markdown**!
+    This *will transform* into **markdown**!
     """,
     "code2" => """
-```elixir
-defp apply_action(socket, :index, _params) do
-  socket
-  |> assign(:page_title, "Code Loader")
-  |> assign(:selected_code, "")
-  |> assign(:code_loader, CodeLoader.changeset(%CodeLoader{}))
-end
-```
+    ```elixir
+    defp apply_action(socket, :index, _params) do
+      socket
+      |> assign(:page_title, "Code Loader")
+      |> assign(:selected_code, "")
+      |> assign(:code_loader, CodeLoader.changeset(%CodeLoader{}))
+    end
+    ```
     """
   }
 
