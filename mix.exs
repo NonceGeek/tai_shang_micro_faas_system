@@ -5,7 +5,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
     [
       app: :function_server_based_on_arweave,
       version: "0.1.0",
-      elixir: "~> 1.13",
+      elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
