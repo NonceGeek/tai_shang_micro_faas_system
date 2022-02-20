@@ -35,13 +35,15 @@ defmodule FunctionServerBasedOnArweave.DataToChain do
         output: output,
         func: func_id
       }
-    data_to_chain(payload, @tags.record)
+    payload
+    |> Poison.encode()
+    |> data_to_chain(@tags.record)
   end
 
   def data_to_chain(data, tags) do
     {tx, tx_id, _} = ArweaveSdkEx.Wallet.sign_tx(
       @node,
-      Poison.encode!(data),
+      data,
       tags,
       @jwk,
       @reward_coefficient

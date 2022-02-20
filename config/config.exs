@@ -9,7 +9,8 @@ import Config
 
 config :function_server_based_on_arweave,
   ecto_repos: [FunctionServerBasedOnArweave.Repo],
-  arweave_endpoint: "https://arweave.net"
+  arweave_endpoint: "https://arweave.net",
+  arweave_explorer: "https://viewblock.io/arweave/tx"
 
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,

@@ -2,39 +2,36 @@
 
 <.form
         let={f}
-        for={@code_loader}
+        for={:form}
         id="code-loader-form"
-        phx_change="validate"
-        phx_submit="save">
+        phx_change="changed"
+        phx_submit="run">
 
 <%= label f, :code_list %>
 
-<%= select f, :name, @codes, class: "form-field" %>
+<%= select f, :code_name, @code_names,  value: @selected_code, class: "form-field" %>
 
+<p><b>check code on explorer: </b></p>
+  <%= raw(Earmark.as_html!("> #{@explorer_link}"))%>
 <div>
-<%= raw(@code_text) %>
+<%= raw(Earmark.as_html!("```elixir \n" <> @code_text <> "\n```")) %>
 </div>
 
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
 
+<%= if !is_nil(assigns[:func_names]) do %>
 <div>
-<%= select f, :method_name, @methods, class: "form-field" %>
+  <%= select f, :func_name, @func_names,  value: @selected_func, class: "form-field" %>
+
+  <%= label f, :input_list %>
+  <%=  text_input f, :input_list, class: "form-field", value: "[]", placeholder: "[]" %>
+
+  <%# <button phx-click="run_code" class="btn-primary">Run Code</button> %>
+  <button type="submit" phx-disable-with="Runing...">Run Code</button>
+  <p>
+    <%= assigns[:output] %>
+  </p>
 </div>
-
-<%= 
-for param <- @params do
-  case param.type do
-    "number" ->
-      number_input f, param.name, class: "form-field", placeholder: param.name
-    "text" ->
-      text_input f, param.name, class: "form-field", placeholder: param.name
-  end
-end
-%>
-
-<%# <button phx-click="run_code" class="btn-primary">Run Code</button> %>
-<button type="submit" phx-disable-with="Runing...">Run Code</button>
-
-<%= textarea f, :output, class: "form-field" %>
+<% end %>
 
 </.form>

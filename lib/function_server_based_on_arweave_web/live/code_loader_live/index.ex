@@ -1,151 +1,121 @@
 defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   use FunctionServerBasedOnArweaveWeb, :live_view
 
-  alias FunctionServerBasedOnArweave.Arweave.CodeLoader
-
-  @code_text %{
-    "code1" => """
-    This Is A Test
-    =========
-
-    This *will transform* into **markdown**!
-    """,
-    "code2" => """
-    ```elixir
-    defp apply_action(socket, :index, _params) do
-      socket
-      |> assign(:page_title, "Code Loader")
-      |> assign(:selected_code, "")
-      |> assign(:code_loader, CodeLoader.changeset(%CodeLoader{}))
-    end
-    ```
-    """
-  }
-
-  @code_methods %{
-    "code1" => [
-      [key: "Code 1 Method 1", value: "code1_method1"],
-      [key: "Code 1 Method 2", value: "code1_method2"]
-    ],
-    "code2" => [
-      [key: "Code 2 Method 1", value: "code2_method1"],
-      [key: "Code 2 Method 2", value: "code2_method2"]
-    ]
-  }
-
-  @method_params %{
-    "code1_method1" => [
-      %{type: "text", name: :"Code 1 Method 1 Text Param"}
-    ],
-    "code1_method2" => [
-      %{type: "number", name: :"Code 1 Method 2 Number Param"}
-    ],
-    "code2_method1" => [
-      %{type: "text", name: :"Code 2 Method 1 Text Param"},
-      %{type: "number", name: :"Code 2 Method 1 Number Param"}
-    ],
-    "code2_method2" => [
-      %{type: "number", name: :"Code 2 Method 2 Number Param"},
-      %{type: "text", name: :"Code 2 Method 2 Text Param"}
-    ]
-  }
+  alias FunctionServerBasedOnArweave.OnChainCode
+  alias ArweaveSdkEx.CodeRunner
 
   @impl true
   def mount(_params, _session, socket) do
-    codes = [
-      [key: "Code 1", value: "code1"],
-      [key: "Code 2", value: "code2"]
-    ]
-    # TODO: load funcs from acct
+    # codes = [
+    #   [key: "Code 1", value: "code1"],
+    #   [key: "Code 2", value: "code2"]
+    # ]
 
+    code_names =
+      OnChainCode.get_all()
+      |> Enum.map(&(&1.name))
+    selected_code_name = Enum.fetch!(code_names, 0)
+    {tx_id, code_text} = build_code(selected_code_name)
     socket =
       socket
-      |> assign(:codes, codes)
+      |> assign(:code_names, code_names)
       |> assign(:methods, [])
       |> assign(:params, [])
-      |> assign(:selected_code, "")
+      |> assign(:selected_code,selected_code_name)
+      |> assign(:code_text, code_text)
+      |> assign(:explorer_link, build_explorer_link(tx_id))
 
     {:ok, socket}
   end
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  defp apply_action(socket, :index, _params) do
-    socket
-    |> assign(:page_title, "Code Loader")
-    |> assign(:selected_code, "")
-    |> assign(:code_text, "")
-    |> assign(:code_loader, CodeLoader.changeset(%CodeLoader{}))
+    {:noreply, socket}
   end
 
   @impl true
-  def handle_event(
-        "validate",
-        %{"_target" => ["code_loader", "name"], "code_loader" => code_loader_params} = _params,
-        socket
-      ) do
-    name = Map.get(code_loader_params, "name")
+  def handle_event("changed",
+    %{
+      "_target" => ["form", "code_name"],
+      "form" => %{"code_name" => code_name}
+    } = params, socket) do
 
-    changeset =
-      socket.assigns.code_loader
-      |> CodeLoader.changeset(code_loader_params)
-      |> Map.put(:action, :validate)
+    {tx_id, code_text} = build_code(code_name)
 
-    socket =
+    {
+      :noreply,
       socket
-      |> assign(:code_loader, changeset)
-      |> assign(:selected_code, name)
-      |> assign(:code_text, Earmark.as_html!(Map.get(@code_text, name)))
-      |> assign(:methods, Map.get(@code_methods, name))
-
-    {:noreply, socket}
+      |> assign(:selected_code, code_name)
+      |> assign(:code_text, code_text)
+      |> assign(:explorer_link, build_explorer_link(tx_id))
+    }
   end
 
-  @impl true
-  def handle_event(
-        "validate",
-        %{"_target" => ["code_loader", "method_name"], "code_loader" => code_loader_params} =
-          _params,
-        socket
-      ) do
-    method_name = Map.get(code_loader_params, "method_name")
-
-    changeset =
-      socket.assigns.code_loader
-      |> CodeLoader.changeset(code_loader_params)
-      |> Map.put(:action, :validate)
-
-    socket =
+  def handle_event("load_code", params, %{assigns: assigns} = socket) do
+    OnChainCode.load_code(assigns.code_text)
+    func_names =
+      assigns.selected_code
+      |> OnChainCode.get_functions()
+      |> Enum.map(fn {key, value} ->
+        key
+      end)
+    IO.puts inspect func_names
+    {
+      :noreply,
       socket
-      |> assign(:code_loader, changeset)
-      |> assign(:params, Map.get(@method_params, method_name))
-
-    {:noreply, socket}
+      |> assign(:func_names, func_names)
+      |> assign(:selected_func, Enum.fetch!(func_names, 0))
+    }
   end
 
   @impl true
-  def handle_event("load_code", %{"name" => code_name} = _params, socket) do
-    IO.inspect("---------- Loading Code #{code_name} --------- ")
+  def handle_event("run", params, socket) do
+    params_atom = ExStructTranslator.to_atom_struct(params)
+    do_handle_event(params_atom, socket)
+  end
 
-    {:noreply, socket}
+  def do_handle_event(%{
+    form: %{
+    code_name: code_name,
+    func_name: func_name,
+    input_list: input_list_str
+  }}, socket) do
+    input_list = Poison.decode!(input_list_str)
+    output =
+      CodeRunner.run_func(
+        code_name,
+        func_name,
+        input_list
+      )
+    {
+      :noreply,
+      socket
+      |> assign(:output, output)
+    }
   end
 
   @impl true
-  def handle_event(_action, %{"code_loader" => code_loader_params} = _params, socket) do
-    IO.inspect("---------- Runing Code #{code_loader_params["name"]} --------- ")
-    # code_loader_params sample:
-    # %{
-    #   "Code 2 Method 2 Number Param" => "3",
-    #   "Code 2 Method 2 Text Param" => "ken",
-    #   "method_name" => "code2_method2",
-    #   "name" => "code2",
-    #   "output" => "",
-    #   "text" => "code text 2"
-    # }
-
+  def handle_event(_, _, socket) do
     {:noreply, socket}
   end
+
+  # +
+  # | other funcs
+  # +
+
+  def build_code(selected_code) do
+    # get_tx_id
+    # get_content_by_tx_id
+    # parse code as markdown
+    %{tx_id: tx_id} = OnChainCode.get_by_name(selected_code)
+    {:ok, %{code: code}} =
+      CodeRunner.get_ex_by_tx_id(ArweaveNode.get_node(), tx_id)
+    {tx_id, code}
+
+  end
+
+  def build_explorer_link(tx_id) do
+    "#{ArweaveNode.get_explorer()}/#{tx_id}"
+  end
+
 end
