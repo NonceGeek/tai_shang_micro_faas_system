@@ -12,7 +12,7 @@ defmodule CodesOnChain.GetBestBlockHeight do
   end
 
   def get_best_block_height("Arweave", endpoint) do
-    1
+    ArweaveSdkEx.block_height(endpoint)
   end
 
 end
