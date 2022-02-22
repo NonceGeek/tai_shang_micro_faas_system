@@ -52,6 +52,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
 
       # arweave
       {:arweave_sdk_ex, "~> 0.1.7"},
+      {:ethereumex, "~> 0.9"},
       {:ecto, "~> 3.7.1", override: true},
 
       # markdown
