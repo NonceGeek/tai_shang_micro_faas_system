@@ -8,11 +8,13 @@ defmodule CodesOnChain.GetBestBlockHeight do
 
   @spec get_best_block_height(String.t(), String.t()) :: integer()
   def get_best_block_height("Ethereum", endpoint) do
-    1
+    Application.put_env(:ethereumex, :url, endpoint)
+    {:ok, height} = Ethereumex.HttpClient.eth_block_number()
+    height |> String.slice(2..-1) |> String.to_integer(16)
   end
 
   def get_best_block_height("Arweave", endpoint) do
-    1
+    ArweaveSdkEx.block_height(endpoint)
   end
 
 end
