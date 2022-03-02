@@ -52,6 +52,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_code, code_name)
       |> assign(:code_text, code_text)
       |> assign(:explorer_link, build_explorer_link(tx_id))
+      |> push_event("highlight", %{})
     }
   end
 

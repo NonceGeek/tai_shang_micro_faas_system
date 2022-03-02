@@ -13,7 +13,7 @@
 
 <p><b>check code on explorer: </b></p>
   <%= raw(Earmark.as_html!("> #{@explorer_link}"))%>
-<div>
+<div id="code-loaded">
 <%= raw(Earmark.as_html!("```elixir \n" <> @code_text <> "\n```")) %>
 </div>
 
