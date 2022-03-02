@@ -23,9 +23,19 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def get_by_id(id), do: Repo.get_by(Ele, id: id)
 
   def get_by_name(name), do:  Repo.get_by(Ele, name: name)
-  def create_by_tx_id(tx_id) do
-    {:ok, %{code: code}} = CodeRunner.get_ex_by_tx_id(ArweaveNode.get_node(), tx_id)
-    Ele.create_by_payload_and_tx_id(code, tx_id)
+  def get_by_tx_id(tx_id), do: Repo.get_by(Ele, tx_id: tx_id)
+
+
+  def create_or_query_by_tx_id(tx_id) do
+    ele = get_by_tx_id(tx_id)
+    if is_nil(ele) == true do
+      {:ok, %{code: code}} = CodeRunner.get_ex_by_tx_id(ArweaveNode.get_node(), tx_id)
+      Ele.create_by_payload_and_tx_id(code, tx_id)
+    else
+      {:ok, ele}
+    end
+
+
   end
   def create_by_payload_and_tx_id(code, tx_id) do
     Code.eval_string(code)
@@ -52,6 +62,10 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # |> validate_required([:name])
   end
 
+  # +
+  # | spec funcs
+  # +
+
 
   def load_code(code)do
     Code.eval_string(code)
@@ -75,6 +89,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     |> Enum.into(%{})
   end
 
+  @spec get_module_name_from_code(String.t()) :: String.t()
   def get_module_name_from_code(code) do
     code
     |> String.split("\n")

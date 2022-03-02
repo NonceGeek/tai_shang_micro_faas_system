@@ -65,8 +65,6 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
         key
       end)
 
-    IO.puts(inspect(func_names))
-
     {
       :noreply,
       socket
@@ -81,6 +79,11 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     do_handle_event(params_atom, socket)
   end
 
+  @impl true
+  def handle_event(_, _, socket) do
+    {:noreply, socket}
+  end
+
   def do_handle_event(
         %{
           form: %{
@@ -93,7 +96,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       ) do
     socket =
       with {:ok, input_list} <- Poison.decode(input_list_str),
-           is_list(input_list) do
+           true <- is_list(input_list) do
         output =
           try do
             CodeRunner.run_func(
@@ -112,11 +115,6 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
           assign(socket, :output, "Input must be a list")
       end
 
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_event(_, _, socket) do
     {:noreply, socket}
   end
 

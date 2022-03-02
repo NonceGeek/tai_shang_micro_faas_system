@@ -1,5 +1,5 @@
 defmodule CodesOnChain.AsciiDrawer do
-    @moduledoc """
+  @moduledoc """
     This is an code-on-chain example:
       Draw ascii pic with param
   """
