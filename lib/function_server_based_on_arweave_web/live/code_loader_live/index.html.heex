@@ -13,8 +13,7 @@
 
 <p><b>check code on explorer: </b></p>
   <%= raw(Earmark.as_html!("> #{@explorer_link}"))%>
-<div id="code-loaded">
-<%= raw(Earmark.as_html!("```elixir \n" <> @code_text <> "\n```")) %>
+<div id="code-loaded" style="height: 350px; margin-bottom: 50px;">
 </div>
 
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>

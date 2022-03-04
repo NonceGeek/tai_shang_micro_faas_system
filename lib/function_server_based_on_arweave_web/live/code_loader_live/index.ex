@@ -26,6 +26,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_code, selected_code_name)
       |> assign(:code_text, code_text)
       |> assign(:explorer_link, build_explorer_link(tx_id))
+      |> push_highlight_event()
 
     {:ok, socket}
   end
@@ -52,7 +53,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_code, code_name)
       |> assign(:code_text, code_text)
       |> assign(:explorer_link, build_explorer_link(tx_id))
-      |> push_event("highlight", %{})
+      |> push_highlight_event()
     }
   end
 
@@ -71,18 +72,19 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       socket
       |> assign(:func_names, func_names)
       |> assign(:selected_func, Enum.fetch!(func_names, 0))
+      |> push_highlight_event()
     }
   end
 
   @impl true
   def handle_event("run", params, socket) do
     params_atom = ExStructTranslator.to_atom_struct(params)
-    do_handle_event(params_atom, socket)
+    do_handle_event(params_atom, socket |> push_highlight_event())
   end
 
   @impl true
   def handle_event(_, _, socket) do
-    {:noreply, socket}
+    {:noreply, socket |> push_highlight_event()}
   end
 
   def do_handle_event(
@@ -134,5 +136,9 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
   def build_explorer_link(tx_id) do
     "#{ArweaveNode.get_explorer()}/#{tx_id}"
+  end
+
+  defp push_highlight_event(%{assigns: assigns} = socket) do
+    push_event(socket, "highlight", %{code_text: assigns.code_text})
   end
 end
