@@ -25,7 +25,8 @@ config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoi
   secret_key_base: "zF05EoK/9NCGsy7ypYVLQLJDJsJuxtMX6CHhdPRdSBBlD9dvP4iHss6peBx0FYb7",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    # esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    node: ["build.js", "--watch", cd: Path.expand("../assets", __DIR__)]
   ]
 
 # ## SSL Support
