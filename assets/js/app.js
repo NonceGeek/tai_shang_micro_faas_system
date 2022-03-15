@@ -32,46 +32,21 @@ let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToke
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
 
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.main.js';
-
-self.MonacoEnvironment = {
-  getWorkerUrl: function (moduleId, label) {
-    if (label === 'json') {
-      return './assets/vs/editor/json.worker.bundle.js';
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return './assets/vs/editor/css.worker.bundle.js';
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return './assets/vs/editor/html.worker.bundle.js';
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return './assets/vs/editor/ts.worker.bundle.js';
-    }
-    return './assets/vs/editor/editor.worker.js';
+function highlightCode() {
+  let el = document.getElementById("code-loaded")
+  if (el) {
+    hljs.highlightAll();
   }
-};
-
-function highlightCode(code_text) {
-  const editor = monaco.editor.create(document.getElementById('code-loaded'), {
-    value: code_text,
-    domReadOnly: true,
-    readOnly: true,
-    automaticLayout: true,
-    scrollBeyondLastLine: false,
-    language: 'elixir'
-  });
-  const contentHeight = editor.getModel().getLineCount() * 19;
-  editor.layout({ height: contentHeight });
 }
 
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => {
   topbar.hide()
+  highlightCode()
 })
 
 window.addEventListener(`phx:highlight`, (e) => {
-  highlightCode(e.detail.code_text)
+  highlightCode()
 })
 
 // connect if there are any LiveViews on the page
