@@ -2,7 +2,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   use FunctionServerBasedOnArweaveWeb, :live_view
 
   alias FunctionServerBasedOnArweave.OnChainCode
-  alias ArweaveSdkEx.CodeRunner
+  require Logger
 
   @impl true
   def mount(_params, _session, socket) do
@@ -100,14 +100,15 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
            true <- is_list(input_list) do
         output =
           try do
-            CodeRunner.run_func(
+            Logger.info("#{code_name}, #{func_name}, #{inspect(input_list)}")
+              run_func(
               code_name,
               func_name,
               input_list
             )
           rescue
-            _ ->
-              "Invalid input arguments or function call!"
+            reason ->
+              "Invalid input arguments or function call!because: #{inspect(reason)}"
           end
 
         assign(socket, :output, output)
@@ -128,11 +129,21 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     # get_content_by_tx_id
     # parse code as markdown
     %{tx_id: tx_id} = OnChainCode.get_by_name(selected_code)
-    {:ok, %{code: code}} = CodeRunner.get_ex_by_tx_id(ArweaveNode.get_node(), tx_id)
+  {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
     {tx_id, code}
   end
 
   def build_explorer_link(tx_id) do
     "#{ArweaveNode.get_explorer()}/#{tx_id}"
   end
+
+  def run_func(mod_name, func_name, params) do
+    func_name_atom = String.to_atom(func_name)
+
+    result =
+      "Elixir.#{mod_name}"
+      |> String.to_atom()
+      |> apply(func_name_atom, params)
+  end
+
 end

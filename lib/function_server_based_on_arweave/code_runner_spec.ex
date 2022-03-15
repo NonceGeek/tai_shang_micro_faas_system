@@ -5,7 +5,7 @@ defmodule FunctionServerBasedOnArweave.CodeRunnerSpec do
   def run_ex_on_chain(tx_id, func_name, input_list) do
     # Fetch tx on chain.
     # Save to database
-    with {:ok, %{code: code}} <- CodeRunner.get_ex_by_tx_id(ArweaveNode.get_node(), tx_id),
+    with {:ok, %{content: code}} <- CodeRunner.get_content_in_tx(ArweaveNode.get_node(), tx_id),
       {:ok, _ele} <- OnChainCode.create_or_query_by_tx_id(tx_id) do
       # Load Module
       # Run func

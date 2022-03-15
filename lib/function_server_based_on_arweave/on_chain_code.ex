@@ -3,7 +3,6 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   use Ecto.Schema
   import Ecto.Changeset
   alias FunctionServerBasedOnArweave.OnChainCode, as: Ele
-  alias ArweaveSdkEx.CodeRunner
   alias FunctionServerBasedOnArweave.Repo
 
   @rejected_func_list [:__info__, :module_info]
@@ -29,7 +28,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def create_or_query_by_tx_id(tx_id) do
     ele = get_by_tx_id(tx_id)
     if is_nil(ele) == true do
-      {:ok, %{code: code}} = CodeRunner.get_ex_by_tx_id(ArweaveNode.get_node(), tx_id)
+      {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
       Ele.create_by_payload_and_tx_id(code, tx_id)
     else
       {:ok, ele}

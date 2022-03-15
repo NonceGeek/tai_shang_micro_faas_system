@@ -23,14 +23,14 @@
 </div>
 
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
-
+<br><br>
 <%= if !is_nil(assigns[:func_names]) do %>
 <div>
   <%= select f, :func_name, @func_names,  value: @selected_func, class: "form-field" %>
 
   <%= label f, :input_list %>
   <%=  text_input f, :input_list, class: "form-field", value: "[]", placeholder: "[]" %>
-
+  <br><br>
   <%# <button phx-click="run_code" class="btn-primary">Run Code</button> %>
   <button type="submit" phx-disable-with="Runing...">Run Code</button>
   <p>
