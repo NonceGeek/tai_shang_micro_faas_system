@@ -19,15 +19,15 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
     Please alter your postgres sql role in terminal, here is a example:
 
-```sh
-$ psql
-psql (14.2)
-Type "help" for help.
+    ```sh
+    $ psql
+    psql (14.2)
+    Type "help" for help.
 
-lucas=# ALTER USER postgres WITH CREATEDB;
-ALTER ROLE
-lucas=# \q
-```
+    lucas=# ALTER USER postgres WITH CREATEDB;
+    ALTER ROLE
+    lucas=# \q
+    ```
 
 ## Learn more
 
