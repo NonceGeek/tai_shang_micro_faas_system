@@ -2,7 +2,8 @@ defmodule FunctionServerBasedOnArweave.DataToChain do
 
   alias FunctionServerBasedOnArweave.Coupon
   @node Application.fetch_env!(:function_server_based_on_arweave, :arweave_endpoint)
-  @jwk ArweaveSdkEx.Wallet.read_jwk_json_from_file("priv.json.secret")
+  # @jwk ArweaveSdkEx.Wallet.read_jwk_json_from_file("priv.json.secret")
+  @jwk %{}
   @tags %{
     record: %{"Content-Type" => "data/run-record"}
   }
