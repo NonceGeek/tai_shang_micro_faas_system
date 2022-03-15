@@ -12,6 +12,23 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
 Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
 
+
+## Troubleshooting
+
+1. `ERROR 42501 (insufficient_privilege) permission denied to create database`
+
+    Please alter your postgres sql role in terminal, here is a example:
+
+```sh
+$ psql
+psql (14.2)
+Type "help" for help.
+
+lucas=# ALTER USER postgres WITH CREATEDB;
+ALTER ROLE
+lucas=# \q
+```
+
 ## Learn more
 
   * Official website: https://www.phoenixframework.org/
@@ -19,3 +36,4 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+
