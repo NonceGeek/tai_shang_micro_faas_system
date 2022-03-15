@@ -33,7 +33,7 @@
   <%# <button phx-click="run_code" class="btn-primary">Run Code</button> %>
   <button type="submit" phx-disable-with="Runing...">Run Code</button>
   <p>
-    <%= assigns[:output] %>
+    <%= inspect(assigns[:output]) %>
   </p>
 </div>
 <% end %>
