@@ -54,7 +54,7 @@ defmodule FunctionServerBasedOnArweaveWeb.FunctionRunnerController do
       payload
       |> ExStructTranslator.to_atom_struct()
       |> do_run()
-    json(conn, result)
+    json(conn, %{result: result})
   end
 
   def do_run(%{
