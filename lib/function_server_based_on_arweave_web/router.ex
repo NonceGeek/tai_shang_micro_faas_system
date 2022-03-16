@@ -24,6 +24,8 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   scope "/api/v1", FunctionServerBasedOnArweaveWeb do
     pipe_through :api
 
+    get "/get_codes",  FunctionRunnerController, :get_codes
+    get "/get_code",  FunctionRunnerController, :get_code
     post "/run", FunctionRunnerController, :run
   end
 

@@ -2,6 +2,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   use FunctionServerBasedOnArweaveWeb, :live_view
 
   alias FunctionServerBasedOnArweave.OnChainCode
+  alias  ArweaveSdkEx.CodeRunner
   require Logger
 
   @impl true
@@ -101,7 +102,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
         output =
           try do
             Logger.info("#{code_name}, #{func_name}, #{inspect(input_list)}")
-              run_func(
+            CodeRunner.run_func(
               code_name,
               func_name,
               input_list
@@ -137,13 +138,13 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     "#{ArweaveNode.get_explorer()}/#{tx_id}"
   end
 
-  def run_func(mod_name, func_name, params) do
-    func_name_atom = String.to_atom(func_name)
+  # def run_func(mod_name, func_name, params) do
+  #   func_name_atom = String.to_atom(func_name)
 
-    result =
-      "Elixir.#{mod_name}"
-      |> String.to_atom()
-      |> apply(func_name_atom, params)
-  end
+  #   result =
+  #     "Elixir.#{mod_name}"
+  #     |> String.to_atom()
+  #     |> apply(func_name_atom, params)
+  # end
 
 end
