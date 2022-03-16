@@ -9,7 +9,7 @@ defmodule FunctionServerBasedOnArweaveWeb.FunctionRunnerController do
   @prefix "CodesOnChain."
 
   def get_codes(conn, %{
-      "without_content" => true
+      "without_content" => "true"
     }) do
     codes =
       OnChainCode.get_all()
@@ -35,13 +35,13 @@ defmodule FunctionServerBasedOnArweaveWeb.FunctionRunnerController do
 
   def get_code(conn, %{"name" => name}) do
     %{code: code} =
-      OnChainCode.OnChainCode.get_by_name(name)
+      OnChainCode.get_by_name(name)
     json(conn, %{code: code})
   end
 
   def get_code(conn, %{"tx_id" =>tx_id}) do
     %{code: code} =
-      OnChainCode.OnChainCode.get_by_tx_id(tx_id)
+      OnChainCode.get_by_tx_id(tx_id)
     json(conn, %{code: code})
   end
 
