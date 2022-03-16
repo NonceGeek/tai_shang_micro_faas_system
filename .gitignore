@@ -34,5 +34,3 @@ npm-debug.log
 .envrc
 *.secret
 
-# on chain codes
-lib/codes_on_chain/*
