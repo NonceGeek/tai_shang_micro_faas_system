@@ -33,3 +33,6 @@ npm-debug.log
 /assets/node_modules/
 .envrc
 *.secret
+
+# on chain codes
+lib/codes_on_chain/

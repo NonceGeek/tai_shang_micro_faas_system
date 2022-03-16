@@ -7,11 +7,11 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   @rejected_func_list [:__info__, :module_info]
 
-
   schema "on_chain_code" do
     field :name, :string
     field :tx_id, :string
     field :description, :string
+    field :code, :string
     # field :method_name, :string
     # field :output, :string
 
@@ -27,23 +27,26 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   def create_or_query_by_tx_id(tx_id) do
     ele = get_by_tx_id(tx_id)
+
     if is_nil(ele) == true do
       {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
       Ele.create_by_payload_and_tx_id(code, tx_id)
     else
       {:ok, ele}
     end
-
-
   end
+
   def create_by_payload_and_tx_id(code, tx_id) do
     Code.eval_string(code)
     name = get_module_name_from_code(code)
+    # save file to local
+    File.write!("lib/codes_on_chain/#{name}.ex", code)
     description = get_description_from_name(name)
     Ele.create(%{
       name: name,
       tx_id: tx_id,
-      description: description
+      description: description,
+      code: code
     })
     # description = get_module_description_from_code(code)
   end
@@ -57,7 +60,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   @doc false
   def changeset(code_loader, attrs \\ %{}) do
     code_loader
-    |> cast(attrs, [:name, :tx_id, :description])
+    |> cast(attrs, [:name, :tx_id, :description, :code])
     # |> validate_required([:name])
   end
 

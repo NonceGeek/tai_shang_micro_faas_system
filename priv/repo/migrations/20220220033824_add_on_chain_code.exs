@@ -6,7 +6,7 @@ defmodule FunctionServerBasedOnArweave.Repo.Migrations.AddOnChainCode do
       add :name, :string
       add :description, :string
       add :tx_id, :string
-
+      add :code, :text
       timestamps()
     end
   end

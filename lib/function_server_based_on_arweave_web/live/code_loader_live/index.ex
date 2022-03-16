@@ -128,8 +128,8 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     # get_tx_id
     # get_content_by_tx_id
     # parse code as markdown
-    %{tx_id: tx_id} = OnChainCode.get_by_name(selected_code)
-  {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
+    %{tx_id: tx_id, code: code} = OnChainCode.get_by_name(selected_code)
+    # {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
     {tx_id, code}
   end
 
