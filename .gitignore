@@ -35,4 +35,4 @@ npm-debug.log
 *.secret
 
 # on chain codes
-lib/codes_on_chain/
+lib/codes_on_chain/*
