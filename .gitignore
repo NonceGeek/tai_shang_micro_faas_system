@@ -33,4 +33,4 @@ npm-debug.log
 /assets/node_modules/
 .envrc
 *.secret
-
+*.DS_Store
