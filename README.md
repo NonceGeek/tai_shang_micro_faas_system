@@ -43,7 +43,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 Based on Arweave's FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Arweave Network and loaded into Runtime to provide functional service support for other applications. Plugin is used for uploading code snippets.
 
-![img](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c0neoti6j21cc0jsdi5.jpg)
+![去中心化FaaS系统的实现-en-zzf (3)](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c241bwi9j21cc0jsq59.jpg)
 
 ## 0x02 Background
 
@@ -133,12 +133,12 @@ defmodule CodesOnChain.#{Mod_Name} do
     the description of this module.
   """
 
-  def get_module_doc, do: @moduledoc # 固定函数，用以获取模块文档  
+  def get_module_doc, do: @moduledoc # Static function to get module document
   
-  @spec func_name(type) :: type # spec 不是必须的，但是最好有，表明输入变量与输出变量的类型
+  @spec func_name(type) :: type # spec is not necessary but recommended. It can show the input and output variable type
   def func_name(var) do
-      # 此处是具体的函数实现
-      # 最后一个变量是返回结果
+      # This is the function implementation
+      # The last variable is the returned value
       result
   end
 end
