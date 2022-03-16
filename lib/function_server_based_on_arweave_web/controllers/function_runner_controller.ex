@@ -35,7 +35,7 @@ defmodule FunctionServerBasedOnArweaveWeb.FunctionRunnerController do
 
   def get_code(conn, %{"name" => name}) do
     %{code: code} =
-      OnChainCode.get_by_name(name)
+      OnChainCode.get_by_name("#{@prefix}#{name}")
     json(conn, %{code: code})
   end
 
