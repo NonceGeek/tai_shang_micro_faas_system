@@ -5,6 +5,18 @@
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
+  * edit `priv/repo/seeds.exs` file with the `snippet tx list` you like( it's also fine to put different snippet groups in diffrent files, and call them in seeds.exs) :
+  ```elixir
+   tx_ids =
+     [
+       "-6TxJsLSeoXfEhKfGzG5-n65QpAbuiwp4fO_7-2A-vA", # BestBlockHeightGetter
+       "ghBIjdbs2HpGM0Huy3IV0Ynm9OOWxDLkcW6q0X7atqs", # EndpointProvider
+       "kqozWQAcbDr3S_hSEi91O4eQ28tpDvrOKj0xlQ6_dKw", # BlockToAsciiEmojiTranslator
+       "rr5p8_FJ4l0KvjhCtIzmxfBNN3UiN2Cv2Ml08ys9odE", # AsciiDrawer
+       "UzvTGCxCg0xB2mDqX27vPf_nTz4TjUaGRYZeJ3GsuM0", # Verifier
+
+     ]
+  ```
   * Create and migrate your database with `mix ecto.setup`
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
