@@ -111,7 +111,7 @@ FaaS admins can use all valid code snippet stored on AR network via `Tx ID` (Cod
 
 #### 3.3.1 Two methods to upload the code
 
-![img](https://r8jmm3f9xe.feishu.cn/space/api/box/stream/download/asynccode/?code=ZGM4Y2U1MjE4NTM0NDZkZWIyY2NkMzE4NmM2ODNkNWFfa3I3dDlXNHpGRmNIeUtKOTc3YzBXT2tIMEQxNFhCMk1fVG9rZW46Ym94Y25ER1IzWHhSaVBNNHVYM2NMWHppY1BnXzE2NDc0MzUyMDg6MTY0NzQzODgwOF9WNA)
+![8dc93c1c-9e0c-48d8-8466-b1930d1fdc99](https://user-images.githubusercontent.com/12784118/159096899-ab97a095-d99c-4b7d-a261-29b675076c5f.png)
 
 - **Method A**
 
