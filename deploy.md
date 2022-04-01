@@ -99,14 +99,14 @@ gigalixir account
 ## 0x04 Prepare Your App
 
 ```
-https://github.com/WeLightProject/function_server_based_on_arweave
+git clone https://github.com/WeLightProject/function_server_based_on_arweave
 ```
 
 ## 0x05 Set Up App for Deploys
 
 ```
 cd function_server_based_on_arweave
-APP_NAME=$(gigalixir create -n faasex)
+APP_NAME=$(gigalixir create -n faasex) #Attention: the name should be unique in gigalixir.
 ```
 
 Verify that the app was created, by running
