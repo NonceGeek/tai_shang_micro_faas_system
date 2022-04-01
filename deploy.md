@@ -209,19 +209,6 @@ Finally, build and deploy.
 git push gigalixir
 ```
 
-Wait a minute or two for the app to pass health checks. You can check the status by running
-
-```
-gigalixir ps
-```
-
-Once it’s healthy, verify it works
-```
-curl https://$APP_NAME.gigalixirapp.com/
-# or you could also run
-# gigalixir open
-```
-
 ## 0x09 Run Migrations
 
 ```
@@ -238,6 +225,58 @@ gigalixir run -- mix run priv/repo/seeds.exs
 
 ## 0x10 Enjoy it!
 
+Wait a minute or two for the app to pass health checks. You can check the status by running
+
+```
+gigalixir ps
+```
+
+Verify it works
+```
+curl https://$APP_NAME.gigalixirapp.com/
+# or you could also run
+# gigalixir open
+```
+
 Now you can run `gigalixir open` to open your own website.
 
 ![](https://raw.githubusercontent.com/zhenfeng-zhu/pic-go/main/202203241434010.png)
+
+If you get error, please try to clean your build cache and then try agin.
+
+```
+git -c http.extraheader="GIGALIXIR-CLEAN: true" push gigalixir
+```
+
+## Furthermore
+
+### Set up your custom domain
+
+After first deploy, you can see app by visiting https://$APP_NAME.gigalixirapp.com/ .
+
+but if you want, you can point your own domain such as www.example.com to your app. To do this, run the following command and follow the instructions.
+
+```
+gigalixir domains:add www.example.com
+```
+
+This will do a few things. It registers your fully qualified domain name in the load balancer so that it knows to direct traffic to your containers. It also sets up SSL/TLS encryption for you and provisions a certificate. 
+
+You can also add domain by visiting `https://console.gigalixir.com/#/apps/` with UI style.
+
+![](https://raw.githubusercontent.com/zhenfeng-zhu/pic-go/main/202204011038713.png)
+
+### Set up your environment variables
+
+All app configuration is done through environment variables. You can get, set, and delete configs using the following commands. Note that setting configs automatically restarts your app.
+
+FaaS admins can use all valid code snippet stored on AR network via `Tx ID` (Code Market will be launched in the future)! Through the `Add new Function by Tx id` page, admins can dynamically pull the code from the Arweave network. Uploading the code is achieved through `dApp/Plugin` which is decoupled from FaaS. We use `System.get_env("ADMIN_PASSWD")` to get ADMIN_PASSWD environment variable.
+
+So that, we can set or unset `ADMIN_PASSWD` like this:
+
+```
+gigalixir config
+gigalixir config:set ADMIN_PASSWD=bar
+gigalixir config:unset ADMIN_PASSWD
+```
+
