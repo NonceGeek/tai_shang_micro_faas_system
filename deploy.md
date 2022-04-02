@@ -266,6 +266,24 @@ You can also add domain by visiting `https://console.gigalixir.com/#/apps/` with
 
 ![](https://raw.githubusercontent.com/zhenfeng-zhu/pic-go/main/202204011038713.png)
 
+You may need to change your check_origin setting in order for websockets to pass the origin check. 
+
+Verify your `runtime.exs`:
+
+```elixir
+  config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+    http: [
+      # Enable IPv6 and bind on all interfaces.
+      # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
+      # See the documentation on https://hexdocs.pm/plug_cowboy/Plug.Cowboy.html
+      # for details about using IPv6 vs IPv4 and loopback vs public addresses.
+      ip: {0, 0, 0, 0, 0, 0, 0, 0},
+      port: String.to_integer(System.get_env("PORT") || "4000")
+    ],
+    secret_key_base: secret_key_base,
+    check_origin: false
+```
+
 ### Set up your environment variables
 
 All app configuration is done through environment variables. You can get, set, and delete configs using the following commands. Note that setting configs automatically restarts your app.
