@@ -3,22 +3,35 @@ Gigalixir is a fully-featured, production-stable platform-as-a-service built jus
 
 Try Gigalixir for free without a credit card by following the [Getting Started Guide](https://gigalixir.readthedocs.io/en/latest/getting-started-guide.html).
 
-# What is FunctionServerBasedOnArweave?
+Gigalixir 是专为 Elixir 构建的功能齐全、生产稳定的「平台即服务」，它可以在低成本的情况下部署使用 Elixir & Phoniex 服务，而无需构建生产基础设施或处理维护和操作。有关更多信息，请参阅 https://gigalixir.com。
+
+# What is TaiShang Micro FaaS System?
 
 Based on Arweave's FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Arweave Network and loaded into Runtime to provide functional service support for other applications. Plugin is used for uploading code snippets.
 
-![去中心化FaaS系统的实现-en-zzf (3)](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c241bwi9j21cc0jsq59.jpg)
+基于 Arweave 的 Micro FaaS 系统，任何人都可以快捷方便地启动，可以从 Arweave 网络中提取 Elixir/Rust 等语言编写（取决于 FaaS 的语言版本）的代码片段并加载到 Runtime 中，为其他应用程序提供功能服务支持。
 
-# How to deploy FunctionServerBasedOnArweave to Gigalixir?
+此外还提供用于上传代码片段的 dApp 插件。
+
+FaaS Repo：
+
+> https://github.com/WeLightProject/tai_shang_micro_faas_system
+
+![image-20220414170710681](/Users/liaohua/Documents/e6c9d24egy1h19d2l6u24j21bd0u0adt.png)
+
+![去中心化FaaS系统的实现-en-zzf (3)](/Users/liaohua/Documents/e6c9d24egy1h0c241bwi9j21cc0jsq59.png)
+
+# How to deploy TaiShang Micro FaaS System to Gigalixir?
 
 ## 0x00 Prerequisites
 
-- For macOS
+- **For macOS**
 
 brew. For help, take a look at the [homebrew documentation](https://docs.brew.sh/Installation).
+
 git. For help, take a look at the [git documentation](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 
-- For Linux
+- **For Linux**
 
 python3. python2 also works, but it is EOL as of January 1st, 2020.
 pip3. For help, take a look at the pip documentation.
@@ -99,13 +112,13 @@ gigalixir account
 ## 0x04 Prepare Your App
 
 ```
-git clone https://github.com/WeLightProject/function_server_based_on_arweave
+git clone https://github.com/WeLightProject/tai_shang_micro_faas_system.git
 ```
 
 ## 0x05 Set Up App for Deploys
 
 ```
-cd function_server_based_on_arweave
+cd tai_shang_micro_faas_system
 APP_NAME=$(gigalixir create -n faasex) #Attention: the name should be unique in gigalixir.
 ```
 
@@ -240,7 +253,7 @@ curl https://$APP_NAME.gigalixirapp.com/
 
 Now you can run `gigalixir open` to open your own website.
 
-![](https://raw.githubusercontent.com/zhenfeng-zhu/pic-go/main/202203241434010.png)
+![image-20220414170710681](/Users/liaohua/Documents/e6c9d24egy1h19d2l6u24j21bd0u0adt.png)
 
 If you get error, please try to clean your build cache and then try agin.
 
@@ -264,7 +277,7 @@ This will do a few things. It registers your fully qualified domain name in the 
 
 You can also add domain by visiting `https://console.gigalixir.com/#/apps/` with UI style.
 
-![](https://raw.githubusercontent.com/zhenfeng-zhu/pic-go/main/202204011038713.png)
+![202204011038713](/Users/liaohua/Documents/202204011038713.png)
 
 You may need to change your check_origin setting in order for websockets to pass the origin check. 
 
