@@ -21,6 +21,7 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
   }, socket) do
     with true <- input_passwd == @passwd,
     {:ok, ele} <- OnChainCode.create_or_query_by_tx_id(tx_id) do
+      IO.puts @passwd
       {
         :noreply,
         socket
