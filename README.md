@@ -1,4 +1,4 @@
-# FunctionServerBasedOnArweave
+# Tai Shang Micro FaaS System
 
 > Online Server: https://faas.noncegeek.com
 > 
@@ -73,11 +73,11 @@ From the perspective of the service purchaser, the use of FaaS saves the rental 
 
 - **The closed form of the function makes it difficult to use across users**
 
-Traditional FaaS can only be used by the demander who upload the functions for their own purpose. The code of the function cannot be guaranteed to be tamper-proof and transparent, and there is no way to record the executing process of the function. Therefore, without the assistance of blockchain technology, it is impossible to have an open function market where users can purchase and use functions based on their needs, or to carry out combining functions across users.  In conclusion, the opaque and closed nature of the function limits the potential of FaaS.
+  Traditional FaaS can only be used by the demander who upload the functions for their own purpose. The code of the function cannot be guaranteed to be tamper-proof and transparent, and there is no way to record the executing process of the function. Therefore, without the assistance of blockchain technology, it is impossible to have an open function market where users can purchase and use functions based on their needs, or to carry out combining functions across users.  In conclusion, the opaque and closed nature of the function limits the potential of FaaS.
 
 - **Stateless functions**
 
-In addition, the functions provided by the traditional FaaS is stateless.
+  In addition, the functions provided by the traditional FaaS is stateless.
 
 ### 2.3 FaaS Based on Blockchain
 
@@ -85,11 +85,11 @@ Combining with blockchain, we can construct a new type of FaaS system
 
 - **transparent, open, and immutable on-chain functions**
 
-All code snippets, functions, and modules are stored in the Arweave blockchain, and dynamically loaded into memory while the FaaS service is running. The functions are transparent, open, and immutable. Therefore, it is possible to share the uploaded functions among users through an open function market, thus making F (in FaaS) a Lego building block.
+  All code snippets, functions, and modules are stored in the Arweave blockchain, and dynamically loaded into memory while the FaaS service is running. The functions are transparent, open, and immutable. Therefore, it is possible to share the uploaded functions among users through an open function market, thus making F (in FaaS) a Lego building block.
 
 - **allow state storage**
 
-Through the functions, users can store the state on each blockchain network, and read the state from it. The authentication is realized through the signature that follows the Ethereum standard, which breaks through the `stateless` limitation of the traditional FaaS system.
+  Through the functions, users can store the state on each blockchain network, and read the state from it. The authentication is realized through the signature that follows the Ethereum standard, which breaks through the `stateless` limitation of the traditional FaaS system.
 
 ## 0x03 How to Use
 
@@ -115,15 +115,15 @@ FaaS admins can use all valid code snippet stored on AR network via `Tx ID` (Cod
 
 - **Method A**
 
-Upload the code through dApp based on AR Network and pay for the storage via AR Token. 
+  Upload the code through dApp based on AR Network and pay for the storage via AR Token. 
 
-![img](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c0nrk6ghj21js0u0tc9.jpg)
+  ![img](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c0nrk6ghj21js0u0tc9.jpg)
 
 - **Method B**
 
-Upload the code via a Bundlr-based plugin and pay for the storage via Matic Token on Polygon.
+  Upload the code via a Bundlr-based plugin and pay for the storage via Matic Token on Polygon.
 
-![img](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c0nybmynj211409xmy9.jpg)
+  ![img](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c0nybmynj211409xmy9.jpg)
 
 #### 3.3.2 Load the code snippet from the AR network
 
@@ -180,10 +180,6 @@ defmodule CodesOnChain.AsciiDrawer do
 
 end
 ```
-
-![img](https://r8jmm3f9xe.feishu.cn/space/api/box/stream/download/asynccode/?code=NWNiOTczNWExY2VhNDQ3ZTA4ZTE1ZTUwYTI1YTBkZWJfODNuMUtGVzhpcDFiUHgyTjF5M1pNZWFKOW9wenNOWXNfVG9rZW46Ym94Y243d3BBMXQwMFE5U3NKa21HT1dKM1NnXzE2NDc0MzUyMDg6MTY0NzQzODgwOF9WNA)
-
-
 
 ### 4.3 Data-Storage Snippet
 
