@@ -18,7 +18,14 @@ defmodule FunctionServerBasedOnArweave.Application do
       FunctionServerBasedOnArweaveWeb.Endpoint,
       # Start a worker by calling: FunctionServerBasedOnArweave.Worker.start_link(arg)
       # {FunctionServerBasedOnArweave.Worker, arg}
-      {CodesOnChain.Syncer, [contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"]}
+      {
+        CodesOnChain.Syncer, [
+          chain_name: "moonbeam",
+          api_explorer: "https://api-moonbeam.moonscan.io/",
+          api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
+          contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
+        ]
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

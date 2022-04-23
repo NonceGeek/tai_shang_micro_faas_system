@@ -4,7 +4,13 @@ defmodule FunctionServerBasedOnArweaveWeb.TestController do
   def get(conn, %{
       "key" => key
     }) do
-    value = GenServer.call(CodesOnChain.Syncer, {:get, key})
+    value = CodesOnChain.Syncer.get_from_db(key)
+
+    json(conn, value)
+  end
+
+  def all(conn, _) do
+    value = CodesOnChain.Syncer.all_from_db()
 
     json(conn, value)
   end

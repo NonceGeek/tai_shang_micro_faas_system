@@ -29,6 +29,7 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
     post "/run", FunctionRunnerController, :run
 
     get "/db", TestController, :get
+    get "/db/all", TestController, :all
   end
 
   # Other scopes may use custom stacks.

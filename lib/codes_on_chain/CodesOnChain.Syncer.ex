@@ -5,37 +5,42 @@ defmodule CodesOnChain.Syncer do
   use GenServer
   require Logger
 
-  alias Ethereumex.HttpClient
   alias FunctionServerBasedOnArweave.CodeRunnerSpec
 
   # 1 minutes
-  @sync_interval 30_000
+  @sync_interval 60_000
+  @retries 5
   @default_user_agent "faas syncer"
-  @chain %{
-    name: "moonbeam",
-    addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f",
-    api_explorer: "https://api-moonbeam.moonscan.io/",
-    endpoint: "https://rpc.api.moonbeam.network/",
-    api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8"
-  }
 
   # +-----------+
   # | GenServer |
   # +-----------+
-  def start_link([contract_addr: contract_addr] = args) do
-    GenServer.start_link(__MODULE__, args, name: :"syncer_#{contract_addr}")
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
-  @doc """
-    init -> hand_info(init) -> sync_routine
-  """
-  def init([contract_addr: contract_addr] = args) do
+  def init(
+        [
+          chain_name: chain_name,
+          api_explorer: api_explorer,
+          api_key: api_key,
+          contract_addr: contract_addr
+        ] = _args
+      ) do
     Process.flag(:trap_exit, true)
 
     case init_db() do
       {:ok, db_ref} ->
         sync_after_interval()
-        {:ok, %{db_ref: db_ref, contract_addr: contract_addr}}
+
+        {:ok,
+         %{
+           db_ref: db_ref,
+           chain_name: chain_name,
+           api_explorer: api_explorer,
+           api_key: api_key,
+           contract_addr: contract_addr
+         }}
 
       {:error, reason} ->
         Logger.error(reason)
@@ -43,31 +48,46 @@ defmodule CodesOnChain.Syncer do
     end
   end
 
-  defp init_db() do
+  def init_db() do
     db_path = :code.priv_dir(:function_server_based_on_arweave)
     opts = [create_if_missing: true]
 
     :rocksdb.open(String.to_charlist("#{db_path}/db/"), opts)
   end
 
+  def get_from_db(key) do
+    GenServer.call(__MODULE__, {:get, key})
+  end
+
+  def all_from_db() do
+    GenServer.call(__MODULE__, :all)
+  end
+
   def terminate(reason, %{db_ref: db_ref}) do
+    Logger.error("${__MODULE__} terminates due to #{reason}")
     case :rocksdb.close(db_ref) do
       {:error, err} ->
-        IO.inspect(err)
+        IO.puts("Closing rocksdb error: #{inspect(err)}")
+        :ok
+
       _ ->
         :ok
     end
-
-    :ok
   end
 
   def handle_info(:sync, state) do
-    %{db_ref: db_ref, contract_addr: contract_addr} = state
+    %{
+      db_ref: db_ref,
+      chain_name: chain_name,
+      api_explorer: api_explorer,
+      api_key: api_key,
+      contract_addr: contract_addr
+    } = state
 
     contract =
       db_get(db_ref, get_contract_id(state), %{contract_addr: contract_addr, last_block: 1})
 
-    sync(db_ref, contract)
+    sync(db_ref, chain_name, api_explorer, api_key, contract)
 
     sync_after_interval()
     {:noreply, state}
@@ -80,6 +100,10 @@ defmodule CodesOnChain.Syncer do
     {:reply, val, state}
   end
 
+  def handle_call(:all, _from, %{db_ref: db_ref} = state) do
+    {:reply, db_all(db_ref), state}
+  end
+
   defp get_contract_id(contract) do
     "contract_#{contract.contract_addr}"
   end
@@ -88,24 +112,23 @@ defmodule CodesOnChain.Syncer do
     Process.send_after(self(), :sync, @sync_interval)
   end
 
-  defp sync(db_ref, %{last_block: last_block} = contract) do
-    IO.puts("------------- get end point -----------")
-    endpoint = get_endpoint(@chain.name)
-    IO.puts("------------- get blockheight -----------")
-    best_block = get_blockheight(@chain.name, endpoint)
+  defp sync(db_ref, chain_name, api_explorer, api_key, contract) do
+    endpoint = get_endpoint(chain_name)
+    best_block = get_blockheight(endpoint)
     contract_id = get_contract_id(contract)
 
-    IO.puts("------------- sync -----------")
-    do_sync(db_ref, contract, best_block)
+    do_sync(db_ref, api_explorer, api_key, contract, best_block)
 
     updated_contract = Map.put(contract, :last_block, best_block + 1)
 
     db_put(db_ref, contract_id, updated_contract)
   end
 
-  defp do_sync(db_ref, contract, best_block) do
+  defp do_sync(db_ref, api_explorer, api_key, contract, best_block) do
     {:ok, %{"result" => txs}} =
       get_txs_by_contract_addr(
+        api_explorer,
+        api_key,
         contract.contract_addr,
         contract.last_block,
         best_block
@@ -115,29 +138,30 @@ defmodule CodesOnChain.Syncer do
   end
 
   defp get_txs_by_contract_addr(
+         api_explorer,
+         api_key,
          contract_addr,
          start_block,
          end_block,
          asc_or_desc \\ :asc
        ) do
     url =
-      "#{@chain.api_explorer}api?module=account&action=txlist&address="
+      "#{api_explorer}api?module=account&action=txlist&address="
       |> Kernel.<>("#{contract_addr}&startblock=")
       |> Kernel.<>("#{start_block}&endblock=#{end_block}&sort=")
       |> Kernel.<>("#{asc_or_desc}&apikey=")
-      |> Kernel.<>("#{@chain.api_key}")
+      |> Kernel.<>("#{api_key}")
 
     Logger.info("call url: #{url}")
     http_get(url)
   end
 
-  defp handle_txs(db_ref, contract, txs) do
-    contract_id = get_contract_id(contract)
+  defp handle_txs(db_ref, _contract, txs) do
+    # contract_id = get_contract_id(contract)
 
     Enum.each(txs, fn tx ->
-      Logger.info("Handling tx: #{inspect(tx)}")
       tx_atom_map = ExStructTranslator.to_atom_struct(tx)
-      # db_put(db_ref, contract_id, tx)
+      db_put(db_ref, tx_atom_map.hash, tx_atom_map)
     end)
   end
 
@@ -147,20 +171,24 @@ defmodule CodesOnChain.Syncer do
     |> Map.get(chain_name)
   end
 
-  defp get_blockheight(chain_name, endpoint) do
-    # CodeRunnerSpec.run_ex_on_chain(
-    #   "-6TxJsLSeoXfEhKfGzG5-n65QpAbuiwp4fO_7-2A-vA",
-    #   "get_best_block_height",
-    #   [chain_name, endpoint]
-    # )
-    # CodesOnChain.BestBlockHeightGetter.get_best_block_height(chain_name, endpoint)
-    case HttpClient.eth_block_number(url: endpoint) do
-      {:ok, hex} ->
-        hex_to_int(hex)
-      {:error, err} ->
-        IO.inspect(err)
-        1
-    end
+  defp get_blockheight(endpoint) do
+    # case HttpClient.eth_block_number(url: endpoint) do
+    #   {:ok, hex} ->
+    #     hex_to_int(hex)
+    #   {:error, err} ->
+    #     IO.inspect(err)
+    #     1
+    # end
+    {:ok, res} =
+      http_post(endpoint, %{
+        "jsonrpc" => "2.0",
+        "method" => "eth_blockNumber",
+        "params" => [],
+        "id" => 83
+      })
+
+    Map.get(res, "result")
+    |> hex_to_int()
   end
 
   defp db_get(db_ref, k, default_value \\ nil) do
@@ -170,6 +198,7 @@ defmodule CodesOnChain.Syncer do
 
       {:ok, val} ->
         IO.puts("Got value for #{k} from DB")
+
         Jason.decode!(val)
         |> ExStructTranslator.to_atom_struct()
     end
@@ -181,12 +210,39 @@ defmodule CodesOnChain.Syncer do
     :rocksdb.put(db_ref, k, Jason.encode!(v), [])
   end
 
+  defp db_all(db_ref) do
+    case :rocksdb.iterator(db_ref, []) do
+      {:ok, itr_handle} ->
+        data = db_loop_through_iterator(itr_handle, %{}, :first)
+        :rocksdb.iterator_close(itr_handle)
+        data
+
+      {:error, err} ->
+        IO.puts("Creating iterator error: #{inspect(err)}")
+        []
+    end
+  end
+
+  defp db_loop_through_iterator(itr_handle, result, action \\ :next) do
+    case :rocksdb.iterator_move(itr_handle, action) do
+      {:ok, key, value} ->
+        db_loop_through_iterator(itr_handle, Map.put(result, key, Jason.decode!(value)))
+
+      {:ok, key} ->
+        db_loop_through_iterator(itr_handle, Map.put(result, key, nil))
+
+      {:error, err} ->
+        IO.puts("Looping iterator error: #{inspect(err)}")
+        result
+    end
+  end
+
   defp http_get(url) do
-    http_get(url, 5)
+    http_get(url, @retries)
   end
 
   defp http_get(_url, retries) when retries == 0 do
-    {:error, "retires #{@retries} times and not success"}
+    {:error, "GET retires #{@retries} times and not success"}
   end
 
   defp http_get(url, retries) do
@@ -202,6 +258,34 @@ defmodule CodesOnChain.Syncer do
       {:error, _} ->
         Process.sleep(500)
         http_get(url, retries - 1)
+    end
+  end
+
+  defp http_post(url, data) do
+    http_post(url, data, @retries)
+  end
+
+  defp http_post(_url, _data, retries) when retries == 0 do
+    {:error, "POST retires #{@retries} times and not success"}
+  end
+
+  defp http_post(url, data, retries) do
+    body = Jason.encode!(data)
+
+    url
+    |> HTTPoison.post(
+      body,
+      [{"User-Agent", @default_user_agent}, {"Content-Type", "application/json"}],
+      hackney: [headers: [{"User-Agent", @default_user_agent}]]
+    )
+    |> handle_response()
+    |> case do
+      {:ok, body} ->
+        {:ok, body}
+
+      {:error, _} ->
+        Process.sleep(500)
+        http_post(url, data, retries - 1)
     end
   end
 
