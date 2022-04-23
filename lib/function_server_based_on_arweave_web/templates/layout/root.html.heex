@@ -20,7 +20,14 @@
       <section class="container">
         <nav>
           <ul>
-            <li><a href="https://github.com/WeLightProject/function_server_based_on_arweave">Github Repo</a></li>
+            <li><a href="https://github.com/WeLightProject/tai_shang_micro_faas_system">Github Repo</a></li>
+            <li>
+              <%= if Pow.Plug.current_user(@conn) do %>
+                <span><%= link "Sign out", to: Routes.pow_session_path(@conn, :delete), method: :delete %></span>
+              <% else %>
+                <span><%= link "Sign in", to: Routes.pow_session_path(@conn, :new) %></span>
+              <% end %>
+            </li>
             <li>v0.1.0</li>
           </ul>
         </nav>
@@ -35,9 +42,11 @@
             <li class="nav-item">
               <a class="nav-link active" href="/">Code Loader</a>
             </li>
+              <%= if Pow.Plug.current_user(@conn) do %>
             <li class="nav-item">
               <a class="nav-link active" href="/add_func">Add new Funtion by Tx id</a>
             </li>
+            <% end %>
             <!--<li class="nav-item">
               <a class="nav-link active" href="/live/to_chain">资源上链</a>
                <a class="nav-link active" href="https://welightproject.github.io/Tai-Shang-Voxel-Handler/">Resources to Chain</a>

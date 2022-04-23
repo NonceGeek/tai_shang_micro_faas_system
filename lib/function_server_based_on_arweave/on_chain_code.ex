@@ -74,7 +74,10 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # module_name = get_module_name_from_code(code)
     # module_name.module_info
   end
-
+  def remove_code_by_name(name) do
+    get_by_name(name) |>
+    Repo.delete
+  end
   def get_functions(name) do
     %{exports: raw_functions} =
       get_module_info(name)

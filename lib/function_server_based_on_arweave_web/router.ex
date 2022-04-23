@@ -1,5 +1,6 @@
 defmodule FunctionServerBasedOnArweaveWeb.Router do
   use FunctionServerBasedOnArweaveWeb, :router
+  use Pow.Phoenix.Router
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -14,11 +15,29 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", FunctionServerBasedOnArweaveWeb do
+  pipeline :protected do
+    plug Pow.Plug.RequireAuthenticated,
+      error_handler: Pow.Phoenix.PlugErrorHandler
+  end
+
+  pipeline :admin do
+    plug FunctionServerBasedOnArweaveWeb.EnsureRolePlug, :admin
+  end
+
+  scope "/" do
     pipe_through :browser
 
+    pow_routes()
+  end
+  scope "/", FunctionServerBasedOnArweaveWeb do
+    pipe_through :browser
     live "/", CodeLoaderLive.Index, :index
+  end
+
+  scope "/", FunctionServerBasedOnArweaveWeb do
+    pipe_through [:browser,:protected]
     live "/add_func", FuncAdderLive.Index, :index
+    live "/remove_code", CodeRemoveLive.Index, :index
   end
 
   scope "/api/v1", FunctionServerBasedOnArweaveWeb do

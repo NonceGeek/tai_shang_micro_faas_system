@@ -74,7 +74,13 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_func, Enum.fetch!(func_names, 0))
     }
   end
-
+ def handle_event("remove_code", _params, %{assigns: assigns} = socket) do
+     OnChainCode.remove_code_by_name(assigns.selected_code)
+    {
+      :noreply,
+      socket
+    }
+ end
   @impl true
   def handle_event("run", params, socket) do
     params_atom = ExStructTranslator.to_atom_struct(params)
