@@ -6,11 +6,12 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   require Logger
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, session, socket) do
     # codes = [
     #   [key: "Code 1", value: "code1"],
     #   [key: "Code 2", value: "code2"]
     # ]
+    auth = has_auth(Map.get(session, "function_server_based_on_arweave_auth"))
 
     code_names =
       OnChainCode.get_all()
@@ -27,10 +28,16 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_code, selected_code_name)
       |> assign(:code_text, code_text)
       |> assign(:explorer_link, build_explorer_link(tx_id))
+      |> assign(:auth, auth)
 
     {:ok, socket}
   end
-
+ defp has_auth(nil) do
+      false
+ end
+ defp has_auth(_) do
+      true
+ end
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}

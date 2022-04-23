@@ -21,7 +21,9 @@ defmodule FunctionServerBasedOnArweave.Users.User do
    |> Ecto.Changeset.cast(attrs, [:role])
    |> Ecto.Changeset.validate_inclusion(:role, ~w(user admin))
  end
-
+##
+## FunctionServerBasedOnArweave.Users.User.create_admin(%{email: "root@gmail.com", password: "12345678", password_confirmation: "12345678"})
+##
  @spec create_admin(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
  def create_admin(params) do
    %User{}

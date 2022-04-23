@@ -23,7 +23,10 @@
 </div>
 
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
+
+<%= if assigns[:auth] do %>
 <button phx-click="remove_code" phx-value-name={@selected_code} class="btn-primary" type="button">Remove Code</button>
+<% end %>
 <br><br>
 <%= if !is_nil(assigns[:func_names]) do %>
 <div>
