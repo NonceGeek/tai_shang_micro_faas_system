@@ -17,17 +17,33 @@ defmodule CodesOnChain.Syncer do
   # +-----------+
   # Startup this Syncer using similar parameters.  Currently only support Moonbeam
   # [
-      # chain_name: "moonbeam",
-      # api_explorer: "https://api-moonbeam.moonscan.io/",
-      # api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
-      # contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
+  # syncer_name: "moonbeam_xxx_nft",
+  # chain_name: "moonbeam",
+  # api_explorer: "https://api-moonbeam.moonscan.io/",
+  # api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
+  # contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
   # ]
   def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+    chain_name = Keyword.fetch!(args, :chain_name)
+    contract_addr = Keyword.fetch!(args, :contract_addr)
+
+    args = Keyword.put_new(args, :syncer_name, String.to_atom("#{chain_name}_#{contract_addr}"))
+
+    syncer_name =
+      Keyword.fetch!(args, :syncer_name)
+      |> ensure_atom()
+
+    GenServer.start_link(__MODULE__, Keyword.put(args, :syncer_name, syncer_name),
+      name: syncer_name
+    )
   end
+
+  defp ensure_atom(val) when is_atom(val), do: val
+  defp ensure_atom(val), do: to_string(val) |> String.to_atom()
 
   def init(
         [
+          syncer_name: syncer_name,
           chain_name: chain_name,
           api_explorer: api_explorer,
           api_key: api_key,
@@ -36,12 +52,13 @@ defmodule CodesOnChain.Syncer do
       ) do
     Process.flag(:trap_exit, true)
 
-    case init_db() do
+    case init_db(syncer_name) do
       {:ok, db_ref} ->
         sync_after_interval()
 
         {:ok,
          %{
+           syncer_name: syncer_name,
            db_ref: db_ref,
            chain_name: chain_name,
            api_explorer: api_explorer,
@@ -55,23 +72,24 @@ defmodule CodesOnChain.Syncer do
     end
   end
 
-  def init_db() do
+  def init_db(syncer_name) do
     db_path = :code.priv_dir(:function_server_based_on_arweave)
     opts = [create_if_missing: true]
 
-    :rocksdb.open(String.to_charlist("#{db_path}/db/"), opts)
+    :rocksdb.open(String.to_charlist("#{db_path}/db/#{syncer_name}/"), opts)
   end
 
-  def get_from_db(key) do
-    GenServer.call(__MODULE__, {:get, key})
+  def get_from_db(syncer_name, key) do
+    GenServer.call(ensure_atom(syncer_name), {:get, key})
   end
 
-  def all_from_db() do
-    GenServer.call(__MODULE__, :all)
+  def all_from_db(syncer_name) do
+    GenServer.call(ensure_atom(syncer_name), :all)
   end
 
-  def terminate(reason, %{db_ref: db_ref}) do
-    Logger.error("${__MODULE__} terminates due to #{reason}")
+  def terminate(reason, %{db_ref: db_ref, syncer_name: syncer_name}) do
+    Logger.error("#{syncer_name} terminates due to #{reason}")
+
     case :rocksdb.close(db_ref) do
       {:error, err} ->
         IO.puts("Closing rocksdb error: #{inspect(err)}")
@@ -168,6 +186,7 @@ defmodule CodesOnChain.Syncer do
 
     Enum.each(txs, fn tx ->
       tx_map = ExStructTranslator.to_atom_struct(tx)
+
       if tx_map.txreceipt_status == "1" do
         db_put(db_ref, tx_map.hash, tx_map)
       end
