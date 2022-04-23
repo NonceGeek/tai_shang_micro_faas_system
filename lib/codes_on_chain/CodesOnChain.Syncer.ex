@@ -9,7 +9,7 @@ defmodule CodesOnChain.Syncer do
   alias FunctionServerBasedOnArweave.CodeRunnerSpec
 
   # 1 minutes
-  @sync_interval 10_000
+  @sync_interval 30_000
   @default_user_agent "faas syncer"
   @chain %{
     name: "moonbeam",
@@ -89,10 +89,13 @@ defmodule CodesOnChain.Syncer do
   end
 
   defp sync(db_ref, %{last_block: last_block} = contract) do
+    IO.puts("------------- get end point -----------")
     endpoint = get_endpoint(@chain.name)
+    IO.puts("------------- get blockheight -----------")
     best_block = get_blockheight(@chain.name, endpoint)
     contract_id = get_contract_id(contract)
 
+    IO.puts("------------- sync -----------")
     do_sync(db_ref, contract, best_block)
 
     updated_contract = Map.put(contract, :last_block, best_block + 1)
@@ -156,7 +159,7 @@ defmodule CodesOnChain.Syncer do
         hex_to_int(hex)
       {:error, err} ->
         IO.inspect(err)
-        0
+        1
     end
   end
 
