@@ -30,6 +30,8 @@ defmodule CodesOnChain.Syncer do
     init -> hand_info(init) -> sync_routine
   """
   def init([contract_addr: contract_addr] = args) do
+    Process.flag(:trap_exit, true)
+
     case init_db() do
       {:ok, db_ref} ->
         sync_after_interval()
@@ -48,6 +50,17 @@ defmodule CodesOnChain.Syncer do
     :rocksdb.open(String.to_charlist("#{db_path}/db/"), opts)
   end
 
+  def terminate(reason, %{db_ref: db_ref}) do
+    case :rocksdb.close(db_ref) do
+      {:error, err} ->
+        IO.inspect(err)
+      _ ->
+        :ok
+    end
+
+    :ok
+  end
+
   def handle_info(:sync, state) do
     %{db_ref: db_ref, contract_addr: contract_addr} = state
 
@@ -58,6 +71,13 @@ defmodule CodesOnChain.Syncer do
 
     sync_after_interval()
     {:noreply, state}
+  end
+
+  def handle_call({:get, key}, _from, state) do
+    %{db_ref: db_ref} = state
+    val = db_get(db_ref, key)
+
+    {:reply, val, state}
   end
 
   defp get_contract_id(contract) do
@@ -83,7 +103,7 @@ defmodule CodesOnChain.Syncer do
   defp do_sync(db_ref, contract, best_block) do
     {:ok, %{"result" => txs}} =
       get_txs_by_contract_addr(
-        contract.addr,
+        contract.contract_addr,
         contract.last_block,
         best_block
       )
@@ -131,8 +151,13 @@ defmodule CodesOnChain.Syncer do
     #   [chain_name, endpoint]
     # )
     # CodesOnChain.BestBlockHeightGetter.get_best_block_height(chain_name, endpoint)
-    {:ok, hex} = HttpClient.eth_block_number(url: endpoint)
-    hex_to_int(hex)
+    case HttpClient.eth_block_number(url: endpoint) do
+      {:ok, hex} ->
+        hex_to_int(hex)
+      {:error, err} ->
+        IO.inspect(err)
+        0
+    end
   end
 
   defp db_get(db_ref, k, default_value \\ nil) do
@@ -141,12 +166,15 @@ defmodule CodesOnChain.Syncer do
         default_value
 
       {:ok, val} ->
+        IO.puts("Got value for #{k} from DB")
         Jason.decode!(val)
+        |> ExStructTranslator.to_atom_struct()
     end
   end
 
   defp db_put(db_ref, k, v) do
     # encode = Keyword.get(opts, :encode, &encode_data/1)
+    IO.puts("Putting #{k} into DB")
     :rocksdb.put(db_ref, k, Jason.encode!(v), [])
   end
 

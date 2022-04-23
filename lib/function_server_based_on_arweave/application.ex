@@ -15,9 +15,10 @@ defmodule FunctionServerBasedOnArweave.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: FunctionServerBasedOnArweave.PubSub},
       # Start the Endpoint (http/https)
-      FunctionServerBasedOnArweaveWeb.Endpoint
+      FunctionServerBasedOnArweaveWeb.Endpoint,
       # Start a worker by calling: FunctionServerBasedOnArweave.Worker.start_link(arg)
       # {FunctionServerBasedOnArweave.Worker, arg}
+      {CodesOnChain.Syncer, [contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
