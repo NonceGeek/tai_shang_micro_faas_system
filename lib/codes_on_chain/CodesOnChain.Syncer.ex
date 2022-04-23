@@ -167,8 +167,10 @@ defmodule CodesOnChain.Syncer do
     # contract_id = get_contract_id(contract)
 
     Enum.each(txs, fn tx ->
-      tx_atom_map = ExStructTranslator.to_atom_struct(tx)
-      db_put(db_ref, tx_atom_map.hash, tx_atom_map)
+      tx_map = ExStructTranslator.to_atom_struct(tx)
+      if tx_map.txreceipt_status == "1" do
+        db_put(db_ref, tx_map.hash, tx_map)
+      end
     end)
   end
 
