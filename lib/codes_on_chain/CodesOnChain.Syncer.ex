@@ -15,6 +15,13 @@ defmodule CodesOnChain.Syncer do
   # +-----------+
   # | GenServer |
   # +-----------+
+  # Startup this Syncer using similar parameters.  Currently only support Moonbeam
+  # [
+      # chain_name: "moonbeam",
+      # api_explorer: "https://api-moonbeam.moonscan.io/",
+      # api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
+      # contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
+  # ]
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
