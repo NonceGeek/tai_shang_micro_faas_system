@@ -19,6 +19,11 @@ config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoi
   pubsub_server: FunctionServerBasedOnArweave.PubSub,
   live_view: [signing_salt: "mbnVB7Pw"]
 
+# Authentication
+config :function_server_based_on_arweave, :pow,
+  user: FunctionServerBasedOnArweave.Users.User,
+  repo: FunctionServerBasedOnArweave.Repo,
+  web_module: FunctionServerBasedOnArweaveWeb
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
