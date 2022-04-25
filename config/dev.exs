@@ -3,7 +3,8 @@ import Config
 # Configure your database
 config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Repo,
   username: "postgres",
-  password: "postgres",
+  # password: "postgres",
+  password: "123456",
   database: "function_server_based_on_arweave_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,

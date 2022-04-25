@@ -66,8 +66,14 @@ defmodule FunctionServerBasedOnArweave.MixProject do
 
       # handle_uri
       {:ex_url, "~> 1.4"},
+
       {:httpoison, "~> 1.5"},
       {:rocksdb, git: "https://gitlab.com/barrel-db/erlang-rocksdb.git"},
+
+      # authentication
+      {:pow, "~> 1.0.26"},
+      # trace
+      {:recon, "~> 2.5"}
     ]
   end
 
