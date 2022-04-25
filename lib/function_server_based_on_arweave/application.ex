@@ -15,7 +15,7 @@ defmodule FunctionServerBasedOnArweave.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: FunctionServerBasedOnArweave.PubSub},
       # Start the Endpoint (http/https)
-      FunctionServerBasedOnArweaveWeb.Endpoint
+      FunctionServerBasedOnArweaveWeb.Endpoint,
       # Start a worker by calling: FunctionServerBasedOnArweave.Worker.start_link(arg)
       # {FunctionServerBasedOnArweave.Worker, arg}
     ]

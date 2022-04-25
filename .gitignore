@@ -34,3 +34,5 @@ npm-debug.log
 .envrc
 *.secret
 *.DS_Store
+
+/priv/db
