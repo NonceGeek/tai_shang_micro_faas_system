@@ -6,11 +6,10 @@ defmodule CodesOnChain.Syncer do
   require Logger
 
   alias FunctionServerBasedOnArweave.CodeRunnerSpec
+  alias Components.ExHttp
 
   # 1 minutes
-  @sync_interval 60_000
-  @retries 5
-  @default_user_agent "faas syncer"
+  @sync_interval 10_000
 
   # +-----------+
   # | GenServer |
@@ -38,9 +37,6 @@ defmodule CodesOnChain.Syncer do
     )
   end
 
-  defp ensure_atom(val) when is_atom(val), do: val
-  defp ensure_atom(val), do: to_string(val) |> String.to_atom()
-
   def init(
         [
           syncer_name: syncer_name,
@@ -54,16 +50,17 @@ defmodule CodesOnChain.Syncer do
 
     case init_db(syncer_name) do
       {:ok, db_ref} ->
+        contract_id =
+          init_chain_and_contract(db_ref, chain_name, api_explorer, api_key, contract_addr)
+
         sync_after_interval()
 
         {:ok,
          %{
            syncer_name: syncer_name,
            db_ref: db_ref,
-           chain_name: chain_name,
-           api_explorer: api_explorer,
            api_key: api_key,
-           contract_addr: contract_addr
+           contract_id: contract_id
          }}
 
       {:error, reason} ->
@@ -72,23 +69,8 @@ defmodule CodesOnChain.Syncer do
     end
   end
 
-  def init_db(syncer_name) do
-    db_path = :code.priv_dir(:function_server_based_on_arweave)
-    opts = [create_if_missing: true]
-
-    :rocksdb.open(String.to_charlist("#{db_path}/db/#{syncer_name}/"), opts)
-  end
-
-  def get_from_db(syncer_name, key) do
-    GenServer.call(ensure_atom(syncer_name), {:get, key})
-  end
-
-  def all_from_db(syncer_name) do
-    GenServer.call(ensure_atom(syncer_name), :all)
-  end
-
   def terminate(reason, %{db_ref: db_ref, syncer_name: syncer_name}) do
-    Logger.error("#{syncer_name} terminates due to #{reason}")
+    Logger.error("#{syncer_name} terminates due to #{inspect(reason)}")
 
     case :rocksdb.close(db_ref) do
       {:error, err} ->
@@ -103,16 +85,13 @@ defmodule CodesOnChain.Syncer do
   def handle_info(:sync, state) do
     %{
       db_ref: db_ref,
-      chain_name: chain_name,
-      api_explorer: api_explorer,
       api_key: api_key,
-      contract_addr: contract_addr
+      contract_id: contract_id
     } = state
 
-    contract =
-      db_get(db_ref, get_contract_id(state), %{contract_addr: contract_addr, last_block: 1})
+    contract = db_get(db_ref, contract_id)
 
-    sync(db_ref, chain_name, api_explorer, api_key, contract)
+    sync(db_ref, api_key, contract)
 
     sync_after_interval()
     {:noreply, state}
@@ -129,32 +108,88 @@ defmodule CodesOnChain.Syncer do
     {:reply, db_all(db_ref), state}
   end
 
-  defp get_contract_id(contract) do
-    "contract_#{contract.contract_addr}"
+  # +-----------+
+  # Public API that can be invoked by CodeRunner
+  # +-----------+
+  def init_db(syncer_name) do
+    db_path = :code.priv_dir(:function_server_based_on_arweave)
+    opts = [create_if_missing: true]
+
+    :rocksdb.open(String.to_charlist("#{db_path}/db_#{syncer_name}/"), opts)
+  end
+
+  def get_from_db(syncer_name, key) do
+    GenServer.call(ensure_atom(syncer_name), {:get, key})
+  end
+
+  def all_from_db(syncer_name) do
+    GenServer.call(ensure_atom(syncer_name), :all)
+  end
+
+  # +-------------+
+  # Internal Methods
+  # +-------------+
+  defp init_chain_and_contract(db_ref, chain_name, api_explorer, api_key, contract_addr) do
+    contract_id = get_contract_id(contract_addr)
+
+    case db_get(db_ref, contract_id) do
+      nil ->
+        contract_abi_string = get_contract_abi(api_explorer, api_key, contract_addr)
+        endpoint = get_endpoint(chain_name)
+
+        contract = %{
+          id: contract_id,
+          endpoint: endpoint,
+          api_explorer: api_explorer,
+          addr: contract_addr,
+          last_block: 1,
+          abi: contract_abi_string
+        }
+
+        db_put(db_ref, contract_id, contract)
+
+      _ ->
+        :ok
+    end
+
+    contract_id
+  end
+
+  defp get_contract_abi(
+         api_explorer,
+         api_key,
+         contract_addr
+       ) do
+    url =
+      "#{api_explorer}api?module=contract&action=getabi&address=#{contract_addr}&apikey=#{api_key}"
+
+    Logger.info("call url to get contract abi: #{url}")
+    {:ok, %{"result" => contract_abi_string}} = ExHttp.http_get(url)
+    contract_abi_string
+  end
+
+  defp get_contract_id(contract_addr) do
+    "contract_#{contract_addr}"
   end
 
   defp sync_after_interval() do
     Process.send_after(self(), :sync, @sync_interval)
   end
 
-  defp sync(db_ref, chain_name, api_explorer, api_key, contract) do
-    endpoint = get_endpoint(chain_name)
-    best_block = get_blockheight(endpoint)
-    contract_id = get_contract_id(contract)
+  defp sync(db_ref, api_key, contract) do
+    best_block = get_blockheight(contract.endpoint)
 
-    do_sync(db_ref, api_explorer, api_key, contract, best_block)
+    do_sync(db_ref, api_key, contract, best_block)
 
-    updated_contract = Map.put(contract, :last_block, best_block + 1)
-
-    db_put(db_ref, contract_id, updated_contract)
+    db_put(db_ref, contract.id, %{contract | last_block: best_block + 1})
   end
 
-  defp do_sync(db_ref, api_explorer, api_key, contract, best_block) do
+  defp do_sync(db_ref, api_key, contract, best_block) do
     {:ok, %{"result" => txs}} =
       get_txs_by_contract_addr(
-        api_explorer,
+        contract.api_explorer,
         api_key,
-        contract.contract_addr,
+        contract.addr,
         contract.last_block,
         best_block
       )
@@ -177,20 +212,8 @@ defmodule CodesOnChain.Syncer do
       |> Kernel.<>("#{asc_or_desc}&apikey=")
       |> Kernel.<>("#{api_key}")
 
-    Logger.info("call url: #{url}")
-    http_get(url)
-  end
-
-  defp handle_txs(db_ref, _contract, txs) do
-    # contract_id = get_contract_id(contract)
-
-    Enum.each(txs, fn tx ->
-      tx_map = ExStructTranslator.to_atom_struct(tx)
-
-      if tx_map.txreceipt_status == "1" do
-        db_put(db_ref, tx_map.hash, tx_map)
-      end
-    end)
+    Logger.info("Get contract txs through url: #{url}")
+    ExHttp.http_get(url)
   end
 
   defp get_endpoint(chain_name) do
@@ -208,16 +231,122 @@ defmodule CodesOnChain.Syncer do
     #     1
     # end
     {:ok, res} =
-      http_post(endpoint, %{
+      ExHttp.http_post(endpoint, %{
         "jsonrpc" => "2.0",
         "method" => "eth_blockNumber",
         "params" => [],
-        "id" => 83
+        "id" => 1
       })
 
     Map.get(res, "result")
     |> hex_to_int()
   end
+
+  # +-------------+
+  # | Transaction Handling Funcs |
+  # +-------------+
+  defp handle_txs(db_ref, contract, txs) do
+    abi = Jason.decode!(contract.abi)
+
+    Enum.each(txs, fn tx ->
+      handle_tx(db_ref, contract, abi, ExStructTranslator.to_atom_struct(tx))
+    end)
+  end
+
+  defp handle_tx(_db_ref, _contract, _abi, tx) when tx.txreceipt_status != "1" do
+    :ignore
+  end
+
+  defp handle_tx(db_ref, contract, abi, tx) do
+    data = find_and_decode_func(abi, tx.input)
+
+    do_handle_tx(db_ref, contract, tx, data)
+  end
+
+  def do_handle_tx(
+        db_ref,
+        contract,
+        %{from: from, to: to, value: value},
+        {%{function: func_name}, data}
+      ) do
+    # IO.puts("--- handling tx #{func_name} for #{inspect(data)}")
+    handle_tx_type(db_ref, contract, func_name, from, to, value, data)
+  end
+
+  def do_handle_tx(_db_ref, _contract, _tx, _others) do
+    :pass
+  end
+
+  def handle_tx_type(db_ref, _contract, func, _from, _to, _value, [_from_bin, to_bin, token_id])
+      when func in ["safeTransferFrom", "transferFrom"] do
+    nft = db_get(db_ref, token_id)
+
+    if nft != nil do
+      IO.puts("Updating nft #{token_id} owner: #{bin_to_addr(to_bin)}")
+      db_put(db_ref, token_id, %{nft | owner: bin_to_addr(to_bin)})
+    end
+  end
+
+  def handle_tx_type(db_ref, contract, "claim", from, _to, _value, [token_id]) do
+    %{id: nft_c_id, addr: addr, endpoint: endpoint} = contract
+    nft = db_get(db_ref, token_id)
+
+    if nft == nil do
+      # INIT Token
+      uri = get_token_uri(endpoint, addr, token_id)
+
+      nft = %{
+        uri: uri,
+        owner: from,
+        token_id: token_id,
+        contract_id: nft_c_id
+      }
+
+      IO.puts("#{from} claims nft token: #{token_id}")
+
+      db_put(db_ref, token_id, nft)
+    end
+  end
+
+  def handle_tx_type(_others, _, _, _, _, _, _) do
+    {:ok, "pass"}
+  end
+
+  defp get_token_uri(endpoint, contract_addr, token_id) do
+    data = get_data("tokenURI(uint256)", [token_id])
+
+    data
+    |> eth_call_repeat(contract_addr, "latest", endpoint)
+    |> data_to_str()
+  end
+
+  defp eth_call_repeat(data, contract_addr, func_name, endpoint) do
+    # result =
+    #   Ethereumex.HttpClient.eth_call(%{data: data, to: contract_addr}, func_name, url: endpoint)
+
+    result =
+      ExHttp.http_post(endpoint, %{
+        "jsonrpc" => "2.0",
+        "method" => "eth_call",
+        "params" => [%{from: nil, to: contract_addr, data: data}, "latest"],
+        "id" => 1
+      })
+
+    case result do
+      {:ok, value} ->
+        Map.get(value, "result")
+
+      {:error, :timeout} ->
+        # wait 1 sec
+        Process.sleep(1000)
+        eth_call_repeat(data, contract_addr, func_name, endpoint)
+    end
+  end
+
+  # +-------------+
+  # | DB Utility Funcs |
+  # +-------------+
+  defp db_get(db_ref, k) when not is_bitstring(k), do: db_get(db_ref, to_string(k))
 
   defp db_get(db_ref, k, default_value \\ nil) do
     case :rocksdb.get(db_ref, k, []) do
@@ -232,8 +361,9 @@ defmodule CodesOnChain.Syncer do
     end
   end
 
+  defp db_put(db_ref, k, v) when not is_bitstring(k), do: db_put(db_ref, to_string(k), v)
+
   defp db_put(db_ref, k, v) do
-    # encode = Keyword.get(opts, :encode, &encode_data/1)
     IO.puts("Putting #{k} into DB")
     :rocksdb.put(db_ref, k, Jason.encode!(v), [])
   end
@@ -265,85 +395,47 @@ defmodule CodesOnChain.Syncer do
     end
   end
 
-  defp http_get(url) do
-    http_get(url, @retries)
-  end
-
-  defp http_get(_url, retries) when retries == 0 do
-    {:error, "GET retires #{@retries} times and not success"}
-  end
-
-  defp http_get(url, retries) do
-    url
-    |> HTTPoison.get([{"User-Agent", @default_user_agent}],
-      hackney: [headers: [{"User-Agent", @default_user_agent}]]
-    )
-    |> handle_response()
-    |> case do
-      {:ok, body} ->
-        {:ok, body}
-
-      {:error, _} ->
-        Process.sleep(500)
-        http_get(url, retries - 1)
-    end
-  end
-
-  defp http_post(url, data) do
-    http_post(url, data, @retries)
-  end
-
-  defp http_post(_url, _data, retries) when retries == 0 do
-    {:error, "POST retires #{@retries} times and not success"}
-  end
-
-  defp http_post(url, data, retries) do
-    body = Jason.encode!(data)
-
-    url
-    |> HTTPoison.post(
-      body,
-      [{"User-Agent", @default_user_agent}, {"Content-Type", "application/json"}],
-      hackney: [headers: [{"User-Agent", @default_user_agent}]]
-    )
-    |> handle_response()
-    |> case do
-      {:ok, body} ->
-        {:ok, body}
-
-      {:error, _} ->
-        Process.sleep(500)
-        http_post(url, data, retries - 1)
-    end
-  end
-
-  # normal
-  defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: body}})
-       when status_code in 200..299 do
-    case Poison.decode(body) do
-      {:ok, json_body} ->
-        {:ok, json_body}
-
-      {:error, payload} ->
-        Logger.error("Reason: #{inspect(payload)}")
-        {:error, :network_error}
-    end
-  end
-
-  # 404 or sth else
-  defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: _}}) do
-    Logger.error("Reason: #{status_code} ")
-    {:error, :network_error}
-  end
-
-  defp handle_response(error) do
-    Logger.error("Reason: other_error")
-    error
-  end
-
+  # +-------------+
+  # | Basic Utility Funcs |
+  # +-------------+
   defp hex_to_int(hex) do
     hex
     |> String.slice(2..-1)
     |> String.to_integer(16)
   end
+
+  defp hex_to_bin(hex) do
+    hex
+    |> String.slice(2..-1)
+    |> Base.decode16!(case: :lower)
+  end
+
+  defp bin_to_addr(bin) do
+    "0x" <> Base.encode16(bin, case: :lower)
+  end
+
+  defp data_to_str(raw) do
+    raw
+    |> hex_to_bin()
+    |> ABI.TypeDecoder.decode_raw([:string])
+    |> List.first()
+  end
+
+  def find_and_decode_func(abi, input_hex) do
+    abi
+    |> ABI.parse_specification()
+    |> ABI.find_and_decode(hex_to_bin(input_hex))
+  end
+
+  defp get_data(func_str, params) do
+    payload =
+      func_str
+      |> ABI.encode(params)
+      |> Base.encode16(case: :lower)
+
+    "0x" <> payload
+  end
+
+  defp ensure_atom(val) when is_atom(val), do: val
+  defp ensure_atom(val), do: to_string(val) |> String.to_atom()
 end
