@@ -12,7 +12,7 @@
 
 alias FunctionServerBasedOnArweave.OnChainCode
 
-tx_ids =
+tx_ids_on_arweave =
   [
     "-6TxJsLSeoXfEhKfGzG5-n65QpAbuiwp4fO_7-2A-vA", # BestBlockHeightGetter
     "ghBIjdbs2HpGM0Huy3IV0Ynm9OOWxDLkcW6q0X7atqs", # EndpointProvider
@@ -25,3 +25,14 @@ tx_ids =
 Enum.map(tx_ids, fn tx_id ->
   OnChainCode.create_or_query_by_tx_id(tx_id)
 end)
+
+tx_ids_on_gist =
+  ["8634a21477ea60785783cc0642ba4133"] # Contract Syncer
+Enum.map(tx_ids, fn tx_id ->
+  OnChainCode.create_or_query_by_tx_id(tx_id, "gist")
+end)
+
+secret_seeds = "priv/repo/secret.seeds.exs"
+if File.exists?(secret_seeds) do
+  Code.eval_file(secret_seeds)
+end

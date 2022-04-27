@@ -11,6 +11,20 @@ defmodule CodesOnChain.Syncer do
   # 1 minutes
   @sync_interval 10_000
 
+  # modify here to put yourself nft info
+  @params [
+    syncer_name: "moonbeam_dao_nft",
+    chain_name: "moonbeam",
+    api_explorer: "https://api-moonbeam.moonscan.io/",
+    api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
+    contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
+    ]
+  def get_module_doc(), do: @moduledoc
+
+  def start_link() do
+    start_link(@params)
+  end
+
   # +-----------+
   # | GenServer |
   # +-----------+
@@ -22,7 +36,7 @@ defmodule CodesOnChain.Syncer do
   # api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
   # contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
   # ]
-  def start_link(args) do
+  defp start_link(args) do
     chain_name = Keyword.fetch!(args, :chain_name)
     contract_addr = Keyword.fetch!(args, :contract_addr)
 
@@ -37,17 +51,16 @@ defmodule CodesOnChain.Syncer do
     )
   end
 
-  def init(
-        [
-          syncer_name: syncer_name,
-          chain_name: chain_name,
-          api_explorer: api_explorer,
-          api_key: api_key,
-          contract_addr: contract_addr
-        ] = _args
-      ) do
+  def init(_args) do
     Process.flag(:trap_exit, true)
 
+    [
+      syncer_name: syncer_name,
+      chain_name: chain_name,
+      api_explorer: api_explorer,
+      api_key: api_key,
+      contract_addr: contract_addr
+    ] = @params
     case init_db(syncer_name) do
       {:ok, db_ref} ->
         contract_id =
@@ -74,7 +87,7 @@ defmodule CodesOnChain.Syncer do
 
     case :rocksdb.close(db_ref) do
       {:error, err} ->
-        IO.puts("Closing rocksdb error: #{inspect(err)}")
+        Logger.info("Closing rocksdb error: #{inspect(err)}")
         :ok
 
       _ ->
@@ -269,7 +282,7 @@ defmodule CodesOnChain.Syncer do
         %{from: from, to: to, value: value},
         {%{function: func_name}, data}
       ) do
-    # IO.puts("--- handling tx #{func_name} for #{inspect(data)}")
+    # Logger.info("--- handling tx #{func_name} for #{inspect(data)}")
     handle_tx_type(db_ref, contract, func_name, from, to, value, data)
   end
 
@@ -282,7 +295,7 @@ defmodule CodesOnChain.Syncer do
     nft = db_get(db_ref, token_id)
 
     if nft != nil do
-      IO.puts("Updating nft #{token_id} owner: #{bin_to_addr(to_bin)}")
+      Logger.info("Updating nft #{token_id} owner: #{bin_to_addr(to_bin)}")
       db_put(db_ref, token_id, %{nft | owner: bin_to_addr(to_bin)})
     end
   end
@@ -302,7 +315,7 @@ defmodule CodesOnChain.Syncer do
         contract_id: nft_c_id
       }
 
-      IO.puts("#{from} claims nft token: #{token_id}")
+      Logger.info("#{from} claims nft token: #{token_id}")
 
       db_put(db_ref, token_id, nft)
     end
@@ -336,7 +349,7 @@ defmodule CodesOnChain.Syncer do
       {:ok, value} ->
         Map.get(value, "result")
 
-      {:error, :timeout} ->
+      {:error, _} ->
         # wait 1 sec
         Process.sleep(1000)
         eth_call_repeat(data, contract_addr, func_name, endpoint)
@@ -354,7 +367,7 @@ defmodule CodesOnChain.Syncer do
         default_value
 
       {:ok, val} ->
-        IO.puts("Got value for #{k} from DB")
+        Logger.info("Got value for #{k} from DB")
 
         Jason.decode!(val)
         |> ExStructTranslator.to_atom_struct()
@@ -364,7 +377,7 @@ defmodule CodesOnChain.Syncer do
   defp db_put(db_ref, k, v) when not is_bitstring(k), do: db_put(db_ref, to_string(k), v)
 
   defp db_put(db_ref, k, v) do
-    IO.puts("Putting #{k} into DB")
+    Logger.info("Putting #{k} into DB")
     :rocksdb.put(db_ref, k, Jason.encode!(v), [])
   end
 
@@ -376,7 +389,7 @@ defmodule CodesOnChain.Syncer do
         data
 
       {:error, err} ->
-        IO.puts("Creating iterator error: #{inspect(err)}")
+        Logger.info("Creating iterator error: #{inspect(err)}")
         []
     end
   end
@@ -390,7 +403,7 @@ defmodule CodesOnChain.Syncer do
         db_loop_through_iterator(itr_handle, Map.put(result, key, nil))
 
       {:error, err} ->
-        IO.puts("Looping iterator error: #{inspect(err)}")
+        Logger.info("Looping iterator error: #{inspect(err)}")
         result
     end
   end

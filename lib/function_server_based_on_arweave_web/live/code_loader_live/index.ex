@@ -5,6 +5,8 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   alias  ArweaveSdkEx.CodeRunner
   require Logger
 
+  @gist_prefix "https://api.github.com/gists"
+
   @impl true
   def mount(_params, session, socket) do
     # codes = [
@@ -18,7 +20,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> Enum.map(& &1.name)
 
     selected_code_name = Enum.fetch!(code_names, 0)
-    {tx_id, code_text} = build_code(selected_code_name)
+    {tx_id, code_text, type} = build_code(selected_code_name)
 
     socket =
       socket
@@ -27,7 +29,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:params, [])
       |> assign(:selected_code, selected_code_name)
       |> assign(:code_text, code_text)
-      |> assign(:explorer_link, build_explorer_link(tx_id))
+      |> assign(:explorer_link, build_explorer_link(tx_id, type))
       |> assign(:auth, auth)
 
     {:ok, socket}
@@ -52,14 +54,14 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
         } = _params,
         socket
       ) do
-    {tx_id, code_text} = build_code(code_name)
+    {tx_id, code_text, type} = build_code(code_name)
 
     {
       :noreply,
       socket
       |> assign(:selected_code, code_name)
       |> assign(:code_text, code_text)
-      |> assign(:explorer_link, build_explorer_link(tx_id))
+      |> assign(:explorer_link, build_explorer_link(tx_id, type))
       |> push_event("highlight", %{})
     }
   end
@@ -86,6 +88,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     {
       :noreply,
       socket
+      |> redirect(to: "/")
     }
  end
   @impl true
@@ -142,14 +145,19 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     # get_tx_id
     # get_content_by_tx_id
     # parse code as markdown
-    %{tx_id: tx_id, code: code} = OnChainCode.get_by_name(selected_code)
+    %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(selected_code)
     # {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
-    {tx_id, code}
+    {tx_id, code, type}
   end
 
-  def build_explorer_link(tx_id) do
+  def build_explorer_link(tx_id, "ar") do
     "#{ArweaveNode.get_explorer()}/#{tx_id}"
   end
+
+  def build_explorer_link(tx_id, "gist") do
+    "#{@gist_prefix}/#{tx_id}"
+  end
+
 
   # def run_func(mod_name, func_name, params) do
   #   func_name_atom = String.to_atom(func_name)

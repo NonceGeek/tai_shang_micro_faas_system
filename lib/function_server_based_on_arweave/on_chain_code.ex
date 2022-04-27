@@ -3,6 +3,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   use Ecto.Schema
   import Ecto.Changeset
   alias FunctionServerBasedOnArweave.OnChainCode, as: Ele
+  alias FunctionServerBasedOnArweave.CodeFetchers.Gist
   alias FunctionServerBasedOnArweave.Repo
 
   @rejected_func_list [:__info__, :module_info]
@@ -12,6 +13,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     field :tx_id, :string
     field :description, :string
     field :code, :string
+    field :type, :string, default: "ar"
     # field :method_name, :string
     # field :output, :string
 
@@ -25,18 +27,25 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def get_by_tx_id(tx_id), do: Repo.get_by(Ele, tx_id: tx_id)
 
 
-  def create_or_query_by_tx_id(tx_id) do
+  def create_or_query_by_tx_id(tx_id, type \\ "ar") do
     ele = get_by_tx_id(tx_id)
-
     if is_nil(ele) == true do
-      {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
-      Ele.create_by_payload_and_tx_id(code, tx_id)
+      do_create_or_query_by_tx_id(tx_id, type)
+      {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
+      Ele.create_by_payload_and_tx_id(code, tx_id, type)
     else
       {:ok, ele}
     end
   end
 
-  def create_by_payload_and_tx_id(code, tx_id) do
+  def do_create_or_query_by_tx_id(tx_id, "ar") do
+    ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
+  end
+
+  def do_create_or_query_by_tx_id(tx_id, "gist") do
+    Gist.get_from_gist(tx_id)
+  end
+  def create_by_payload_and_tx_id(code, tx_id, type) do
     Code.eval_string(code)
     name = get_module_name_from_code(code)
     # save file to local
@@ -46,7 +55,8 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
       name: name,
       tx_id: tx_id,
       description: description,
-      code: code
+      code: code,
+      type: type
     })
     # description = get_module_description_from_code(code)
   end
@@ -60,7 +70,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   @doc false
   def changeset(code_loader, attrs \\ %{}) do
     code_loader
-    |> cast(attrs, [:name, :tx_id, :description, :code])
+    |> cast(attrs, [:name, :tx_id, :description, :code, :type])
     # |> validate_required([:name])
   end
 

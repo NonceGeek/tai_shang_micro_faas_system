@@ -35,4 +35,7 @@ npm-debug.log
 *.secret
 *.DS_Store
 
+# secrets
+*secret*
+
 /priv/db

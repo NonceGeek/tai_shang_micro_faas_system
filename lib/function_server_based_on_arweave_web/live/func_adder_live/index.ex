@@ -2,9 +2,7 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
   use FunctionServerBasedOnArweaveWeb, :live_view
 
   alias FunctionServerBasedOnArweave.OnChainCode
-  alias ArweaveSdkEx.CodeRunner
 
-  @passwd System.get_env("ADMIN_PASSWD")
   @impl true
   def mount(_params, _session, socket) do
     {:ok, socket}
@@ -15,13 +13,12 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
   def handle_event("submit", %{
     "form" =>
     %{
-      "passwd" => input_passwd,
-      "tx_id" => tx_id
+      "tx_id" => tx_id,
+      "gist_id" => gist_id
     }
   }, socket) do
-    with true <- input_passwd == @passwd,
-    {:ok, ele} <- OnChainCode.create_or_query_by_tx_id(tx_id) do
-      IO.puts @passwd
+    {type, id} = build_type(tx_id, gist_id)
+    with {:ok, _ele} <- OnChainCode.create_or_query_by_tx_id(id, type) do
       {
         :noreply,
         socket
@@ -42,5 +39,8 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
   def handle_event(_key, _params, socket) do
     {:noreply, socket}
   end
+
+  def build_type("", gist_id), do: {"gist", gist_id}
+  def build_type(tx_id, ""), do: {"ar", tx_id}
 
 end
