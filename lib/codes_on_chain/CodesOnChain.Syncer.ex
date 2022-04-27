@@ -7,6 +7,7 @@ defmodule CodesOnChain.Syncer do
 
   alias FunctionServerBasedOnArweave.CodeRunnerSpec
   alias Components.ExHttp
+  alias Components.KvDbHandler
 
   # 1 minutes
   @sync_interval 10_000
@@ -61,76 +62,53 @@ defmodule CodesOnChain.Syncer do
       api_key: api_key,
       contract_addr: contract_addr
     ] = @params
-    case init_db(syncer_name) do
-      {:ok, db_ref} ->
-        contract_id =
-          init_chain_and_contract(db_ref, chain_name, api_explorer, api_key, contract_addr)
 
-        sync_after_interval()
+    contract_id =
+      init_chain_and_contract(chain_name, api_explorer, api_key, contract_addr)
 
-        {:ok,
-         %{
-           syncer_name: syncer_name,
-           db_ref: db_ref,
-           api_key: api_key,
-           contract_id: contract_id
-         }}
+    sync_after_interval()
 
-      {:error, reason} ->
-        Logger.error(reason)
-        :ignore
-    end
+    {:ok,
+     %{
+       syncer_name: syncer_name,
+       api_key: api_key,
+       contract_id: contract_id
+     }}
   end
 
-  def terminate(reason, %{db_ref: db_ref, syncer_name: syncer_name}) do
+  def terminate(reason, %{syncer_name: syncer_name}) do
     Logger.error("#{syncer_name} terminates due to #{inspect(reason)}")
 
-    case :rocksdb.close(db_ref) do
-      {:error, err} ->
-        Logger.info("Closing rocksdb error: #{inspect(err)}")
-        :ok
-
-      _ ->
-        :ok
-    end
+    :ok
   end
 
   def handle_info(:sync, state) do
     %{
-      db_ref: db_ref,
       api_key: api_key,
       contract_id: contract_id
     } = state
 
-    contract = db_get(db_ref, contract_id)
+    contract = KvDbHandler.get(contract_id)
 
-    sync(db_ref, api_key, contract)
+    sync(api_key, contract)
 
     sync_after_interval()
     {:noreply, state}
   end
 
   def handle_call({:get, key}, _from, state) do
-    %{db_ref: db_ref} = state
-    val = db_get(db_ref, key)
+    val = KvDbHandler.get(key)
 
     {:reply, val, state}
   end
 
-  def handle_call(:all, _from, %{db_ref: db_ref} = state) do
-    {:reply, db_all(db_ref), state}
+  def handle_call(:all, _from, state) do
+    {:reply, KvDbHandler.all(), state}
   end
 
   # +-----------+
   # Public API that can be invoked by CodeRunner
   # +-----------+
-  def init_db(syncer_name) do
-    db_path = :code.priv_dir(:function_server_based_on_arweave)
-    opts = [create_if_missing: true]
-
-    :rocksdb.open(String.to_charlist("#{db_path}/db_#{syncer_name}/"), opts)
-  end
-
   def get_from_db(syncer_name, key) do
     GenServer.call(ensure_atom(syncer_name), {:get, key})
   end
@@ -142,10 +120,10 @@ defmodule CodesOnChain.Syncer do
   # +-------------+
   # Internal Methods
   # +-------------+
-  defp init_chain_and_contract(db_ref, chain_name, api_explorer, api_key, contract_addr) do
+  defp init_chain_and_contract(chain_name, api_explorer, api_key, contract_addr) do
     contract_id = get_contract_id(contract_addr)
 
-    case db_get(db_ref, contract_id) do
+    case KvDbHandler.get(contract_id) do
       nil ->
         contract_abi_string = get_contract_abi(api_explorer, api_key, contract_addr)
         endpoint = get_endpoint(chain_name)
@@ -159,7 +137,7 @@ defmodule CodesOnChain.Syncer do
           abi: contract_abi_string
         }
 
-        db_put(db_ref, contract_id, contract)
+        KvDbHandler.put(contract_id, contract)
 
       _ ->
         :ok
@@ -189,15 +167,15 @@ defmodule CodesOnChain.Syncer do
     Process.send_after(self(), :sync, @sync_interval)
   end
 
-  defp sync(db_ref, api_key, contract) do
+  defp sync(api_key, contract) do
     best_block = get_blockheight(contract.endpoint)
 
-    do_sync(db_ref, api_key, contract, best_block)
+    do_sync(api_key, contract, best_block)
 
-    db_put(db_ref, contract.id, %{contract | last_block: best_block + 1})
+    KvDbHandler.put(contract.id, %{contract | last_block: best_block + 1})
   end
 
-  defp do_sync(db_ref, api_key, contract, best_block) do
+  defp do_sync(api_key, contract, best_block) do
     {:ok, %{"result" => txs}} =
       get_txs_by_contract_addr(
         contract.api_explorer,
@@ -207,7 +185,7 @@ defmodule CodesOnChain.Syncer do
         best_block
       )
 
-    handle_txs(db_ref, contract, txs)
+    handle_txs(contract, txs)
   end
 
   defp get_txs_by_contract_addr(
@@ -258,51 +236,50 @@ defmodule CodesOnChain.Syncer do
   # +-------------+
   # | Transaction Handling Funcs |
   # +-------------+
-  defp handle_txs(db_ref, contract, txs) do
+  defp handle_txs(contract, txs) do
     abi = Jason.decode!(contract.abi)
 
     Enum.each(txs, fn tx ->
-      handle_tx(db_ref, contract, abi, ExStructTranslator.to_atom_struct(tx))
+      handle_tx(contract, abi, ExStructTranslator.to_atom_struct(tx))
     end)
   end
 
-  defp handle_tx(_db_ref, _contract, _abi, tx) when tx.txreceipt_status != "1" do
+  defp handle_tx(__contract, _abi, tx) when tx.txreceipt_status != "1" do
     :ignore
   end
 
-  defp handle_tx(db_ref, contract, abi, tx) do
+  defp handle_tx(contract, abi, tx) do
     data = find_and_decode_func(abi, tx.input)
 
-    do_handle_tx(db_ref, contract, tx, data)
+    do_handle_tx(contract, tx, data)
   end
 
   def do_handle_tx(
-        db_ref,
         contract,
         %{from: from, to: to, value: value},
         {%{function: func_name}, data}
       ) do
     # Logger.info("--- handling tx #{func_name} for #{inspect(data)}")
-    handle_tx_type(db_ref, contract, func_name, from, to, value, data)
+    handle_tx_type(contract, func_name, from, to, value, data)
   end
 
-  def do_handle_tx(_db_ref, _contract, _tx, _others) do
+  def do_handle_tx(__contract, _tx, _others) do
     :pass
   end
 
-  def handle_tx_type(db_ref, _contract, func, _from, _to, _value, [_from_bin, to_bin, token_id])
+  def handle_tx_type(_contract, func, _from, _to, _value, [_from_bin, to_bin, token_id])
       when func in ["safeTransferFrom", "transferFrom"] do
-    nft = db_get(db_ref, token_id)
+    nft = KvDbHandler.get(token_id)
 
     if nft != nil do
       Logger.info("Updating nft #{token_id} owner: #{bin_to_addr(to_bin)}")
-      db_put(db_ref, token_id, %{nft | owner: bin_to_addr(to_bin)})
+      KvDbHandler.put(token_id, %{nft | owner: bin_to_addr(to_bin)})
     end
   end
 
-  def handle_tx_type(db_ref, contract, "claim", from, _to, _value, [token_id]) do
+  def handle_tx_type(contract, "claim", from, _to, _value, [token_id]) do
     %{id: nft_c_id, addr: addr, endpoint: endpoint} = contract
-    nft = db_get(db_ref, token_id)
+    nft = KvDbHandler.get(token_id)
 
     if nft == nil do
       # INIT Token
@@ -317,11 +294,11 @@ defmodule CodesOnChain.Syncer do
 
       Logger.info("#{from} claims nft token: #{token_id}")
 
-      db_put(db_ref, token_id, nft)
+      KvDbHandler.put(token_id, nft)
     end
   end
 
-  def handle_tx_type(_others, _, _, _, _, _, _) do
+  def handle_tx_type(_contract, _others, _, _, _, _) do
     {:ok, "pass"}
   end
 
@@ -359,54 +336,6 @@ defmodule CodesOnChain.Syncer do
   # +-------------+
   # | DB Utility Funcs |
   # +-------------+
-  defp db_get(db_ref, k) when not is_bitstring(k), do: db_get(db_ref, to_string(k))
-
-  defp db_get(db_ref, k, default_value \\ nil) do
-    case :rocksdb.get(db_ref, k, []) do
-      :not_found ->
-        default_value
-
-      {:ok, val} ->
-        Logger.info("Got value for #{k} from DB")
-
-        Jason.decode!(val)
-        |> ExStructTranslator.to_atom_struct()
-    end
-  end
-
-  defp db_put(db_ref, k, v) when not is_bitstring(k), do: db_put(db_ref, to_string(k), v)
-
-  defp db_put(db_ref, k, v) do
-    Logger.info("Putting #{k} into DB")
-    :rocksdb.put(db_ref, k, Jason.encode!(v), [])
-  end
-
-  defp db_all(db_ref) do
-    case :rocksdb.iterator(db_ref, []) do
-      {:ok, itr_handle} ->
-        data = db_loop_through_iterator(itr_handle, %{}, :first)
-        :rocksdb.iterator_close(itr_handle)
-        data
-
-      {:error, err} ->
-        Logger.info("Creating iterator error: #{inspect(err)}")
-        []
-    end
-  end
-
-  defp db_loop_through_iterator(itr_handle, result, action \\ :next) do
-    case :rocksdb.iterator_move(itr_handle, action) do
-      {:ok, key, value} ->
-        db_loop_through_iterator(itr_handle, Map.put(result, key, Jason.decode!(value)))
-
-      {:ok, key} ->
-        db_loop_through_iterator(itr_handle, Map.put(result, key, nil))
-
-      {:error, err} ->
-        Logger.info("Looping iterator error: #{inspect(err)}")
-        result
-    end
-  end
 
   # +-------------+
   # | Basic Utility Funcs |
