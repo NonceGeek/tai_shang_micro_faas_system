@@ -102,8 +102,8 @@ defmodule CodesOnChain.Syncer do
     {:reply, val, state}
   end
 
-  def handle_call(:all, _from, state) do
-    {:reply, KvDbHandler.all(), state}
+  def handle_call({:all, opts}, _from, state) do
+    {:reply, KvDbHandler.all(opts), state}
   end
 
   # +-----------+
@@ -113,8 +113,8 @@ defmodule CodesOnChain.Syncer do
     GenServer.call(ensure_atom(syncer_name), {:get, key})
   end
 
-  def all_from_db(syncer_name) do
-    GenServer.call(ensure_atom(syncer_name), :all)
+  def all_from_db(syncer_name, opts \\ []) do
+    GenServer.call(ensure_atom(syncer_name), {:all, opts})
   end
 
   # +-------------+

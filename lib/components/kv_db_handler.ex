@@ -26,6 +26,9 @@ defmodule Components.KvDbHandler do
 
   import Ecto.Query
 
+  @default_paging_limit 50
+  @default_sort :desc
+
   def get(k) when not is_bitstring(k), do: get(to_string(k))
 
   def get(k, default_value \\ nil) do
@@ -49,7 +52,20 @@ defmodule Components.KvDbHandler do
     |> Repo.insert_or_update!()
   end
 
-  def all() do
-    Repo.all(from p in KV)
+  def all([]) do
+    all([limit: @default_paging_limit, sort: @default_sort])
+  end
+
+  def all(opts) do
+    query = from p in KV
+
+    {sort, remained_opts} = Keyword.pop(opts, :sort, @default_sort)
+    valid_opts =
+      Keyword.filter(remained_opts, fn {key, _val} ->
+        key in [:before, :after, :limit]
+      end)
+      |> Keyword.put(:cursor_fields, [{:updated_at, sort}])
+
+    Repo.paginate(query, valid_opts)
   end
 end
