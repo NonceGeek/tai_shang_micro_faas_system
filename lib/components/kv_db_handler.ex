@@ -28,7 +28,6 @@ end
 
 defimpl Jason.Encoder, for: Paginator.Page.Metadata do
   def encode(meta, opts) do
-    IO.inspect(meta)
     Jason.Encode.map(Map.take(meta, [:after, :before, :limit, :total_count, :total_count_cap_exceeded]), opts)
   end
 end
