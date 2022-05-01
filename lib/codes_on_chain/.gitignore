@@ -2,3 +2,4 @@
 */
 !.gitignore
 !CodesOnChain.Syncer.ex
+!CodesOnChain.NftRender.NType.ex
