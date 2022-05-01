@@ -20,6 +20,29 @@ defmodule Components.KV do
   end
 end
 
+defimpl Jason.Encoder, for: Paginator.Page do
+  def encode(page, opts) do
+    Jason.Encode.map(Map.take(page, [:metadata, :entries]), opts)
+  end
+end
+
+defimpl Jason.Encoder, for: Paginator.Page.Metadata do
+  def encode(meta, opts) do
+    Jason.Encode.map(Map.take(meta, [:after, :before, :limit, :total_count, :total_count_cap_exceeded]), opts)
+  end
+end
+
+defimpl Jason.Encoder, for: Components.KV do
+  def encode(kv, opts) do
+    Jason.Encode.map(%{
+      key: kv.key,
+      value: Jason.decode!(kv.value),
+      inserted_at: kv.inserted_at,
+      updated_at: kv.updated_at
+    }, opts)
+  end
+end
+
 defmodule Components.KvDbHandler do
   alias Components.KV
   alias FunctionServerBasedOnArweave.Repo
@@ -65,6 +88,7 @@ defmodule Components.KvDbHandler do
         key in [:before, :after, :limit]
       end)
       |> Keyword.put(:cursor_fields, [{:updated_at, sort}])
+      |> Keyword.put(:include_total_count, true)
 
     Repo.paginate(query, valid_opts)
   end

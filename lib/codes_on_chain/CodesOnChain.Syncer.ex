@@ -113,8 +113,8 @@ defmodule CodesOnChain.Syncer do
     GenServer.call(ensure_atom(syncer_name), {:get, key})
   end
 
-  def all_from_db(syncer_name, opts \\ []) do
-    GenServer.call(ensure_atom(syncer_name), {:all, opts})
+  def all_from_db(syncer_name, opts \\ %{}) do
+    GenServer.call(ensure_atom(syncer_name), {:all, Map.to_list(opts)})
   end
 
   # +-------------+
