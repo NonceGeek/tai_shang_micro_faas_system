@@ -28,7 +28,7 @@ end)
 
 tx_ids_on_gist =
   ["8634a21477ea60785783cc0642ba4133"] # Contract Syncer
-Enum.map(tx_ids, fn tx_id ->
+Enum.map(tx_ids_on_gist, fn tx_id ->
   OnChainCode.create_or_query_by_tx_id(tx_id, "gist")
 end)
 
