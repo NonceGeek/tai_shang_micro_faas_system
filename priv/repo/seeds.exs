@@ -22,7 +22,7 @@ tx_ids_on_arweave =
     "1R7Y8U1bjC0EGePqHDC_0ODY-GiWxOw_rUPQOfXZLGA", # NftRender.NType
   ]
 
-Enum.map(tx_ids, fn tx_id ->
+Enum.map(tx_ids_on_arweave, fn tx_id ->
   OnChainCode.create_or_query_by_tx_id(tx_id)
 end)
 
