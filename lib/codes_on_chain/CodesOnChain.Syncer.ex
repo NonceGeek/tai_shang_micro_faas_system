@@ -5,25 +5,61 @@ defmodule CodesOnChain.Syncer do
   use GenServer
   require Logger
 
-  alias FunctionServerBasedOnArweave.CodeRunnerSpec
   alias Components.ExHttp
-  alias Components.KvDbHandler
+  alias Components.NFT
+  alias Components.Contract
 
   # 1 minutes
   @sync_interval 10_000
 
   # modify here to put yourself nft info
   @params [
-    syncer_name: "moonbeam_dao_nft",
-    chain_name: "moonbeam",
-    api_explorer: "https://api-moonbeam.moonscan.io/",
-    api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
+    chain_name: "Moonbeam",
+    api_explorer: "https://api-moonbeam.moonscan.io",
+    endpoint: "https://rpc.api.moonbeam.network",
     contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
     ]
+
+  # +--------------+
+  # | Public Funcs |
+  # +--------------+
   def get_module_doc(), do: @moduledoc
 
-  def start_link() do
-    start_link(@params)
+  @doc """
+    Start Syncer by api_key(it can be apply from blockchain explorer homepage).
+    To sync nfts to local, so it's convinient to fetch all the nfts.
+  """
+  def start_link(api_key) do
+    start_link(api_key, @params)
+  end
+
+  @doc """
+    return exp:
+    %Paginator.Page{
+      entries: [
+        nfts_list
+      ],
+      metadata: %Paginator.Page.Metadata{
+        after: "g3QAAAABZAAKdXBkYXRlZF9hdHQAAAAJZAAKX19zdHJ1Y3RfX2QAFEVsaXhpci5OYWl2ZURhdGVUaW1lZAAIY2FsZW5kYXJkABNFbGl4aXIuQ2FsZW5kYXIuSVNPZAADZGF5YQNkAARob3VyYQVkAAttaWNyb3NlY29uZGgCYQBhAGQABm1pbnV0ZWETZAAFbW9udGhhBWQABnNlY29uZGELZAAEeWVhcmIAAAfm",
+        before: nil,
+        limit: 50,
+        total_count: nil,
+        total_count_cap_exceeded: nil
+      }
+    }
+
+    just put the after or before as cursor_after or cursor_before param!
+  """
+  @spec get_by_contract_addr(String.t()) :: Paginator.Page.t()
+  def get_by_contract_addr(addr) do
+    %{id: id} = Contract.get_by_addr(addr)
+    NFT.get_by_contract_id(id)
+  end
+
+  @spec get_by_contract_addr(String.t(), Stirng.t()) :: Paginator.Page.t()
+  def get_by_contract_addr(addr, cursor_after) do
+    %{id: id} = Contract.get_by_addr(addr)
+    NFT.get_by_contract_id(id, cursor_after)
   end
 
   # +-----------+
@@ -34,10 +70,9 @@ defmodule CodesOnChain.Syncer do
   # syncer_name: "moonbeam_xxx_nft",
   # chain_name: "moonbeam",
   # api_explorer: "https://api-moonbeam.moonscan.io/",
-  # api_key: "Y6AIFQQVAJ3H38CC11QFDUDJWAWNCWE3U8",
   # contract_addr: "0xb6fc950c4bc9d1e4652cbedab748e8cdcfe5655f"
   # ]
-  defp start_link(args) do
+  defp start_link(api_key, args) do
     chain_name = Keyword.fetch!(args, :chain_name)
     contract_addr = Keyword.fetch!(args, :contract_addr)
 
@@ -47,106 +82,87 @@ defmodule CodesOnChain.Syncer do
       Keyword.fetch!(args, :syncer_name)
       |> ensure_atom()
 
-    GenServer.start_link(__MODULE__, Keyword.put(args, :syncer_name, syncer_name),
-      name: syncer_name
-    )
+    args_handled =
+      args
+      |> Keyword.put(:syncer_name, syncer_name)
+      |> Keyword.put(:api_key, api_key)
+
+    GenServer.start_link(__MODULE__,args_handled, name: syncer_name)
   end
 
-  def init(_args) do
+  def init(args) do
     Process.flag(:trap_exit, true)
-
-    [
-      syncer_name: syncer_name,
+    %{
       chain_name: chain_name,
       api_explorer: api_explorer,
+      syncer_name: _syncer_name,
+      endpoint: endpoint,
       api_key: api_key,
       contract_addr: contract_addr
-    ] = @params
+    } = Enum.into(args, %{})
 
-    contract_id =
-      init_chain_and_contract(chain_name, api_explorer, api_key, contract_addr)
+    api_explorer =
+      handle_url(api_explorer)
+    {:ok, contract} =
+      init_chain_and_contract(chain_name, endpoint, api_explorer, api_key, contract_addr)
 
     sync_after_interval()
 
     {:ok,
      %{
-       syncer_name: syncer_name,
-       api_key: api_key,
-       contract_id: contract_id
+        api_key: api_key,
+        contract: contract,
+        syncer_name: Keyword.get(args, :syncer_name)
      }}
   end
 
   def terminate(reason, %{syncer_name: syncer_name}) do
     Logger.error("#{syncer_name} terminates due to #{inspect(reason)}")
-
     :ok
   end
 
   def handle_info(:sync, state) do
-    %{
-      api_key: api_key,
-      contract_id: contract_id
-    } = state
+    %{contract: contract, api_key: api_key} = state
 
-    contract = KvDbHandler.get(contract_id)
-
-    sync(api_key, contract)
+    {:ok, contract_updated} =
+      sync(api_key, contract)
 
     sync_after_interval()
-    {:noreply, state}
+    {:noreply, Map.put(state, :contract, contract_updated)}
   end
 
-  def handle_call({:get, key}, _from, state) do
-    val = KvDbHandler.get(key)
+  # +------------------+
+  # | DB Utility Funcs |
+  # +------------------+
 
-    {:reply, val, state}
-  end
+  # +------------------+
+  # Internal Methods   |
+  # +------------------+
+  defp init_chain_and_contract(chain_name, endpoint, api_explorer, api_key, contract_addr) do
 
-  def handle_call({:all, opts}, _from, state) do
-    {:reply, KvDbHandler.all(opts), state}
-  end
+    contract = Contract.get_by_addr(contract_addr)
 
-  # +-----------+
-  # Public API that can be invoked by CodeRunner
-  # +-----------+
-  def get_from_db(syncer_name, key) do
-    GenServer.call(ensure_atom(syncer_name), {:get, key})
-  end
-
-  def all_from_db(syncer_name, opts \\ %{}) do
-    GenServer.call(ensure_atom(syncer_name), {:all, Map.to_list(opts)})
-  end
-
-  # +-------------+
-  # Internal Methods
-  # +-------------+
-  defp init_chain_and_contract(chain_name, api_explorer, api_key, contract_addr) do
-    contract_id = get_contract_id(contract_addr)
-
-    case KvDbHandler.get(contract_id) do
-      nil ->
-        contract_abi_string = get_contract_abi(api_explorer, api_key, contract_addr)
-        endpoint = get_endpoint(chain_name)
-
-        contract = %{
-          id: contract_id,
-          endpoint: endpoint,
+    if is_nil(contract) do
+      # init contract
+      abi = get_contract_abi(api_explorer, api_key, contract_addr)
+      Contract.create_without_repeat(%{
+        addr: contract_addr,
+        abi: abi,
+        chain_info: %{
+          chain_name: chain_name,
           api_explorer: api_explorer,
-          addr: contract_addr,
-          last_block: 1,
-          abi: contract_abi_string
-        }
-
-        KvDbHandler.put(contract_id, contract)
-
-      _ ->
-        :ok
+          endpoint: endpoint
+        },
+        last_block: 0
+      })
+    else
+      # return existed contract
+      {:ok, contract}
     end
-
-    contract_id
   end
 
-  defp get_contract_abi(
+  @spec get_contract_abi(String.t(), String.t(), String.t()) :: map()
+  def get_contract_abi(
          api_explorer,
          api_key,
          contract_addr
@@ -156,35 +172,30 @@ defmodule CodesOnChain.Syncer do
 
     Logger.info("call url to get contract abi: #{url}")
     {:ok, %{"result" => contract_abi_string}} = ExHttp.http_get(url)
-    contract_abi_string
-  end
-
-  defp get_contract_id(contract_addr) do
-    "contract_#{contract_addr}"
+    Poison.decode!(contract_abi_string)
   end
 
   defp sync_after_interval() do
     Process.send_after(self(), :sync, @sync_interval)
   end
 
-  defp sync(api_key, contract) do
-    best_block = get_blockheight(contract.endpoint)
+  def sync(api_key, contract) do
+    # get_best |> sync between |> update last_block to best_block
+    best_block = get_best_block(contract.chain_info["endpoint"])
 
     do_sync(api_key, contract, best_block)
-
-    KvDbHandler.put(contract.id, %{contract | last_block: best_block + 1})
+    Contract.update(contract, %{last_block: best_block + 1})
   end
 
   defp do_sync(api_key, contract, best_block) do
     {:ok, %{"result" => txs}} =
       get_txs_by_contract_addr(
-        contract.api_explorer,
+        contract.chain_info["api_explorer"],
         api_key,
         contract.addr,
         contract.last_block,
         best_block
       )
-
     handle_txs(contract, txs)
   end
 
@@ -207,13 +218,7 @@ defmodule CodesOnChain.Syncer do
     ExHttp.http_get(url)
   end
 
-  defp get_endpoint(chain_name) do
-    "ghBIjdbs2HpGM0Huy3IV0Ynm9OOWxDLkcW6q0X7atqs"
-    |> CodeRunnerSpec.run_ex_on_chain("get_endpoints", [])
-    |> Map.get(chain_name)
-  end
-
-  defp get_blockheight(endpoint) do
+  def get_best_block(endpoint) do
     # case HttpClient.eth_block_number(url: endpoint) do
     #   {:ok, hex} ->
     #     hex_to_int(hex)
@@ -233,11 +238,10 @@ defmodule CodesOnChain.Syncer do
     |> hex_to_int()
   end
 
-  # +-------------+
+  # +----------------------------+
   # | Transaction Handling Funcs |
-  # +-------------+
-  defp handle_txs(contract, txs) do
-    abi = Jason.decode!(contract.abi)
+  # +----------------------------+
+  defp handle_txs(%{abi: abi} = contract, txs) do
 
     Enum.each(txs, fn tx ->
       handle_tx(contract, abi, ExStructTranslator.to_atom_struct(tx))
@@ -250,7 +254,6 @@ defmodule CodesOnChain.Syncer do
 
   defp handle_tx(contract, abi, tx) do
     data = find_and_decode_func(abi, tx.input)
-
     do_handle_tx(contract, tx, data)
   end
 
@@ -267,25 +270,44 @@ defmodule CodesOnChain.Syncer do
     :pass
   end
 
-  def handle_tx_type(_contract, func, _from, _to, _value, [_from_bin, to_bin, token_id])
-      when func in ["safeTransferFrom", "transferFrom"] do
-    nft = KvDbHandler.get(token_id)
+  # +------------------------+
+  # | Spec NFT func handlers |
+  # +------------------------+
+  def do_handle_tx(%{id: c_id} = contract, "setTokenInfo", _from, _to, _value, [token_id, _badges_raw]) do
+    nft = NFT.get_by_contract_id_and_token_id(c_id, token_id)
+    %{addr: addr, chain_info: %{"endpoint" => endpoint}} = contract
+      # UPDATE Badges & URI
+      uri = get_token_uri(endpoint, addr, token_id)
+      Logger.info("Updating nft #{token_id} uri: #{uri}")
+      NFT.update(nft, %{uri: uri})
+  end
+
+  # +-------------------------+
+  # | Utils NFT func handlers |
+  # +-------------------------+
+
+  def handle_tx_type(%{id: c_id}, func, _from, _to, _value, [_from_bin, to_bin, token_id])
+      when func in ["safeTransferFrom", "transferFrom"] and token_id <= 2147483646 do
+        nft = NFT.get_by_contract_id_and_token_id(c_id, token_id)
 
     if nft != nil do
-      Logger.info("Updating nft #{token_id} owner: #{bin_to_addr(to_bin)}")
-      KvDbHandler.put(token_id, %{nft | owner: bin_to_addr(to_bin)})
+      addr = bin_to_addr(to_bin)
+      Logger.info("Updating nft #{token_id} owner: #{addr}")
+      NFT.update(nft, %{owner: addr})
     end
   end
 
-  def handle_tx_type(contract, "claim", from, _to, _value, [token_id]) do
-    %{id: nft_c_id, addr: addr, endpoint: endpoint} = contract
-    nft = KvDbHandler.get(token_id)
+  def handle_tx_type(%{id: c_id} = contract, "claim", from, _to, _value, [token_id])
+    when token_id <= 2147483646 do
+    %{id: nft_c_id, addr: addr, chain_info: %{"endpoint" => endpoint}} =
+      contract
+    nft = NFT.get_by_contract_id_and_token_id(c_id, token_id)
 
     if nft == nil do
       # INIT Token
       uri = get_token_uri(endpoint, addr, token_id)
 
-      nft = %{
+      payload = %{
         uri: uri,
         owner: from,
         token_id: token_id,
@@ -294,7 +316,7 @@ defmodule CodesOnChain.Syncer do
 
       Logger.info("#{from} claims nft token: #{token_id}")
 
-      KvDbHandler.put(token_id, nft)
+      NFT.create(payload)
     end
   end
 
@@ -327,19 +349,15 @@ defmodule CodesOnChain.Syncer do
         Map.get(value, "result")
 
       {:error, _} ->
-        # wait 1 sec
-        Process.sleep(1000)
+        # wait 60 sec
+        Process.sleep(60000)
         eth_call_repeat(data, contract_addr, func_name, endpoint)
     end
   end
 
-  # +-------------+
-  # | DB Utility Funcs |
-  # +-------------+
-
-  # +-------------+
+  # +---------------------+
   # | Basic Utility Funcs |
-  # +-------------+
+  # +---------------------+
   defp hex_to_int(hex) do
     hex
     |> String.slice(2..-1)
@@ -380,4 +398,13 @@ defmodule CodesOnChain.Syncer do
 
   defp ensure_atom(val) when is_atom(val), do: val
   defp ensure_atom(val), do: to_string(val) |> String.to_atom()
+
+  defp handle_url(""), do: ""
+  defp handle_url(url) do
+    if String.at(url, -1) == "/" do
+      url
+    else
+      url <> "/"
+    end
+  end
 end

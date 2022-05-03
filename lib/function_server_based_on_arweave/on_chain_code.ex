@@ -46,11 +46,13 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     Gist.get_from_gist(tx_id)
   end
   def create_by_payload_and_tx_id(code, tx_id, type) do
-    Code.eval_string(code)
+    # Code.eval_string(code)
     name = get_module_name_from_code(code)
     # save file to local
     File.write!("lib/codes_on_chain/#{name}.ex", code)
+    # load code by local file
     description = get_description_from_name(name)
+    # create it in database
     Ele.create(%{
       name: name,
       tx_id: tx_id,
@@ -58,7 +60,6 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
       code: code,
       type: type
     })
-    # description = get_module_description_from_code(code)
   end
 
   def create(attrs \\ %{}) do
@@ -85,8 +86,9 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # module_name.module_info
   end
   def remove_code_by_name(name) do
-    get_by_name(name) |>
-    Repo.delete
+    name
+    |> get_by_name()
+    |> Repo.delete
   end
   def get_functions(name) do
     %{exports: raw_functions} =

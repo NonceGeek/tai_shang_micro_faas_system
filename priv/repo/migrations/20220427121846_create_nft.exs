@@ -6,10 +6,8 @@ defmodule FunctionServerBasedOnArweave.Repo.Migrations.CreateNFT do
       add :token_id, :integer
       add :owner, :string
       add :uri, :text
-
+      add :contract_id, :integer
       timestamps()
     end
-
-    create unique_index(:nft, [:token_id])
   end
 end

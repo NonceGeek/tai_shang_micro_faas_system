@@ -7,10 +7,10 @@ defmodule FunctionServerBasedOnArweave.CodeRunnerSpec do
     # Save to database
     with {:ok, %{content: code}} <- ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id),
       {:ok, _ele} <- OnChainCode.create_or_query_by_tx_id(tx_id) do
-      # Load Module
-      # Run func
       moduel_name = OnChainCode.get_module_name_from_code(code)
-      OnChainCode.load_code(code)
+      # Reload Module
+      IEx.Helpers.r(String.to_atom("Elixir.#{moduel_name}"))
+      # Run func
       CodeRunner.run_func(
         moduel_name,
         func_name,
