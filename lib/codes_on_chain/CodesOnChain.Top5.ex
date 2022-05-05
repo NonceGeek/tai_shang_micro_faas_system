@@ -9,4 +9,12 @@ defmodule CodesOnChain.Top5 do
   # %{filename_trimed_without_file format: %{type: xx, content: xx}}
   # eg. %{DAO: %{type: "application/json", content: "opps"}}
 
+  alias Components.GistHandler
+  def handle_gist(gist_id) do
+    %{files: %{
+      "DAO.json": %{type: "application/json", content: content},
+    }
+    } = GistHandler.get_gist(gist_id)
+    Poison.decode!(content)
+  end
 end

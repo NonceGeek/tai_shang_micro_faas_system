@@ -47,12 +47,12 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:telemetry_metrics, ">= 0.0.0"},
       {:telemetry_poller, ">= 0.0.0"},
       {:gettext, "~> 0.18"},
-      {:jason, "~> 1.2"},
+      {:jason, "~> 1.3"},
       {:plug_cowboy, "~> 2.5"},
 
       # arweave
       {:arweave_sdk_ex, "~> 0.1.10"},
-      {:ethereumex, "~> 0.9"},
+      {:ethereumex, "~> 0.7.0"},
       {:ecto, "~> 3.7.1", override: true},
 
       # markdown
