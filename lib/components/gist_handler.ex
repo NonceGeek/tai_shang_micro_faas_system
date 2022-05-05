@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Components.GistHandler do
+defmodule Components.GistHandler do
   alias Components.ExHttp
   require Logger
   @prefix "https://api.github.com/gists"
