@@ -10,7 +10,7 @@ defmodule CodesOnChain.Syncer do
   alias Components.Contract
 
   # 1 minutes
-  @sync_interval 10_000
+  @sync_interval 60_000
 
   # modify here to put yourself nft info
   @params [
@@ -121,6 +121,12 @@ defmodule CodesOnChain.Syncer do
     :ok
   end
 
+  def alive?() do
+    chain_name = Keyword.fetch!(@params, :chain_name)
+    contract_addr = Keyword.fetch!(@params, :contract_addr)
+    !is_nil(Process.whereis(String.to_atom("#{chain_name}_#{contract_addr}")))
+  end
+
   def handle_info(:sync, state) do
     %{contract: contract, api_key: api_key} = state
 
@@ -132,11 +138,7 @@ defmodule CodesOnChain.Syncer do
   end
 
   # +------------------+
-  # | DB Utility Funcs |
-  # +------------------+
-
-  # +------------------+
-  # Internal Methods   |
+  # | Internal Methods |
   # +------------------+
   defp init_chain_and_contract(chain_name, endpoint, api_explorer, api_key, contract_addr) do
 
@@ -178,6 +180,8 @@ defmodule CodesOnChain.Syncer do
   defp sync_after_interval() do
     Process.send_after(self(), :sync, @sync_interval)
   end
+
+
 
   def sync(api_key, contract) do
     # get_best |> sync between |> update last_block to best_block
