@@ -11,6 +11,15 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :browser_empty do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, {FunctionServerBasedOnArweaveWeb.LayoutView, :empty}
+    plug :protect_from_forgery
+    plug :put_secure_browser_headers
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -32,6 +41,11 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through :browser
     live "/", CodeLoaderLive.Index, :index
+  end
+
+  scope "/", FunctionServerBasedOnArweaveWeb do
+    pipe_through :browser_empty
+    live "/page",  PageLive, :index
   end
 
   scope "/", FunctionServerBasedOnArweaveWeb do

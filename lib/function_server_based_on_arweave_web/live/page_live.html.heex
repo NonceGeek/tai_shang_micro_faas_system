@@ -1,0 +1,56 @@
+<br><br>
+<%= raw(Earmark.as_html!(
+"**Github User Name:**\n
+#{@gist_data.owner.login}\n
+**Twitter:**\n
+#{@gist_data.files.basic.twitter}\n 
+**Website:**\n
+#{@gist_data.files.basic.website}\n 
+**Addr List:**\n"
+))%>
+
+<%= for %{addr: addr, chain_name: chain_name} <-  @gist_data.files.basic.addrs do %>
+<%= raw(Earmark.as_html!(
+"- addr: #{addr}**@#{chain_name}**"
+    ))%>
+<% end %>
+<hr>
+
+<%= raw(Earmark.as_html!(
+"**Favourites:**\n"
+)) %>
+
+<%=raw(Earmark.as_html!( Enum.reduce(@gist_data.files.favorite, "", fn ele, acc ->
+    acc <> " `#{ele}`"
+end)))%>
+
+<hr>
+
+<%= raw(Earmark.as_html!(
+"**DAO participated in:**\n"
+)) %>
+
+<%= for %{name: name, description: description} <-  @gist_data.files.dao do %>
+<%= raw(Earmark.as_html!(
+"- **name:** #{name}
+- **description:** #{description}
+"))%>
+<% end %>
+
+<hr>
+
+<%= raw(Earmark.as_html!(
+"**Resume:**\n"
+)) %>
+
+<%= raw(Earmark.as_html!(@gist_data.files.resume)) %>
+
+<hr>
+
+<%= raw(Earmark.as_html!(
+"**Mirror Articles:**\n"
+)) %>
+
+<%= for mirror_link <-  @gist_data.files.mirror do %>
+    <%= raw(Earmark.as_html!( "https://www.arweave.net/#{mirror_link}")) %>
+<% end %>
