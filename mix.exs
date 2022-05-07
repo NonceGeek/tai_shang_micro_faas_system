@@ -52,7 +52,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
 
       # arweave
       {:arweave_sdk_ex, "~> 0.1.10"},
-      {:ethereumex, "~> 0.7.0"},
+      {:ethereumex, "~> 0.9"},
       {:ecto, "~> 3.7.1", override: true},
 
       # markdown
@@ -66,7 +66,6 @@ defmodule FunctionServerBasedOnArweave.MixProject do
 
       # handle_uri
       {:ex_url, "~> 1.4"},
-
       {:httpoison, "~> 1.5"},
       {:paginator, "~> 1.1"},
 
