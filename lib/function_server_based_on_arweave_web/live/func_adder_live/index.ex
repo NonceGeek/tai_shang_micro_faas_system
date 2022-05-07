@@ -14,10 +14,11 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
     "form" =>
     %{
       "tx_id" => tx_id,
-      "gist_id" => gist_id
+      "gist_id" => gist_id,
+      "nft_code_id" => nft_code_id
     }
   }, socket) do
-    {type, id} = build_type(tx_id, gist_id)
+    {type, id} = build_type(tx_id, gist_id, nft_code_id)
     with {:ok, _ele} <- OnChainCode.create_or_query_by_tx_id(id, type) do
       {
         :noreply,
@@ -40,7 +41,8 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
     {:noreply, socket}
   end
 
-  def build_type("", gist_id), do: {"gist", gist_id}
-  def build_type(tx_id, ""), do: {"ar", tx_id}
+  def build_type("", gist_id, ""), do: {"gist", gist_id}
+  def build_type(tx_id, "", ""), do: {"ar", tx_id}
+  def build_type("", "", nft_code_id), do: {"nft", nft_code_id}
 
 end
