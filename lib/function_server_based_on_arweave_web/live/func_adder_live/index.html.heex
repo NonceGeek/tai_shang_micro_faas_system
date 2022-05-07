@@ -15,14 +15,21 @@
 <center><%= label f, :TX_ID_ON_ARWEAVE %>
 <%= text_input f, :tx_id, class: "form-field" %>
 OR
-<br>
+<br />
 <%= label f, :GiST_ID %>
-<br>
+<br />
   <a href="https://gist.github.com/" target="_blank">go to add a snippet on gist(remember to set it to PUBLIC)!</a>
 </center>
-<br>
+<br />
 <%= text_input f, :gist_id, class: "form-field" %>
-<br><br>
+<br />
+<center> 
+OR
+<br />
+<%= label f, :NFT_CODE_ID %>
+<%= text_input f, :nft_code_id, class: "form-field" %>
+</center>
+<br />
 <button type="submit" phx-disable-with="loading...">Add Code</button>
 
 </.form>

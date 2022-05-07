@@ -4,6 +4,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   import Ecto.Changeset
   alias FunctionServerBasedOnArweave.OnChainCode, as: Ele
   alias FunctionServerBasedOnArweave.CodeFetchers.Gist
+  alias FunctionServerBasedOnArweave.CodeFetchers.NFT
   alias FunctionServerBasedOnArweave.Repo
 
   @rejected_func_list [:__info__, :module_info]
@@ -45,6 +46,11 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def do_create_or_query_by_tx_id(tx_id, "gist") do
     Gist.get_from_gist(tx_id)
   end
+
+  def do_create_or_query_by_tx_id(tx_id, "nft") do
+    NFT.get_from_nft(tx_id)
+  end
+
   def create_by_payload_and_tx_id(code, tx_id, type) do
     # Code.eval_string(code)
     name = get_module_name_from_code(code)
