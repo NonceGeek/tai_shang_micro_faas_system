@@ -15,7 +15,11 @@ config :function_server_based_on_arweave,
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
   url: [host: "localhost"],
-  render_errors: [view: FunctionServerBasedOnArweaveWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [
+    view: FunctionServerBasedOnArweaveWeb.ErrorView,
+    accepts: ~w(html json),
+    layout: false
+  ],
   pubsub_server: FunctionServerBasedOnArweave.PubSub,
   live_view: [signing_salt: "mbnVB7Pw"]
 
@@ -24,6 +28,7 @@ config :function_server_based_on_arweave, :pow,
   user: FunctionServerBasedOnArweave.Users.User,
   repo: FunctionServerBasedOnArweave.Repo,
   web_module: FunctionServerBasedOnArweaveWeb
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
@@ -31,7 +36,8 @@ config :function_server_based_on_arweave, :pow,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Mailer, adapter: Swoosh.Adapters.Local
+config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Mailer,
+  adapter: Swoosh.Adapters.Local
 
 # Swoosh API client is needed for adapters other than SMTP.
 config :swoosh, :api_client, false
@@ -52,6 +58,12 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :ethereumex,
+  http_options: [pool_timeout: 5000, receive_timeout: 15_000],
+  http_headers: [
+    {"Content-Type", "application/json"}
+  ]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
