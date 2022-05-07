@@ -15,9 +15,14 @@ defmodule CodesOnChain.Top5 do
   #   "mirror.json": %{type: "application/json", content: mir_content},
   #   "resume.md": %{type: "text/markdown", content: resume},
   # }
+  @moduledoc """
+    Generate Top5 Homepage!
+  """
   alias Components.GistHandler
 
   @json_type "application/json"
+  
+  def get_module_doc(), do: @moduledoc
 
   def handle_gist(gist_id) do
     %{files: files} =

@@ -6,6 +6,8 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   alias FunctionServerBasedOnArweave.CodeFetchers.Gist
   alias FunctionServerBasedOnArweave.Repo
 
+  require Logger
+
   @rejected_func_list [:__info__, :module_info]
 
   schema "on_chain_code" do
@@ -28,13 +30,19 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
 
   def create_or_query_by_tx_id(tx_id, type \\ "ar") do
-    ele = get_by_tx_id(tx_id)
-    if is_nil(ele) == true do
-      do_create_or_query_by_tx_id(tx_id, type)
-      {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
-      Ele.create_by_payload_and_tx_id(code, tx_id, type)
-    else
-      {:ok, ele}
+    try do
+      ele = get_by_tx_id(tx_id)
+      if is_nil(ele) == true do
+        do_create_or_query_by_tx_id(tx_id, type)
+        {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
+        Logger.info(code)
+        Ele.create_by_payload_and_tx_id(code, tx_id, type)
+      else
+        {:ok, ele}
+      end
+    rescue
+      error ->
+        {:error, inspect(error)}
     end
   end
 
@@ -47,9 +55,12 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   end
   def create_by_payload_and_tx_id(code, tx_id, type) do
     # Code.eval_string(code)
+    Logger.info(code)
     name = get_module_name_from_code(code)
     # save file to local
     File.write!("lib/codes_on_chain/#{name}.ex", code)
+    # reload module
+    IEx.Helpers.r(String.to_atom("Elixir.#{name}"))
     # load code by local file
     description = get_description_from_name(name)
     # create it in database
