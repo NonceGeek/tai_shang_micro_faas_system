@@ -46,6 +46,7 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through :browser_empty
     live "/page",  PageLive, :index
+    live "/namecard", NameCardLive, :index
   end
 
   scope "/", FunctionServerBasedOnArweaveWeb do
