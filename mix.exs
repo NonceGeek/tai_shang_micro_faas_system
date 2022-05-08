@@ -72,7 +72,9 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       # authentication
       {:pow, "~> 1.0.26"},
       # trace
-      {:recon, "~> 2.5"}
+      {:recon, "~> 2.5"},
+
+      {:cors_plug, "~> 2.0"},
     ]
   end
 

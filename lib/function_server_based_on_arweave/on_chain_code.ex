@@ -67,6 +67,8 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # save file to local
     File.write!("lib/codes_on_chain/#{name}.ex", code)
     # load code
+    # I went ahead with Code.eval_string/2 and while it’s at least an order of magnitude slower than running compiled code, it’s good enough for the current event throughput. The expressions I’ll use are quite small. Basically what would go into the condition of an if control statement.
+    # TODO: Code.eval_string_is_slow, so it's better to recompile module after file write.
     Code.eval_string(code)
     description = get_description_from_code(code)
     # create it in database

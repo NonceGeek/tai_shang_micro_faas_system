@@ -3,8 +3,10 @@ defmodule CodesOnChain.Meeting do
     put/get meeting info by signature.
     only in white list(in gist) can get the meeting info.
   """
+  require Logger
 
   alias Components.{GistHandler, KvHandler, Verifier}
+
   @admin_addr "0x2913825f11434a5070797d32df3a892e28d891a0"
   @white_list %{
     gist_id: "4c8b6504b7eb23c8ca75cb3a705eb17b",
@@ -42,7 +44,8 @@ defmodule CodesOnChain.Meeting do
   defp get_white_list() do
     %{gist_id: gist_id, file_name: file_name} = @white_list
     %{files: files} = GistHandler.get_gist(gist_id)
-    files |> Map.get(file_name) |> Map.get(:content) |> Poison.decode!()
+    Logger.info(inspect(files))
+    files |> Map.get(String.to_atom(file_name)) |> Map.get(:content) |> Poison.decode!()
   end
 
 end
