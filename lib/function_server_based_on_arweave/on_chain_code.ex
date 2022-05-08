@@ -66,10 +66,8 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     name = get_module_name_from_code(code)
     # save file to local
     File.write!("lib/codes_on_chain/#{name}.ex", code)
-    # reload module
-    Process.sleep(@sleep_time)
-    IEx.Helpers.r(String.to_atom("Elixir.#{name}"))
-    # load code by local file
+    # load code
+    Code.eval_string(code)
     description = get_description_from_name(name)
     # create it in database
     Ele.create(%{
