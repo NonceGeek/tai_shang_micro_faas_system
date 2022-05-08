@@ -68,7 +68,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     File.write!("lib/codes_on_chain/#{name}.ex", code)
     # load code
     Code.eval_string(code)
-    description = get_description_from_name(name)
+    description = get_description_from_code(code)
     # create it in database
     Ele.create(%{
       name: name,
@@ -134,9 +134,19 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # |> String.to_atom()
   end
 
-  def get_description_from_name(name) do
-    "Elixir.#{name}"
-    |> String.to_atom()
-    |> apply(:get_module_doc, [])
+  def get_description_from_code(code) do
+    code
+    |> String.split("\"\"\"")
+    |> Enum.fetch!(1)
+    |> String.replace_leading("\n", "")
+    |> String.replace_leading(" ", "")
+    |> String.replace_trailing(" ", "")
+    |> String.replace_trailing("\n", "")
   end
+
+  # def get_description_from_name(name) do
+  #   "Elixir.#{name}"
+  #   |> String.to_atom()
+  #   |> apply(:get_module_doc, [])
+  # end
 end
