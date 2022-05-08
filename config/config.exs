@@ -10,7 +10,11 @@ import Config
 config :function_server_based_on_arweave,
   ecto_repos: [FunctionServerBasedOnArweave.Repo],
   arweave_endpoint: "https://arweave.net",
-  arweave_explorer: "https://viewblock.io/arweave/tx"
+  arweave_explorer: "https://viewblock.io/arweave/tx",
+  contract_addr: "0xD1e91A4Bf55111dD3725E46A64CDbE7a2cC97D8a",
+  contract_endpoint: "https://rpc.api.moonbase.moonbeam.network",
+  eth_explorer: "https://moonbase.moonscan.io",
+  gallery: "https://moonbeam.nftscan.com/search"
 
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,

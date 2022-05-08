@@ -20,17 +20,24 @@ OR
 <br />
   <a href="https://gist.github.com/" target="_blank">go to add a snippet on gist(remember to set it to PUBLIC)!</a>
 </center>
+<center> 
 <br />
 <%= text_input f, :gist_id, class: "form-field" %>
 <br />
-<center> 
 OR
 <br />
 <%= label f, :NFT_CODE_ID %>
-<%= text_input f, :nft_code_id, class: "form-field" %>
-</center>
-<br />
-<button type="submit" phx-disable-with="loading...">Add Code</button>
+<%=raw(Earmark.as_html!(
+"**Contract:** [See Contract in Explorer!](#{Constants.get_eth_explorer()}/address/#{Constants.get_contract_addr()}) \n 
+**Gallery:**  [See All Codes in Gallery!](#{Constants.get_gallery()}/#{Constants.get_contract_addr()}) \n
+"
+))%>
 
+<%= text_input f, :nft_code_id, class: "form-field" %>
+
+<br /><br />
+<button type="submit" phx-disable-with="loading...">Add Code</button>
+</center>
 </.form>
+
 </div>

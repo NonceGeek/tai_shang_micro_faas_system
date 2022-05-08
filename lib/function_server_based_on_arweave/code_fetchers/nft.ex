@@ -2,9 +2,6 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.NFT do
   alias Components.ExHttp
   require Logger
 
-  @contract_addr "0xD1e91A4Bf55111dD3725E46A64CDbE7a2cC97D8a"
-  @url "https://rpc.api.moonbase.moonbeam.network/"
-
   defp get_data(func_str, params) do
     payload =
       func_str
@@ -22,14 +19,14 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.NFT do
       |> ABI.TypeDecoder.decode_raw([:string])
       |> List.first()
 
-    ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), ar_txid)
+    ArweaveSdkEx.get_content_in_tx(Constants.get_arweave_node(), ar_txid)
   end
 
   def do_get_from_nft(code_id) do
-    Logger.info("do get from nft #{@url}, and code_id is #{code_id}")
+    Logger.info("do get from nft #{Constants.get_contract_endpoint()}, and code_id is #{code_id}")
 
     result =
-      ExHttp.http_post(@url, %{
+      ExHttp.http_post(Constants.get_contract_endpoint(), %{
         "jsonrpc" => "2.0",
         "id" => 7,
         "method" => "eth_call",
@@ -37,12 +34,10 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.NFT do
           %{
             from: "0x0000000000000000000000000000000000000000",
             data: get_data("code(uint256)", [code_id |> String.to_integer()]),
-            to: @contract_addr
+            to: Constants.get_contract_addr()
           }
         ]
       })
-
-    IO.inspect(result)
 
     case result do
       {:ok, value} ->

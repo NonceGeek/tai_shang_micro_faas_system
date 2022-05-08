@@ -48,7 +48,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   end
 
   def do_create_or_query_by_tx_id(tx_id, "ar") do
-    ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
+    ArweaveSdkEx.get_content_in_tx(Constants.get_arweave_node(), tx_id)
   end
 
   def do_create_or_query_by_tx_id(tx_id, "gist") do

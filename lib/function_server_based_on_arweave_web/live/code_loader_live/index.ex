@@ -146,12 +146,12 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     # get_content_by_tx_id
     # parse code as markdown
     %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(selected_code)
-    # {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(ArweaveNode.get_node(), tx_id)
+    # {:ok, %{content: code}} = ArweaveSdkEx.get_content_in_tx(Constants.get_arweave_node(), tx_id)
     {tx_id, code, type}
   end
 
   def build_explorer_link(tx_id, "ar") do
-    "#{ArweaveNode.get_explorer()}/#{tx_id}"
+    "#{Constants.get_arweave_explorer()}/#{tx_id}"
   end
 
   def build_explorer_link(tx_id, "gist") do
