@@ -49,7 +49,7 @@ defmodule Components.KvHandler do
         val
     end
     |> KV.changeset(%{ value: v_str })
-    |> Repo.insert_or_update!()
+    |> Repo.insert_or_update()
   end
 
   def all([]) do
