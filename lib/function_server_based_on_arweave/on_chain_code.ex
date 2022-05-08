@@ -10,6 +10,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   require Logger
 
   @rejected_func_list [:__info__, :module_info]
+  @sleep_time 2_000
 
   schema "on_chain_code" do
     field :name, :string
@@ -66,6 +67,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # save file to local
     File.write!("lib/codes_on_chain/#{name}.ex", code)
     # reload module
+    Process.sleep(@sleep_time)
     IEx.Helpers.r(String.to_atom("Elixir.#{name}"))
     # load code by local file
     description = get_description_from_name(name)
