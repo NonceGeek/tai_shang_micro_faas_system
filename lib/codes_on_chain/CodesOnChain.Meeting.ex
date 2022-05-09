@@ -33,7 +33,7 @@ defmodule CodesOnChain.Meeting do
   """
   def get_meeting(key, addr, msg, signature) do
     with true <- Verifier.verify_message?(addr, msg, signature),
-      true <- addr in get_white_list() do
+      true <- String.downcase(addr) in get_white_list() do
         {:ok, KvHandler.get(key)}
       else
         error ->
@@ -45,7 +45,11 @@ defmodule CodesOnChain.Meeting do
     %{gist_id: gist_id, file_name: file_name} = @white_list
     %{files: files} = GistHandler.get_gist(gist_id)
     Logger.info(inspect(files))
-    files |> Map.get(String.to_atom(file_name)) |> Map.get(:content) |> Poison.decode!()
+    files
+    |> Map.get(String.to_atom(file_name))
+    |> Map.get(:content)
+    |> Poison.decode!()
+    |> Enum.map(&(String.downcase(&1)))
   end
 
   def rand_msg(), do: "0x" <> RandGen.gen_hex(32)
