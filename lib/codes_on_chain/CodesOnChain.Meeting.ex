@@ -31,10 +31,10 @@ defmodule CodesOnChain.Meeting do
   @doc """
     get meeting after verify the signatue and check if in the whitelist.
   """
-  def get_meeting(addr, meeting_info, signature) do
-    with true <- Verifier.verify_message?(addr, meeting_info, signature),
+  def get_meeting(key, addr, msg, signature) do
+    with true <- Verifier.verify_message?(addr, msg, signature),
       true <- addr in get_white_list() do
-        {:ok, KvHandler.get(addr)}
+        {:ok, KvHandler.get(key)}
       else
         error ->
         {:error, inspect(error)}
@@ -47,5 +47,7 @@ defmodule CodesOnChain.Meeting do
     Logger.info(inspect(files))
     files |> Map.get(String.to_atom(file_name)) |> Map.get(:content) |> Poison.decode!()
   end
+
+  def rand_msg(), do: "0x" <> RandGen.gen_hex(32)
 
 end
