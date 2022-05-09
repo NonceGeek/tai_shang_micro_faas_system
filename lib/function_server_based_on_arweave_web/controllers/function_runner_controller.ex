@@ -54,6 +54,7 @@ defmodule FunctionServerBasedOnArweaveWeb.FunctionRunnerController do
       payload
       |> ExStructTranslator.to_atom_struct()
       |> do_run()
+      |> handle_param()
     json(conn, %{result: result})
   end
 
@@ -79,5 +80,30 @@ defmodule FunctionServerBasedOnArweaveWeb.FunctionRunnerController do
       params
     )
   end
+
+  def handle_param({:ok, result}) do
+    %{
+      status: :ok,
+      payload: do_handle_param(result)
+    }
+  end
+  def handle_param({:error, result}) do
+    %{
+      status: :error,
+      payload: do_handle_param(result)
+    }
+  end
+
+  def handle_param(payload) when is_struct(payload) do
+    ExStructTranslator.struct_to_map(payload)
+  end
+
+  def handle_param(payload), do: payload
+
+  def do_handle_param(result) when is_struct(result) do
+    ExStructTranslator.struct_to_map(result)
+  end
+
+  def do_handle_param(payload), do: payload
 
 end
