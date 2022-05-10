@@ -52,6 +52,6 @@ defmodule CodesOnChain.Meeting do
     |> Enum.map(&(String.downcase(&1)))
   end
 
-  def rand_msg(), do: "0x" <> RandGen.gen_hex(32)
+  def rand_msg(byte_size), do: "0x" <> RandGen.gen_hex(byte_size)
 
 end
