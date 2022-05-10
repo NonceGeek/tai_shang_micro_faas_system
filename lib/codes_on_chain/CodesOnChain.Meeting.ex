@@ -41,7 +41,7 @@ defmodule CodesOnChain.Meeting do
     end
   end
 
-  defp get_white_list() do
+  def get_white_list() do
     %{gist_id: gist_id, file_name: file_name} = @white_list
     %{files: files} = GistHandler.get_gist(gist_id)
     Logger.info(inspect(files))
