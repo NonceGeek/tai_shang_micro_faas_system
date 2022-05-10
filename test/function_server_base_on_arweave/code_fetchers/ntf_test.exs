@@ -3,7 +3,7 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.NFTTest do
 
   alias FunctionServerBasedOnArweave.CodeFetchers.NFT
   test "get from nft" do
-    result = NFT.get_from_nft(1)
-    assert result == "rr5p8_FJ4l0KvjhCtIzmxfBNN3UiN2Cv2Ml08ys9odE"
+    {r, _} = NFT.get_from_nft("1")
+    assert r == :ok
   end
 end

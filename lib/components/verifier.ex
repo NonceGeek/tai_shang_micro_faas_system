@@ -56,7 +56,7 @@ defmodule Components.Verifier do
   end
 
   defp get_message_length_bytes(message) when is_binary(message) do
-    Integer.to_string(String.length(message))
+    Integer.to_string(message |> :erlang.byte_size())
   end
 
   @doc "Destructure a signature to r, s, v to be used by Secp256k1 recover"
