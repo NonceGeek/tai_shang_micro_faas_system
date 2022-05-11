@@ -58,13 +58,21 @@ defmodule CodesOnChain.Top5 do
 
   def trim_file_name(files) do
     Enum.map(files, fn {k, v} ->
-      [name_trimmed, _ ] = handle_file_name(k)
+      name_trimmed = handle_file_name(k)
       {String.downcase(name_trimmed), v}
     end)
     |> Enum.into(%{})
   end
 
   def handle_file_name(name) do
-    name |> Atom.to_string() |> String.split(".")
+    case name
+         |> Atom.to_string()
+         |> String.reverse
+         |> String.split(".", parts: 2) do
+      [_, name_trimmed] ->
+        String.reverse(name_trimmed)
+      [name_trimmed] ->
+        String.reverse(name_trimmed)
+    end
   end
 end
