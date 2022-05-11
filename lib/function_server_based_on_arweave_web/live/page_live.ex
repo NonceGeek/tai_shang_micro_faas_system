@@ -5,10 +5,11 @@ defmodule FunctionServerBasedOnArweaveWeb.PageLive do
   @impl true
   # suit top5
   def mount(%{"gist_id" => gist_id}, _session, socket) do
+    {:ok, payload} = Top5.handle_gist(gist_id)
     {
       :ok,
       socket
-      |> assign(:gist_data, Top5.handle_gist(gist_id))
+      |> assign(:gist_data, payload)
     }
   end
 
