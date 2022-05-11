@@ -1,3 +1,4 @@
+<%=if is_nil(@error) do %>
 <svg width="1058px" height="608px" viewBox="0 0 1058 608" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <style>
         a:link, a:visited {
@@ -64,3 +65,7 @@
         </g>
     </g>
 </svg>
+
+<% else %>
+        <%= @error %>
+<% end %>
