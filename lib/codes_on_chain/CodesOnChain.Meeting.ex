@@ -53,5 +53,6 @@ defmodule CodesOnChain.Meeting do
   end
 
   def rand_msg(byte_size), do: "0x" <> RandGen.gen_hex(byte_size)
+  def rand_msg(), do: "0x" <> RandGen.gen_hex(32)
 
 end

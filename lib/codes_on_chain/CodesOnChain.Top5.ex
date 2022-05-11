@@ -21,17 +21,24 @@ defmodule CodesOnChain.Top5 do
   alias Components.GistHandler
 
   @json_type "application/json"
-  
+
   def get_module_doc(), do: @moduledoc
 
   def handle_gist(gist_id) do
     %{files: files} =
       payload =
         GistHandler.get_gist(gist_id)
+    try do
+      result =
+        payload
+        |> Map.put(:files, handle_files(files))
+        |> ExStructTranslator.to_atom_struct()
+      {:ok, result}
+    rescue
+      _ ->
+        {:error, "the files is not regular!"}
+    end
 
-    payload
-    |> Map.put(:files, handle_files(files))
-    |> ExStructTranslator.to_atom_struct()
   end
 
   def handle_files(files) do
