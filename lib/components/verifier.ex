@@ -50,7 +50,7 @@ defmodule Components.Verifier do
   # ------ defps ------
 
   @doc "Hashes a binary message and removes ethereum message prefix & length from the beginning of the binary."
-  defp hash_message(message) when is_binary(message) do
+  def hash_message(message) when is_binary(message) do
     eth_message = @ethereum_message_prefix <> get_message_length_bytes(message) <> message
     ExKeccak.hash_256(eth_message)
   end

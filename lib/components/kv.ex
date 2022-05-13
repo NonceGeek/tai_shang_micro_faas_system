@@ -7,6 +7,7 @@ defmodule Components.KV do
   schema "kv" do
     field :key, :string
     field :value, :string
+    field :created_by, :string
 
     timestamps()
   end
@@ -20,7 +21,7 @@ defmodule Components.KV do
   end
 end
 
-defmodule Components.KvHandler do
+defmodule Components.KVHandler do
   alias Components.KV
   alias FunctionServerBasedOnArweave.Repo
 
@@ -37,18 +38,18 @@ defmodule Components.KvHandler do
     if result == nil, do: default_value, else: Poison.decode!(result.value) |> ExStructTranslator.to_atom_struct()
   end
 
-  def put(k, v) when not is_bitstring(k), do: put(to_string(k), v)
+  def put(k, v, module_name) when not is_bitstring(k), do: put(to_string(k), v, module_name)
 
-  def put(k, v) do
+  def put(k, v, module_name) do
     v_str = Poison.encode!(v)
 
     case Repo.one(from p in KV, where: p.key == ^k) do
       nil ->
-        %KV{key: k, value: v_str}
+        %KV{key: k, value: v_str, created_by: module_name}
       val ->
         val
     end
-    |> KV.changeset(%{ value: v_str })
+    |> KV.changeset(%{ value: v_str})
     |> Repo.insert_or_update()
   end
 
