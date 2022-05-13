@@ -2,12 +2,12 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   use FunctionServerBasedOnArweaveWeb, :router
   use Pow.Phoenix.Router
 
-  @external_resource "priv/extra_routes.json"
+  # @external_resource "priv/extra_routes.json"
 
-  dynamic_scopes =
-    @external_resource
-    |> File.read!()
-    |> Poison.decode!()
+  # dynamic_scopes =
+  #   @external_resource
+  #   |> File.read!()
+  #   |> Poison.decode!()
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -56,18 +56,18 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   #   live "/test", TestLive, :index
   # end
 
-  for {_custom_scope, routes} <- dynamic_scopes do
-    scope "/", CodesOnChain do
-      pipe_through :browser
-      for [method, uri, controller, action] <- routes do
-        IO.puts inspect method
-        IO.puts inspect uri
-        IO.puts inspect controller
-        IO.puts inspect action
-        live uri, String.to_atom(controller), String.to_existing_atom(action)
-      end
-    end
-  end
+  # for {_custom_scope, routes} <- dynamic_scopes do
+  #   scope "/", CodesOnChain do
+  #     pipe_through :browser
+  #     for [method, uri, controller, action] <- routes do
+  #       IO.puts inspect method
+  #       IO.puts inspect uri
+  #       IO.puts inspect controller
+  #       IO.puts inspect action
+  #       live uri, String.to_atom(controller), String.to_existing_atom(action)
+  #     end
+  #   end
+  # end
 
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through :browser_empty
