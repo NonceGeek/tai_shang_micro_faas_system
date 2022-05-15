@@ -95,22 +95,21 @@ defmodule Components.KVHandler.KVRouter do
 
   @doc """
     for example:
-      ["/uri1", "TestLive", "index"]
+      [["/uri1", "TestLive", "index"]]
   """
   def put_routes(routes) do
 
     payload =
-      routes
-      |> Enum.reduce(get_routes(), fn route, acc ->
-        acc ++ [route]
-      end)
+      get_routes()
+      |> Kernel.++(routes)
       |> Poison.encode!()
 
     File.write!(
-      "#{File.cwd!()}/priv/extra_routes.json",
+      "priv/extra_routes.json",
       payload
     )
-    IEx.Helpers.r(FunctionServerBasedOnArweaveWeb.Router)
+    Code.eval_file("lib/function_server_based_on_arweave_web/router.ex")
+    # IEx.Helpers.r(FunctionServerBasedOnArweaveWeb.Router)
   end
 
 end
