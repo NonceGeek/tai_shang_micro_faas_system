@@ -107,7 +107,7 @@ defmodule Components.KVHandler.KVRouter do
       |> Poison.encode!()
 
     File.write!(
-      "priv/extra_routes.json",
+      "#{File.cwd!()}/priv/extra_routes.json",
       payload
     )
     IEx.Helpers.r(FunctionServerBasedOnArweaveWeb.Router)
