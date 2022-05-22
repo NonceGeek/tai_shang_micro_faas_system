@@ -36,3 +36,13 @@ secret_seeds = "priv/repo/secret.seeds.exs"
 if File.exists?(secret_seeds) do
   Code.eval_file(secret_seeds)
 end
+
+alias FunctionServerBasedOnArweave.Users.User
+
+User.create_admin(
+  %{
+    email: "admin@faas.com",
+    password: "12345678",
+    password_confirmation: "12345678"
+  }
+) |> IO.inspect()
