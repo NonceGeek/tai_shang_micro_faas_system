@@ -1,5 +1,4 @@
 defmodule FunctionServerBasedOnArweave.OnChainCode do
-
   use Ecto.Schema
   import Ecto.Changeset
   alias FunctionServerBasedOnArweave.OnChainCode, as: Ele
@@ -27,18 +26,23 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def get_all(), do: Repo.all(Ele)
   def get_by_id(id), do: Repo.get_by(Ele, id: id)
 
-  def get_by_name(name), do:  Repo.get_by(Ele, name: name)
+  def get_by_name(name), do: Repo.get_by(Ele, name: name)
   def get_by_tx_id(tx_id), do: Repo.get_by(Ele, tx_id: tx_id)
-
 
   def create_or_query_by_tx_id(tx_id, type \\ "ar") do
     try do
       ele = get_by_tx_id(tx_id)
+
       if is_nil(ele) == true do
         do_create_or_query_by_tx_id(tx_id, type)
         {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
         Logger.info(code)
-        Ele.create_by_payload_and_tx_id(code, tx_id, type)
+
+        if type == "gist" do
+          code |> Enum.each(fn x -> Ele.create_by_payload_and_tx_id(x, tx_id, type) end)
+        else
+          Ele.create_by_payload_and_tx_id(code, tx_id, type)
+        end
       else
         {:ok, ele}
       end
@@ -91,6 +95,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def changeset(code_loader, attrs \\ %{}) do
     code_loader
     |> cast(attrs, [:name, :tx_id, :description, :code, :type])
+
     # |> validate_required([:name])
   end
 
@@ -98,26 +103,28 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   # | spec funcs
   # +
 
-
-  def load_code(code)do
+  def load_code(code) do
     Code.eval_string(code)
     # module_name = get_module_name_from_code(code)
     # module_name.module_info
   end
+
   def remove_code_by_name(name) do
     name
     |> get_by_name()
-    |> Repo.delete
+    |> Repo.delete()
   end
+
   def get_functions(name) do
-    %{exports: raw_functions} =
-      get_module_info(name)
+    %{exports: raw_functions} = get_module_info(name)
+
     raw_functions
     |> Enum.reject(fn {key, _value} ->
       key in @rejected_func_list
     end)
     |> Enum.into(%{})
   end
+
   def get_module_info(name) do
     "Elixir.#{name}"
     |> String.to_atom()
@@ -133,6 +140,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     |> String.replace("defmodule", "")
     |> String.replace("do", "")
     |> String.replace(" ", "")
+
     # |> String.to_atom()
   end
 

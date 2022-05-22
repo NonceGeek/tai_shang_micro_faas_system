@@ -5,26 +5,32 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.Gist do
 
   def get_from_gist(gist_id) do
     try do
-      {:ok, %{"files" => files}} =
-        do_get_from_gist(gist_id)
-      {_file_name, %{"content" => content}} =
-        Enum.fetch!(files, 0)
+      {:ok, %{"files" => files}} = do_get_from_gist(gist_id)
+      # {_file_name, %{"content" => content}} = Enum.fetch!(files, 0)
+
+      content_list =
+        files
+        |> Enum.map(fn x ->
+          {_file_name, %{"content" => content}} = x
+          content
+        end)
+
       # same format as get from arweave.
-      {:ok, %{content: content}}
+      {:ok, %{content: content_list}}
     rescue
       _ ->
-      {:error, "error in gist fetching"}
+        {:error, "error in gist fetching"}
     end
-
   end
-  def get_from_gist(gist_id, file_name) do
-    {:ok, %{"files" => files}} =
-      do_get_from_gist(gist_id)
 
-      content =
+  def get_from_gist(gist_id, file_name) do
+    {:ok, %{"files" => files}} = do_get_from_gist(gist_id)
+
+    content =
       files
       |> Map.get(file_name)
       |> Map.get("content")
+
     # same format as get from arweave.
     {:ok, %{content: content}}
   end
