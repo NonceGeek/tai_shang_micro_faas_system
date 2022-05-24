@@ -1,4 +1,4 @@
-defmodule CodesOnChain.Top5 do
+defmodule CodesOnChain.SoulCardRender do
   # Todo:
   # Impl a module using Components.GistHandler
 
@@ -16,13 +16,32 @@ defmodule CodesOnChain.Top5 do
   #   "resume.md": %{type: "text/markdown", content: resume},
   # }
   @moduledoc """
-    Generate Top5 Homepage!
+    Generate SoulCard Data!
   """
   alias Components.GistHandler
 
+  @default_avatar "https://noncegeek.com/avatars/leeduckgo.jpeg"
   @json_type "application/json"
 
   def get_module_doc(), do: @moduledoc
+
+  def get_data(gist_id, ethereum_addr) do
+    try do
+      {:ok, %{files: %{basic: basic_data}}} = handle_gist(gist_id)
+      {:ok,
+        handle_data(basic_data, :basic)
+        |> Map.put(:ethereum_addr, ethereum_addr)
+        |> Map.put(:avatar, @default_avatar)
+      }
+    rescue
+      error ->
+        {:error, inspect(error)}
+    end
+  end
+
+  def handle_data(data, :basic) do
+    data
+  end
 
   def handle_gist(gist_id) do
     %{files: files} =

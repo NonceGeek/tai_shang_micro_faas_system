@@ -108,6 +108,7 @@ defmodule Components.KVHandler.KVRouter do
       "priv/extra_routes.json",
       payload
     )
+
     Code.eval_file("lib/function_server_based_on_arweave_web/router.ex")
     # IEx.Helpers.r(FunctionServerBasedOnArweaveWeb.Router)
   end
