@@ -14,9 +14,12 @@ defmodule CodesOnChain.SoulCardRenderLive do
 
   @impl true
   def render(assigns) do
-    ~H"""
-      <%= raw(@html) %>
-    """
+    template = init_html()
+
+    quoted = EEx.compile_string(template, [engine: Phoenix.LiveView.HTMLEngine])
+
+    {result, _bindings} = Code.eval_quoted(quoted, assigns: assigns)
+    result
   end
 
   def register() do
