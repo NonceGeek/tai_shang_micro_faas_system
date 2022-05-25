@@ -93,7 +93,7 @@ defmodule CodesOnChain.SoulCardRenderLive do
     %{
       files: files
     } = GistHandler.get_gist(@template_gist_id)
-    {file_name, content} = Enum.fetch!(files, 0)
+    {file_name, %{content: content}} = Enum.fetch!(files, 0)
     content
   end
 

@@ -35,9 +35,14 @@ defmodule Components.Ipfs.API do
   """
   @spec get(Connection.t(), String.t()) :: {:ok, binary} | {:error, String.t()}
   def get(connection, multihash) do
-    connection
-    |> create_url("/get?arg=#{multihash}")
-    |> request_get_file()
+    try do
+      {:ok, %HTTPoison.Response{body: body}} =
+      HTTPoison.get("#{connection.host}/ipfs/#{multihash}")
+      {:ok, body}
+    rescue
+      error ->
+        {:error, inspect(error)}
+    end
   end
 
   @doc ~S"""
@@ -434,12 +439,6 @@ defmodule Components.Ipfs.API do
           ])
         end).()
     |> process_response
-  end
-
-  defp request_get_file(url) do
-    url
-    |> HTTPoison.post("")
-    |> process_response(& &1)
   end
 
   defp request(connection, req_type, path, args) do
