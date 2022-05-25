@@ -37,7 +37,7 @@ defmodule Components.ExHttp do
   end
 
   def http_post(url, data, retries) do
-    body = Jason.encode!(data)
+    body = Poison.encode!(data)
 
     url
     |> HTTPoison.post(

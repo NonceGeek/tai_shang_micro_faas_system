@@ -25,20 +25,49 @@ defmodule CodesOnChain.SoulCardRenderLive do
   def register() do
     KVRouter.put_routes(
       [
-        ["/noncegeek_dao", "SoulCardRenderLive", "index"]
+        ["#{@template_gist_id}", "SoulCardRenderLive", "index"]
       ]
     )
   end
 
+  @doc """
+    if the addr owner not belong to any DAO.
+  """
   @impl true
-  def mount(%{"data_gist_id" => data_gist_id, "ethereum_addr" => addr}, _session, socket) do
-    payload =
-      init_html()
-      |> handle_html(data_gist_id, addr)
+  def mount(%{"ethereum_addr" => addr}, _session, socket) do
+    {:ok, data} = SoulCardRender.get_data("c7b2deee1d33eada3bef20b47017b019", addr)
     {
       :ok,
       socket
-      |> assign(:html, payload)
+      |> assign(:data, data)
+    }
+  end
+  @doc """
+    if the addr owner belong to any DAO.
+  """
+  @impl true
+  def mount(%{"dao_eth_addr" => dao_eth_addr, "ethereum_addr" => addr}, _session, socket) do
+    {:ok, data} = SoulCardRender.get_data("c7b2deee1d33eada3bef20b47017b019", addr)
+    dao_data = %{}
+    {
+      :ok,
+      socket
+      |> assign(:data, data)
+      |> assign(:dao_data, dao_data)
+    }
+  end
+
+  @doc """
+    just for test.
+  """
+  @impl true
+  def mount(%{"data_gist_id" => data_gist_id, "ethereum_addr" => addr}, _session, socket) do
+    {:ok, data} = SoulCardRender.get_data(data_gist_id, addr)
+
+    {
+      :ok,
+      socket
+      |> assign(:data, data)
     }
   end
 
@@ -62,13 +91,9 @@ defmodule CodesOnChain.SoulCardRenderLive do
 
   def init_html() do
     %{
-      files:
-        %{"name_card_template.html":
-          %{
-            content: content
-          }
-        }
+      files: files
     } = GistHandler.get_gist(@template_gist_id)
+    {file_name, content} = Enum.fetch!(files, 0)
     content
   end
 
