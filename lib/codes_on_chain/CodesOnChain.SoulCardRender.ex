@@ -1,96 +1,27 @@
 defmodule CodesOnChain.SoulCardRender do
-  # Todo:
-  # Impl a module using Components.GistHandler
-
-  # 0x01  func:
-  # Module match the files in: https://api.github.com/gists/c7b2deee1d33eada3bef20b47017b019
-  # to make sure the format is correct
-  # and output a map like:
-  # %{filename_trimed_without_file format: %{type: xx, content: xx}}
-  # eg. %{DAO: %{type: "application/json", content: "opps"}}
-  # %{
-  #   "DAO.json": %{type: "application/json", content: dao_content},
-  #   "basic.json": %{type: "application/json", content: basic_content},
-  #   "favorite.json": %{type: "application/json", content: fav_content},
-  #   "mirror.json": %{type: "application/json", content: mir_content},
-  #   "resume.md": %{type: "text/markdown", content: resume},
-  # }
   @moduledoc """
     Generate SoulCard Data!
   """
-  alias Components.GistHandler
-
-  @default_avatar "https://noncegeek.com/avatars/leeduckgo.jpeg"
-  @json_type "application/json"
+  alias Components.Ipfs
 
   def get_module_doc(), do: @moduledoc
 
-  def get_data(gist_id, ethereum_addr) do
+  @doc """
+    Get data from IPFS with ipfs_cid.
+  """
+  def get_data(ipfs_cid) do
+    conn = %Ipfs.Connection{}
+    {:ok, payload} =
+      Ipfs.API.get(conn, ipfs_cid)
     try do
-      {:ok, %{files: %{basic: basic_data}}} = handle_gist(gist_id)
-      {:ok,
-        handle_data(basic_data, :basic)
-        |> Map.put(:ethereum_addr, ethereum_addr)
-        |> Map.put(:avatar, @default_avatar)
-      }
+      result =
+        payload
+        |> Poison.decode!()
+        |> ExStructTranslator.to_atom_struct()
+      {:ok, result}
     rescue
       error ->
         {:error, inspect(error)}
     end
-  end
-
-  def handle_data(data, :basic) do
-    data
-  end
-
-  def handle_gist(gist_id) do
-    %{files: files} =
-      payload =
-        GistHandler.get_gist(gist_id)
-    try do
-      result =
-        payload
-        |> Map.put(:files, handle_files(files))
-        |> ExStructTranslator.to_atom_struct()
-      {:ok, result}
-    rescue
-      _ ->
-        {:error, "the files is not regular!"}
-    end
-
-  end
-
-  def handle_files(files) do
-    files
-    |> json_decode_batch()
-    |> trim_file_name()
-  end
-
-  def json_decode_batch(files) do
-    files
-    |> Enum.map(fn {k, payload} ->
-      {k, handle_file_by_type(payload)}
-    end)
-    |> Enum.into(%{})
-  end
-
-  def handle_file_by_type(%{type: @json_type, content: content}) do
-    content
-    |> Poison.decode!()
-
-  end
-
-  def handle_file_by_type(%{type: _, content: content}), do: content
-
-  def trim_file_name(files) do
-    Enum.map(files, fn {k, v} ->
-      [name_trimmed, _ ] = handle_file_name(k)
-      {String.downcase(name_trimmed), v}
-    end)
-    |> Enum.into(%{})
-  end
-
-  def handle_file_name(name) do
-    name |> Atom.to_string() |> String.split(".")
   end
 end
