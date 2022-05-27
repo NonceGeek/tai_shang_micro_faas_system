@@ -22,25 +22,31 @@ defmodule CodesOnChain.SoulCardRenderLive do
     result
   end
 
-  def register(dao_name) do
+  def register() do
     KVRouter.put_routes(
       [
-        [dao_name, "SoulCardRenderLive", "index"]
+        ["/soulcard", "SoulCardRenderLive", "index"]
       ]
     )
   end
 
   @impl true
-  def mount(%{"addr" => addr, "template" => template_gist_id}, _session, socket) do
+  def mount(%{
+      "addr" => addr,
+      "dao_addr" => dao_addr}, _session, socket) do
     # TODO: check if the addr is created
+
     %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr)
+    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr)
 
     {:ok, data} = SoulCardRender.get_data(ipfs_cid)
+    {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
 
     {
       :ok,
       socket
       |> assign(:data, data)
+      |> assign(:data_dao, data_dao)
       |> assign(:template_gist_id, template_gist_id)
     }
   end
