@@ -8,7 +8,7 @@ defmodule CodesOnChain.SoulCardRenderLive do
   alias Components.KVHandler.KVRouter
   alias Components.KVHandler
 
-  # template gist id example "1a301c084577fde54df73ced3139a3cb"
+  @template_gist_id_example "1a301c084577fde54df73ced3139a3cb"
 
   def get_module_doc, do: @moduledoc
 
@@ -47,7 +47,7 @@ defmodule CodesOnChain.SoulCardRenderLive do
       socket
       |> assign(:data, data)
       |> assign(:data_dao, data_dao)
-      |> assign(:template_gist_id, template_gist_id)
+      |> assign(:template_gist_id, @template_gist_id_example)
     }
   end
 
