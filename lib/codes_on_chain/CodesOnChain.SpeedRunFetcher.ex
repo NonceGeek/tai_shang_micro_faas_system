@@ -1,4 +1,5 @@
 defmodule CodesOnChain.SpeedRunFetcher do
+
   alias Components.ExHttp
 
   def fetch_data(addr, speedrun_api_endpoint, speedrun_url) do
@@ -23,11 +24,11 @@ defmodule CodesOnChain.SpeedRunFetcher do
     %{
       chanllege_passed_num: len,
       link: "#{speedrun_url}/builders/#{addr}",
-      level: if(len == 0, do: 0, else: fib(len))
+      level: get_level(len)
     }
   end
 
-  defp fib(0), do: 1
-  defp fib(1), do: 1
-  defp fib(n), do: fib(n - 1) + fib(n - 2)
+  def get_level(len) when len <=3, do: 1
+  def get_level(len) when len <=6, do: 2
+  def get_level(len), do: 3
 end
