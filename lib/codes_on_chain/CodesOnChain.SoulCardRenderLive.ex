@@ -8,13 +8,13 @@ defmodule CodesOnChain.SoulCardRenderLive do
   alias Components.KVHandler.KVRouter
   alias Components.KVHandler
 
-  @template_gist_id "1a301c084577fde54df73ced3139a3cb"
+  # template gist id example "1a301c084577fde54df73ced3139a3cb"
 
   def get_module_doc, do: @moduledoc
 
   @impl true
   def render(assigns) do
-    template = init_html()
+    template = init_html(assigns.template_gist_id)
 
     quoted = EEx.compile_string(template, [engine: Phoenix.LiveView.HTMLEngine])
 
@@ -22,16 +22,16 @@ defmodule CodesOnChain.SoulCardRenderLive do
     result
   end
 
-  def register() do
+  def register(dao_name) do
     KVRouter.put_routes(
       [
-        ["#{@template_gist_id}", "SoulCardRenderLive", "index"]
+        [dao_name, "SoulCardRenderLive", "index"]
       ]
     )
   end
 
   @impl true
-  def mount(%{"addr" => addr}, _session, socket) do
+  def mount(%{"addr" => addr, "template" => template_gist_id}, _session, socket) do
     # TODO: check if the addr is created
     %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr)
 
@@ -41,14 +41,15 @@ defmodule CodesOnChain.SoulCardRenderLive do
       :ok,
       socket
       |> assign(:data, data)
+      |> assign(:template_gist_id, template_gist_id)
     }
   end
 
-  def init_html() do
+  def init_html(template_gist_id) do
     %{
       files: files
-    } = GistHandler.get_gist(@template_gist_id)
-    {file_name, %{content: content}} = Enum.fetch!(files, 0)
+    } = GistHandler.get_gist(template_gist_id)
+    {_file_name, %{content: content}} = Enum.fetch!(files, 0)
     content
   end
 
