@@ -27,16 +27,20 @@ defmodule Components.KVHandler do
 
   import Ecto.Query
 
-  # @default_paging_limit 50
-  # @default_sort :desc
-
-
-  def get(k) when not is_bitstring(k), do: get(to_string(k))
-
-  def get(k, default_value \\ nil) do
+  def get(k) do
     result = Repo.one(from p in KV, where: p.key == ^k)
+    do_get(result)
+  end
 
-    if result == nil, do: default_value, else: Poison.decode!(result.value) |> ExStructTranslator.to_atom_struct()
+  defp do_get(nil), do: nil
+  defp do_get(result) do
+    result_decoded = Poison.decode(result)
+    case result_decoded do
+      {:error, _reason} ->
+        result
+      {:ok, payload} ->
+        ExStructTranslator.to_atom_struct(payload)
+    end
   end
 
   def get_by_module_name(module_name) do
@@ -84,7 +88,6 @@ end
 
 defmodule Components.KVHandler.KVRouter do
 
-  alias Components.KVHandler
   @external_resource "priv/extra_routes.json"
 
   def get_routes() do

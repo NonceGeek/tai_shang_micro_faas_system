@@ -14,19 +14,28 @@ defmodule CodesOnChain.UserManager do
     info format:
     {
       "ipfs_link": ipfs_link, or "gist_id": gist_id,
-      "role": "DAO" or "User"
     }
   """
-  def create_user(info, addr, msg, signature) do
-
+  def create_user(info, role, addr, msg, signature) do
     # update user info when the key does not exist
     with true <- Verifier.verify_message?(addr, msg, signature),
       true <- time_valid?(msg) do
-      KVHandler.put(addr, info, "UserManager")
+      payload =
+        addr
+        |> KVHandler.get()
+        |> do_create_user(role, info)
+      KVHandler.put(addr, payload, "UserManager")
     else
       error ->
         {:error, inspect(error)}
     end
+  end
+
+  def do_create_user(nil, role, info) do
+    Map.put(%{}, role, info)
+  end
+  def do_create_user(payload, role, info) do
+    Map.put(payload, role, info)
   end
 
   @doc """

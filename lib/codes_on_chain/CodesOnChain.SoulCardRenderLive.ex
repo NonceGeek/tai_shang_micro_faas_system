@@ -6,6 +6,7 @@ defmodule CodesOnChain.SoulCardRenderLive do
   alias CodesOnChain.SoulCardRender
   alias Components.GistHandler
   alias Components.KVHandler.KVRouter
+  alias Components.KVHandler
 
   @template_gist_id "1a301c084577fde54df73ced3139a3cb"
 
@@ -30,7 +31,10 @@ defmodule CodesOnChain.SoulCardRenderLive do
   end
 
   @impl true
-  def mount(%{"ipfs_cid" => ipfs_cid}, _session, socket) do
+  def mount(%{"addr" => addr}, _session, socket) do
+    # TODO: check if the addr is created
+    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr)
+
     {:ok, data} = SoulCardRender.get_data(ipfs_cid)
 
     {
