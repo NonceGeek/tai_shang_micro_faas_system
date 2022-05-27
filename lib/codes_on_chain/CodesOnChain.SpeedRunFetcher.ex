@@ -2,6 +2,8 @@ defmodule CodesOnChain.SpeedRunFetcher do
 
   alias Components.ExHttp
 
+  @status_accepted "ACCEPTED"
+
   def fetch_data(addr, speedrun_api_endpoint, speedrun_url) do
     {:ok, data} = ExHttp.http_get(speedrun_api_endpoint)
 
@@ -16,7 +18,7 @@ defmodule CodesOnChain.SpeedRunFetcher do
       |> Map.get("challenges", %{})
       |> Map.to_list()
       |> Enum.filter(fn {_name, challenge} ->
-        Map.get(challenge, "status") == "ACCEPTED"
+        Map.get(challenge, "status") == @status_accepted
       end)
 
     len = length(accepted_challenges)
