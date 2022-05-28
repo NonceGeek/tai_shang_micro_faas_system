@@ -7,6 +7,7 @@ defmodule CodesOnChain.SoulCardRenderLive do
   alias Components.GistHandler
   alias Components.KVHandler.KVRouter
   alias Components.KVHandler
+  alias Components.ModuleHandler
 
   @template_gist_id_example "1a301c084577fde54df73ced3139a3cb"
 
@@ -36,8 +37,8 @@ defmodule CodesOnChain.SoulCardRenderLive do
       "dao_addr" => dao_addr}, _session, socket) do
     # TODO: check if the addr is created
 
-    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr)
-    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr)
+    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, ModuleHandler.get_module_name(__MODULE__))
+    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, ModuleHandler.get_module_name(__MODULE__))
 
     {:ok, data} = SoulCardRender.get_data(ipfs_cid)
     {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)

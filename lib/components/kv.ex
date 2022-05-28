@@ -15,9 +15,9 @@ defmodule Components.KV do
   @doc false
   def changeset(kv, attrs) do
     kv
-    |> cast(attrs, [:key, :value])
-    |> validate_required([:key, :value])
-    |> unique_constraint(:key)
+    |> cast(attrs, [:key, :value, :created_by])
+    |> validate_required([:key, :value, :created_by])
+    |> unique_constraint(:key_and_created_by, name: :key_and_created_by)
   end
 end
 
@@ -27,8 +27,8 @@ defmodule Components.KVHandler do
 
   import Ecto.Query
 
-  def get(k) do
-    result = Repo.one(from p in KV, where: p.key == ^k)
+  def get(k, created_by) do
+    result = Repo.one(from kv in KV, where: kv.key == ^k and kv.created_by == ^created_by)
     do_get(result)
   end
 
@@ -43,9 +43,9 @@ defmodule Components.KVHandler do
     end
   end
 
-  def get_by_module_name(module_name) do
+  def get_by_module_name(created_by) do
     KV
-    |> where([kv], kv.created_by== ^module_name)
+    |> where([kv], kv.created_by== ^created_by)
     |> Repo.all()
   end
 

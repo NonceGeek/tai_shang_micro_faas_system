@@ -4,7 +4,7 @@ defmodule CodesOnChain.UserManager do
     authority by ethereum signature, save a key value pair in K-V Table
   """
   require Logger
-  alias Components.{KVHandler, Verifier}
+  alias Components.{KVHandler, Verifier, ModuleHandler}
   @valid_time 3600 # 1 hour
 
   def get_module_doc(), do: @moduledoc
@@ -22,7 +22,7 @@ defmodule CodesOnChain.UserManager do
       true <- time_valid?(msg) do
       payload =
         addr
-        |> KVHandler.get()
+        |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
         |> do_create_user(role, info)
       KVHandler.put(addr, payload, "UserManager")
     else
@@ -41,7 +41,7 @@ defmodule CodesOnChain.UserManager do
   @doc """
     get user.
   """
-  def get_user(addr), do: KVHandler.get(addr)
+  def get_user(addr), do: KVHandler.get(addr, ModuleHandler.get_module_name(__MODULE__))
 
   def time_valid?(msg) do
     [_, timestamp] = String.split(msg, "_")

@@ -5,7 +5,7 @@ defmodule CodesOnChain.Meeting do
   """
   require Logger
 
-  alias Components.{GistHandler, KVHandler, Verifier}
+  alias Components.{GistHandler, KVHandler, Verifier, ModuleHandler}
 
   @unsigned_msg_key "sign_msg_0x5e6d1ac9"
   @white_list %{
@@ -15,8 +15,6 @@ defmodule CodesOnChain.Meeting do
 
   def get_module_doc(), do: @moduledoc
 
-  def get_module(), do: Atom.to_string(__MODULE__)
-
   @doc """
     put meeting after verify the signatue and the msg sender.
   """
@@ -25,7 +23,7 @@ defmodule CodesOnChain.Meeting do
     with true <- Verifier.verify_message?(addr, meeting_info, signature),
       true <- String.downcase(addr) in admins do
         # update meeting info
-        KVHandler.put(key, meeting_info, get_module())
+        KVHandler.put(key, meeting_info, ModuleHandler.get_module_name(__MODULE__))
         # update unsigned message
         set_unsigned_msg()
       else
@@ -41,7 +39,7 @@ defmodule CodesOnChain.Meeting do
     %{members: members} = get_white_list()
     with true <- Verifier.verify_message?(addr, msg, signature),
       true <- String.downcase(addr) in members do
-        {:ok, KVHandler.get(key)}
+        {:ok, KVHandler.get(key, ModuleHandler.get_module_name(__MODULE__))}
       else
         error ->
         {:error, inspect(error)}
@@ -51,7 +49,7 @@ defmodule CodesOnChain.Meeting do
     %{members: members} = get_white_list()
     with true <- Verifier.verify_message?(addr, get_unsigned_msg(), signature),
       true <- String.downcase(addr) in members do
-        {:ok, KVHandler.get(key)}
+        {:ok, KVHandler.get(key, ModuleHandler.get_module_name(__MODULE__))}
       else
         error ->
         {:error, inspect(error)}
@@ -74,12 +72,12 @@ defmodule CodesOnChain.Meeting do
   end
 
   def get_unsigned_msg() do
-    do_get_unsigned_msg(KVHandler.get(@unsigned_msg_key))
+    do_get_unsigned_msg(KVHandler.get(@unsigned_msg_key, ModuleHandler.get_module_name(__MODULE__)))
   end
   defp do_get_unsigned_msg(nil), do: ""
   defp do_get_unsigned_msg(msg), do: msg
 
-  defp set_unsigned_msg(), do: KVHandler.put(@unsigned_msg_key, rand_msg(), get_module())
+  defp set_unsigned_msg(), do: KVHandler.put(@unsigned_msg_key, rand_msg(), ModuleHandler.get_module_name(__MODULE__))
 
 
   def rand_msg(byte_size), do: "0x" <> RandGen.gen_hex(byte_size)
