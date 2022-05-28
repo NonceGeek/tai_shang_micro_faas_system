@@ -24,6 +24,7 @@ defmodule CodesOnChain.UserManager do
         addr
         |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
         |> do_create_user(role, info)
+      IO.puts inspect payload
       KVHandler.put(addr, payload, "UserManager")
     else
       error ->
@@ -32,10 +33,10 @@ defmodule CodesOnChain.UserManager do
   end
 
   def do_create_user(nil, role, info) do
-    Map.put(%{}, role, info)
+    Map.put(%{}, String.to_atom(role), info)
   end
   def do_create_user(payload, role, info) do
-    Map.put(payload, role, info)
+    Map.put(payload, String.to_atom(role), info)
   end
 
   @doc """
