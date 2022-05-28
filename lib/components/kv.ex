@@ -33,11 +33,11 @@ defmodule Components.KVHandler do
   end
 
   defp do_get(nil), do: nil
-  defp do_get(result) do
-    result_decoded = Poison.decode(result)
+  defp do_get(%{value: value}) do
+    result_decoded = Poison.decode(value)
     case result_decoded do
       {:error, _reason} ->
-        result
+        value
       {:ok, payload} ->
         ExStructTranslator.to_atom_struct(payload)
     end
