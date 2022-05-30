@@ -24,11 +24,32 @@ defmodule CodesOnChain.UserManager do
         addr
         |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
         |> do_create_user(role, info)
-      IO.puts inspect payload
-      KVHandler.put(addr, payload, "UserManager")
+      handle_role(role, addr)
+      KVHandler.put(addr, payload, ModuleHandler.get_module_name(__MODULE__))
     else
       error ->
         {:error, inspect(error)}
+    end
+  end
+
+  def handle_role(role, addr) do
+    payloads =
+      "#{role}_list"
+      |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
+      |> handle_kv_value()
+      |> add_if_not_exist(addr)
+    KVHandler.put("#{role}_list", payloads, ModuleHandler.get_module_name(__MODULE__))
+  end
+
+  def handle_kv_value(nil), do: []
+  def handle_kv_value(others), do: others
+
+  def add_if_not_exist(list, addr) do
+    case Enum.find(list, &(&1==addr)) do
+      nil ->
+        list ++ [addr]
+      _ ->
+        list
     end
   end
 

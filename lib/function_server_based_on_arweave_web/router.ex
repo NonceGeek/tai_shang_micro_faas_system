@@ -22,7 +22,7 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
     plug :put_root_layout, {FunctionServerBasedOnArweaveWeb.LayoutView, :empty}
     plug :protect_from_forgery
     plug CORSPlug, origin: [~r/.*/]
-    plug :put_secure_browser_headers
+    # plug :put_secure_browser_headers
   end
 
   pipeline :api do
