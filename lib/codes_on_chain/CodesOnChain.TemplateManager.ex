@@ -11,7 +11,7 @@ defmodule CodesOnChain.TemplateManager do
   require Logger
   alias Components.{KVHandler, Verifier}
   @valid_time 3600 # 1 hour
-
+  @init_templates ["1a301c084577fde54df73ced3139a3cb"]
   def get_module_doc(), do: @moduledoc
 
   # put("123", "msg", "signature")
@@ -30,10 +30,16 @@ defmodule CodesOnChain.TemplateManager do
     end
   end
 
+  def init()  do
+    if is_nil(get()) do
+      KVHandler.put("templates", init_templates, "TemplateManager")
+    end
+  end
+
   @doc """
   Get all gist_id
   """
-  def get(), do: KVHandler.get("templates", "123")
+  def get(), do: KVHandler.get("templates", "TemplateManager")
 
   def time_valid?(msg) do
     [_, timestamp] = String.split(msg, "_")
