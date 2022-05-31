@@ -1,4 +1,4 @@
-defmodule Component.ArGraphQLInteractor do
+defmodule Components.ArGraphQLInteractor do
   @url "https://arweave.net/graphql"
 
   def query_by_addr(eth_addr, url \\ @url) do

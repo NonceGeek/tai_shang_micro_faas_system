@@ -1,337 +1,360 @@
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
-        <style>
-            .container {
-                width: 100%;
-                height: 100%;
-            }
 
-            #namecard {
-                position: relative;
-                width: 600px;
-                height: 400px;
-                background: #FFFFFF;
-                display: block;
-            }
-          #nameCardReverse {
-            display: none;
-            position: relative;
-            width: 600px;
-            height: 400px;
-            background: #333333;
-            }
+<head>
+  <title>SoulCard</title>
+  <style>
+    /* 重置浏览器自定义的样式 */
+    * {
+      margin: 0;
+      padding: 0;
+    }
 
-            a:link { 
-            color: white; 
-            text-decoration: none; 
-            } 
-            a:visited { 
-            color: white; 
-            text-decoration: none; 
-            } 
-            a:hover { 
-            color: white; 
-            text-decoration: underline; 
-            }
-          div #personImgReverse {
-              position: absolute;
-              width: 251px;
-              height: 251px;
-              left: 268px;
-              top: 55px;
-              background-repeat: no-repeat;
-              background-size: cover;
-              filter: drop-shadow(2px 2px 9px rgba(0, 0, 0, 0.1));
-              border-radius: 50%;
-              cursor: pointer;
-              /* overflow: hidden;
-              display: flex; */
-          }
-            #p-reverse {
-                position: absolute;
-                /* width: 155px; */
-                height: 39px;
-                left: 316px;
-                top: 315px;
+    /* 本页作为 iframe 嵌入到别的页面
+    要和父页面宽度相同 */
+    body {
+      width: 100%;
+    }
 
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 32px;
-                line-height: 39px;
-                /* identical to box height */
-                color: #FFFFFF;
-            }
+    /* 顶部的按钮组 */
+    .actions {
+      display: flex;
+      align-items: center;
+    }
 
-            div #personImg {
-                position: absolute;
-                width: 200px;
-                height: 200px;
-                left: 0px;
-                top: 0px;
-                background-repeat: none;
-                background-size: cover;
-                cursor: pointer;
-            }
-            /* #personImg :hover {
+    .actions .button {
+      background: linear-gradient(to right, #79D5A8, #D5F97D);
+      border-radius: 4px;
+      border: 0;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
 
-            } */
-            .flip-tip {
-                display: none;
-                position: absolute;
-                background-color: #f9f9f9;
-                min-width: 160px;
-                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            }
-            .flip-tip span {
-                color: black;
-                padding: 12px 16px;
-                text-decoration: none;
-                display: block;
-            }
-            #personImg:hover .flip-tip {
-                display: block;
-            }
-            img {
-                max-height:100%;
-                max-width:100%;
-            }
-            div .footer {
-                position: absolute;
-                width: 200px;
-                height: 200px;
-                left: 0px;
-                top: 200px;
-                background: rgba(51, 51, 51, 0.5);
-            }
-            .footer img {
-                position: absolute;
-                /* width: 65px; */
-                height: 16px;
-                top: 24px;
-                display: inline;
-            }
-            .footer span {
-                position: absolute;
-                width: 144px;
-                height: 15px;
-                left: 119px;
-                top: 24px;
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 12px;
-                line-height: 15px;
-                color: #FFFFFF;
-            }
-            .right {
-                position: absolute;
-                width: 400px;
-                height: 400px;
-                left: 200px;
-                top: 0px;
-                background: #333333;
-            }
-            .right #name {
-                position: absolute;
-                /* width: 159px; */
-                height: 39px;
-                left: 57px;
-                top: 73px;
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 600;
-                font-size: 32px;
-                line-height: 39px;
-                color: #FFFFFF;
-            }
-            .right #address {
-                position: absolute;
-                width: 74px;
-                height: 15px;
-                left: 57px;
-                top: 121px;
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 12px;
-                line-height: 15px;
-                color: #FFFFFF;
-                opacity: 0.5;
-            }
-            .right #about_me {
-                position: absolute;
-                width: 257px;
-                height: 47px;
-                left: 58px;
-                top: 150px;
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 16px;
-                line-height: 19px;
-                color: #FFFFFF;
-            }
-            .right #abilities {
-                position: absolute;
-                /* width: 288px; */
-                height: 94px;
-                left: 58px;
-                top: 200px;
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 16px;
-                line-height: 19px;
-                color: #FFFFFF;
-            }
-            button {
+    .button:first-child {
+      margin-right: 8px;
+    }
 
-            }
-            #button-0 {
-                width: 84px;
-                left: 57px;
-                top: 278px;
-                position: absolute;
-                height: 30px;
-                background: #1D1D1D;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 20.5px;
-            }
-            #button-1 {
-                width: 101px;
-                left: 148px;
-                top: 278px;
-                position: absolute;
-                height: 30px;
-                background: #1D1D1D;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 20.5px;
-            }
-            #button-2 {
-                width: 55px;
-                left: 256px;
-                top: 278px;
-                position: absolute;
-                height: 30px;
-                background: #1D1D1D;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 20.5px;
-            }
-            #button-3 {
-                width: 84px;
-                left: 318px;
-                top: 278px;
-                position: absolute;
-                height: 30px;
-                background: #1D1D1D;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 20.5px;
-            }
-            #button-4 {
-                width: 134px;
-                left: 57px;
-                top: 317px;
-                position: absolute;
-                height: 30px;
-                background: #1D1D1D;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-                border-radius: 20.5px;
-            }
-            button span {
-                /* position: absolute; */
-                width: 61px;
-                height: 19px;
-                /* left: 69px;
-                top: 283px; */
-                font-family: 'Inter';
-                font-style: normal;
-                font-weight: 400;
-                font-size: 16px;
-                line-height: 19px;
-                color: #53C78E;
-            }
-        </style>
-    </head>
+    /* namecard 和上方容器间的距离 */
+    #container {
+      margin-top: 8px;
+    }
+
+    #namecard {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      background: #0C0F17;
+    }
+
+    #namecard .left {
+      width: 33.33%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .left #avatar {
+      width: 100%;
+      height: 50%;
+      cursor: pointer;
+    }
+
+    .left .footer {
+      width: 100%;
+      height: 50%;
+      background: #aaa;
+      color: #fff;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .footer img {
+      height: 16px;
+      width: auto;
+    }
+
+    .footer .social-icon:last-child {
+      margin-left: .5em;
+    }
+
+    .footer .speedrun-infos {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .right {
+      width: 66.66%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #333;
+      color: #fff;
+    }
+
+    .right .top #name {
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 32px;
+    }
+
+    .right .top #address {
+      font-size: 12px;
+      margin-top: 20px;
+      color: #888;
+    }
+
+    .right .content {
+      font-size: 16px;
+    }
+
+    .right .content #abilities {
+      margin-top: 10px;
+    }
+
+    .right .button {
+      box-sizing: border-box;
+      padding: 10px 15px;
+      background: #1D1D1D;
+      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+      border-radius: 10em;
+      font-size: 16px;
+      color: #53C78E;
+    }
+
+    /* 第二个 namecard
+    只有头像和用户名 */
+    #namecard2 {
+      width: 600px;
+      height: 400px;
+      background: #0C0F17;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+
+    #namecard2 .image-wrapper {
+      width: 251px;
+      height: 251px;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+
+    #namecard2 .text {
+      height: 39px;
+      font-family: 'Inter';
+      font-weight: 400;
+      font-size: 32px;
+      line-height: 39px;
+      color: #FFFFFF;
+    }
+
+    /* 第三个 namecard */
+    #namecard3 {
+      width: 600px;
+      height: 400px;
+      box-sizing: border-box;
+      padding: 40px;
+      background: #0C0F17;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+
+    #namecard3 .article {
+      width: 70%;
+      background: linear-gradient(to right, #79D5A8, #D5F97D);
+      box-sizing: border-box;
+      border-radius: 4px;
+      padding: 1px;
+      cursor: pointer;
+    }
+
+    #namecard3 .article .text {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border-radius: 4px;
+      background-color: #0C0F17;
+    }
+    
+    #namecard3 .article:not(:first-child) {
+      margin-top: 1em;
+    }
+    
+    #namecard3 .article-1 .text:hover {
+      background-color: #fff;
+      color: #007aff;
+    }
+
+    #namecard3 .article-2 .text:hover {
+      background-color: #fff;
+      color: #34c759;
+    }
+
+    #namecard3 .article-3 .text:hover {
+      background-color: #fff;
+      color: #ff2d55;
+    }
+
+    /* 所有图片与父元素宽高相同 */
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 设置所有链接的通用样式 */
+    a:link {
+      color: white;
+      text-decoration: none;
+    }
+
+    a:visited {
+      color: white;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: white;
+      text-decoration: none;
+    }
+  </style>
+</head>
     <body>
-        <button onclick='copy()'>copy as html!</button> &nbsp;<button onclick='flip()'>flip page!</button> <br>
-        <div id="container">
-            <div id="namecard" class="card" >
-                <div id="personImg" onclick="copy()">
+        <div class="actions">
+            <button class="button" onclick="copy()">copy as html!</button>
+            <button class="button" onclick="flip()">flip page!</button>
+          </div>
+          <div id="container">
+            <div id="namecard" class="card" style="display: flex;">
+              <div class="left">
+                <div id="avatar" onclick="copy()">
                     <img src={assigns.data[:avatar]} />
                 </div>
+
                 <div class="footer">
-                    <p>
-                    <%= if !is_nil(assigns.data[:ins]) do %>
-                        <a target="_blank" href={assigns.data[:ins]}><img src="https://cdn.cdnlogo.com/logos/i/92/instagram.svg" style="left: 26px;"></a>
-                    <% end %>
-                    <%= if !is_nil(assigns.data[:github_link]) do %>
-                        <a target="_blank" href={assigns.data[:github_link]}><img src="https://cdn.cdnlogo.com/logos/g/55/github.svg" style="left: 46px;"></a>
-                    <% end %>
-                    <%= if !is_nil(assigns.data[:mirror_link]) do %>
-                        <a target="_blank" href={assigns.data[:mirror_link]}><img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg" style="left: 68px;"></a>
-                    <% end %>
-                    <%= if !is_nil(assigns.data[:twitter]) do %>
-                        <a target="_blank" href={assigns.data[:twitter]}><img src="https://cdn.cdnlogo.com/logos/t/96/twitter-icon.svg" style="left: 68px;"></a>
-                    <% end %>
-                    </p><br>
-                    <p><span style="position:inherit!important;">&nbsp;&nbsp;&nbsp;&nbsp;<%= assigns.data[:email] %></span></p>
+                    <div class="social-icons">
+                        <%= if !is_nil(assigns.data[:github_link]) do %>
+                            <a class="social-icon" target="_blank" href={assigns.data[:github_link]}>
+                            <img src="https://cdn.cdnlogo.com/logos/g/55/github.svg">
+                            </a>
+                        <% end %>
+                        <%= if !is_nil(assigns.data[:mirror_link]) do %>
+                            <a class="social-icon" target="_blank" href={assigns.data[:mirror_link]}>
+                            <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
+                            </a>
+                        <% end %>
+                        <%= if !is_nil(assigns.data[:twitter]) do %>
+                            <a class="social-icon" target="_blank" href={assigns.data[:twitter]}>
+                            <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
+                            </a>
+                        <% end %>
+                    </div>
+                    <div class="email"><%= assigns.data[:email] %></div>
+                    <div class="speedrun-infos">
+                        <a class="speedrun-info" target="_blank" href="#">speedrun level: 3</a>
+                        <a class="speedrun-info" target="_blank" href="https://speedrun-noncegeek.surge.sh/builders/0x9Fd4cAbe74b06992203CAdDb10536CEA6e55Cac5">speedrun profile</a>
+                    </div>
                 </div>
+
                 <div class="right">
-                    <span id="name"><%= assigns.data[:name] %> </span>
-                    <span id="address"><a target="_blank" href={"https://zapper.fi/account/#{assigns.addr}"}><%= assigns.addr %></a></span>
+                    <div class="top">
+                      <div id="name"><%= assigns.data[:name] %> </div>
+                      <a id="address" target="_blank"
+                        href={"https://zapper.fi/account/#{assigns.addr}"}>
+                        <%= assigns.addr %>
+                      </a>
+                    </div>
                     <div class="content">
-                        <div id="about_me">
+                      <div id="about_me">
                         <%= @data.about_me %>
-                        </div>
-                        <div id="abilities">
+                      </div>
+                      <div id="abilities">
                         <%= @data.abilities %>
-                        </div>
+                      </div>
                     </div>
                     <div class="buttons">
                         <%=  Enum.with_index(@data.fields, fn element, index -> %>
-                        <button id={"button-#{index}"}><span><%= element %></span></button>
-
+                            <button id={"button-#{index}"}><span><%= element %></span></button>
                         <% end) %>
                     </div>
+                  </div>
                 </div>
-            </div>
             
-            <div id="nameCardReverse" class="card">
-                <div  id="personImgReverse">
-                    <img src={assigns.data[:avatar]} />
+                <div id="namecard2" class="card" style="display: none;">
+                  <div class="image-wrapper">
+                    <a href="https://noncegeek.com" target=_blank">
+                      <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2rb87iw5ij20je0j8t9t.jpg">
+                    </a>
+                  </div>
+                  <p class="text">leeduckgo@NonceGeekDAO</p>
                 </div>
-                <p id="p-reverse"><%= assigns.data[:name] %> </p>
-            </div>
-        </div>
+            
+                <div id="namecard3" class="card" style="display: none;">
+                  <div class="article article-1">
+                    <a class="text" href="#" target="_blank">A beginner's guide to NFTs</a>
+                  </div>
+                  <div class="article article-2">
+                    <a class="text" href="#" target="_blank">Why Dark Forest Matters: A Good Game, not a Crypto Game</a>
+                  </div>
+                  <div class="article article-3">
+                    <a class="text" href="#" target="_blank">The Fat CryptoPunks Thesis</a>
+                  </div>
+                </div>
+
+              </div>
 
         <script>
-            var page = 0;
-            function copy(){
-                var payload = document.documentElement.innerHTML;
-                let index = payload.indexOf("<title>");
-                let copyBtn = "<button onclick='copy()'>copy as html!</button>"
-                full_html = "<html><head>" + payload.slice(index).replace() + "</html>";
-
-                navigator.clipboard.writeText(full_html);
+            function copy() {
+              var payload = document.documentElement.innerHTML;
+              let index = payload.indexOf("<title>");
+              let copyBtn = "<button onclick='copy()'>copy as html!</button>"
+              full_html = "<html><head>" + payload.slice(index).replace() + "</html>";
+        
+              navigator.clipboard.writeText(full_html);
             }
-            function flip(){
-                var face = document.querySelectorAll('.card');
-                if (page == 0) {
-                    face[0].style.display = 'none';
-                    face[1].style.display = 'block';
-                    page = 1;
-                } else if (page == 1) {
-                    face[0].style.display = 'block';
-                    face[1].style.display = 'none';
-                    page = 0;
+        
+            // 函数能够正常运行的前提：
+            // 最初只有一个 .card 元素的 display 是 flex
+            // 其余都是 none
+            function flip() {
+              var face = document.querySelectorAll('.card')
+              
+              for (var i = 0; i < face.length; i++) {
+        
+                // 找到当前显示的那个 namecard 的序号
+                if (face[i].style.display === 'flex') {
+        
+                  // 记录下一个 namecard 的序号
+                  var j = (i + 1) % face.length
+        
+                  // 设置下一个 namecard 的 display 为 flex
+                  // 其余的都设置为 none
+                  for (var k = 0; k < face.length; k++) {
+                    if (k === j) {
+                      face[k].style.display = 'flex'
+                    } else {
+                      face[k].style.display = 'none'
+                    }
+                  }
+        
+                  // 设置完毕，结束循环
+                  return
                 }
+              }
             }
-        </script>
+          </script>
 
     </body>
 </html>

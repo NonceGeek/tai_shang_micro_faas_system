@@ -6,23 +6,23 @@ defmodule CodesOnChain.SoulCardRenderLive do
   alias CodesOnChain.SoulCardRender
   alias Components.GistHandler
   alias Components.KVHandler.KVRouter
-  alias Components.KVHandler
+  alias Components.{KVHandler, MirrorHandler}
   alias Components.ModuleHandler
 
   @template_gist_id_example "1a301c084577fde54df73ced3139a3cb"
   @default_avatar "https://noncegeek.com/avatars/leeduckgo.jpeg"
+  @article_num 1
 
   def get_module_doc, do: @moduledoc
 
   @impl true
   def render(assigns) do
-    # template = init_html(assigns.template_gist_id)
-    template = File.read!("template.html")
+    template = init_html(assigns.template_gist_id)
+    # template = File.read!("template.html")
     quoted = EEx.compile_string(template, [engine: Phoenix.LiveView.HTMLEngine])
 
     {result, _bindings} = Code.eval_quoted(quoted, assigns: assigns)
     result
-
   end
 
   def register() do
@@ -32,6 +32,41 @@ defmodule CodesOnChain.SoulCardRenderLive do
       ]
     )
   end
+
+  @impl true
+  def mount(%{
+      "addr" => addr,
+      "dao_addr" => dao_addr}, _session, socket) do
+    # TODO: check if the addr is created
+
+
+    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
+    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
+
+    {:ok, data = %{mirror_link: status}} = SoulCardRender.get_data(ipfs_cid)
+    {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
+    %{gist_id: template_gist_id} = data_dao
+
+    # todo: fetch mirror dynamic
+
+    socket = handle_mirror_status(socket, status, addr)
+
+    {
+      :ok,
+      socket
+      |> assign(:data, handle_data(data, :user))
+      |> assign(:addr, addr)
+      |> assign(:data_dao, data_dao)
+      |> assign(:template_gist_id, @template_gist_id_example)
+      # |> assign(:template_gist_id, template_gist_id)
+    }
+  end
+
+  def handle_mirror_status(socket, true, addr) do
+    assign(socket, :mirrors, MirrorHandler.get_articles(addr, @article_num))
+  end
+
+  def handle_mirror_status(socket, false, _addr), do: socket
 
   @impl true
   def mount(%{
@@ -49,30 +84,6 @@ defmodule CodesOnChain.SoulCardRenderLive do
       socket
       |> assign(:data, handle_data(data, :user))
       |> assign(:addr, addr)
-      |> assign(:template_gist_id, @template_gist_id_example)
-    }
-  end
-
-  @impl true
-  def mount(%{
-      "addr" => addr,
-      "dao_addr" => dao_addr}, _session, socket) do
-    # TODO: check if the addr is created
-
-
-    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
-    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
-
-    {:ok, data} = SoulCardRender.get_data("QmTMH123zN2ggGguZkdFDjiDGy3gz89uD9D53ALMLSkis1")
-    IO.puts inspect data
-    # {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
-
-    {
-      :ok,
-      socket
-      |> assign(:data, handle_data(data, :user))
-      |> assign(:addr, addr)
-      # |> assign(:data_dao, data_dao)
       |> assign(:template_gist_id, @template_gist_id_example)
     }
   end

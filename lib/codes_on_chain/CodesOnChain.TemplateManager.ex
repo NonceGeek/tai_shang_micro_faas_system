@@ -1,12 +1,6 @@
 defmodule CodesOnChain.TemplateManager do
   @moduledoc """
-  Create a TemplateMangaer, authority by Ethereum signature, and save a key-value pair in K-V Table.
-
-  put(template_gist_id, msg, signature)
-  k: v = %{templates: [gist_id_1, gist_id_2, gist_id_3]}
-
-  get()
-  returns the list of gist_id, e.g., [gist_id_1, gist_id_2, gist_id_3]
+    TemplateManager
   """
   require Logger
   alias Components.{KVHandler, Verifier}
@@ -14,14 +8,14 @@ defmodule CodesOnChain.TemplateManager do
   @init_templates ["1a301c084577fde54df73ced3139a3cb"]
   def get_module_doc(), do: @moduledoc
 
-  # put("123", "msg", "signature")
-  def put(template_gist_id, msg, signature) do
-    with true <- Verifier.verify_message?(msg, signature),
+
+  def put(template_gist_id, addr, msg, signature) do
+    with true <- Verifier.verify_message?(addr, msg, signature),
     true <- time_valid?(msg) do
-      templates = get()
-      Enum.empty?() do
-        templates = []
-      end
+      templates =
+        get()
+        |> handle_kv_value()
+
       templates = templates ++ [template_gist_id]
       KVHandler.put("templates", templates, "TemplateManager")
     else
@@ -30,9 +24,12 @@ defmodule CodesOnChain.TemplateManager do
     end
   end
 
+  def handle_kv_value(nil), do: []
+  def handle_kv_value(others), do: others
+
   def init()  do
     if is_nil(get()) do
-      KVHandler.put("templates", init_templates, "TemplateManager")
+      KVHandler.put("templates", @init_templates, "TemplateManager")
     end
   end
 
