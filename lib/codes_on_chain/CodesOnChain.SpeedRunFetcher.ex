@@ -1,5 +1,11 @@
 defmodule CodesOnChain.SpeedRunFetcher do
 
+  @moduledoc """
+    Fetch&Handle Speerun things.
+  """
+  
+  def get_module_doc, do: @moduledoc
+  
   alias Components.ExHttp
 
   @status_accepted "ACCEPTED"

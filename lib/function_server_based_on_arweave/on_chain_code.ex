@@ -1,6 +1,6 @@
 defmodule FunctionServerBasedOnArweave.OnChainCode do
   use Ecto.Schema
-  import Ecto.Changeset
+  import Ecto.{Changeset, Query}
   alias FunctionServerBasedOnArweave.OnChainCode, as: Ele
   alias FunctionServerBasedOnArweave.CodeFetchers.Gist
   alias FunctionServerBasedOnArweave.CodeFetchers.NFT
@@ -29,11 +29,17 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def get_by_name(name), do: Repo.get_by(Ele, name: name)
   def get_by_tx_id(tx_id), do: Repo.get_by(Ele, tx_id: tx_id)
 
+  def get_all_by_tx_id(tx_id) do
+    Ele
+    |> where([c], c.tx_id == ^tx_id)
+    |> Repo.all()
+  end
+
   def create_or_query_by_tx_id(tx_id, type \\ "ar") do
     try do
-      ele = get_by_tx_id(tx_id)
+      ele = get_all_by_tx_id(tx_id)
 
-      if is_nil(ele) == true do
+      if ele == [] do
         do_create_or_query_by_tx_id(tx_id, type)
         {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
         Logger.info(code)
