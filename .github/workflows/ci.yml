@@ -1,0 +1,20 @@
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:latest
+        ports: ["5432:5432"]
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries  5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "22.2"
+          elixir-version: "1.9.4"
+      - run: mix deps.get
+      - run: mix test
