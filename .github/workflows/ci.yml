@@ -18,3 +18,4 @@ jobs:
           elixir-version: "1.13.x"
       - run: mix deps.get
       - run: mix test
+      - run: mix test test/components/*.exs
