@@ -1,361 +1,385 @@
 <html>
 
-<head>
-  <title>SoulCard</title>
-  <style>
-    /* 重置浏览器自定义的样式 */
-    * {
-      margin: 0;
-      padding: 0;
-    }
+    <head>
+      <title>SoulCard@<%= @addr%></title>
+      <style>
+        /* 重置浏览器自定义的样式 */
+        * {
+          margin: 0;
+          padding: 0;
+        }
 
-    /* 本页作为 iframe 嵌入到别的页面
-    要和父页面宽度相同 */
-    body {
-      width: 100%;
-    }
 
-    /* 顶部的按钮组 */
-    .actions {
-      display: flex;
-      align-items: center;
-    }
+        /* 本页作为 iframe 嵌入到别的页面
+        要和父页面宽度相同 */
+        body {
+          width: 510px;
+          height: 370px;
+          overflow: hidden;
+        }
 
-    .actions .button {
-      background: linear-gradient(to right, #79D5A8, #D5F97D);
-      border-radius: 4px;
-      border: 0;
-      padding: 4px 6px;
-      font-size: 12px;
-    }
+        /* 顶部的按钮组 */
+        .actions {
+          display: flex;
+          align-items: center;
+        }
 
-    .button:first-child {
-      margin-right: 8px;
-    }
+        .actions .button {
+          background: linear-gradient(to right, #79D5A8, #D5F97D);
+          border-radius: 4px;
+          border: 0;
+          padding: 4px 6px;
+          font-size: 12px;
+        }
 
-    /* namecard 和上方容器间的距离 */
-    #container {
-      margin-top: 8px;
-    }
+        .button:first-child {
+          margin-right: 8px;
+        }
 
-    #namecard {
-      position: relative;
-      width: 600px;
-      height: 400px;
-      background: #0C0F17;
-    }
+        /* namecard 和上方容器间的距离 */
+        #container {
+          margin-top: 8px;
+        }
 
-    #namecard .left {
-      width: 33.33%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
+        #namecard {
+          position: relative;
+          width: 600px;
+          height: 400px;
+          background: #0C0F17;
+        }
 
-    .left #avatar {
-      width: 100%;
-      height: 50%;
-      cursor: pointer;
-    }
+        #namecard .left {
+          width: 33.33%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
 
-    .left .footer {
-      width: 100%;
-      height: 50%;
-      background: #aaa;
-      color: #fff;
-      font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: center;
-    }
+        .left #avatar {
+          width: 100%;
+          height: 50%;
+          cursor: pointer;
+        }
 
-    .footer img {
-      height: 16px;
-      width: auto;
-    }
+        .left .footer {
+          width: 100%;
+          height: 50%;
+          background: #aaa;
+          color: #fff;
+          font-size: 13px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+          align-items: center;
+        }
 
-    .footer .social-icon:last-child {
-      margin-left: .5em;
-    }
+        .footer img {
+          height: 16px;
+          width: auto;
+        }
 
-    .footer .speedrun-infos {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        .footer .social-icon:last-child {
+          margin-left: .5em;
+        }
 
-    .right {
-      width: 66.66%;
-      height: 100%;
-      box-sizing: border-box;
-      padding: 50px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: #333;
-      color: #fff;
-    }
+        .footer .speedrun-infos {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
 
-    .right .top #name {
-      margin-bottom: 10px;
-      font-weight: bold;
-      font-size: 32px;
-    }
+        .right {
+          width: 66.66%;
+          height: 100%;
+          box-sizing: border-box;
+          padding: 50px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          background: #333;
+          color: #fff;
+        }
 
-    .right .top #address {
-      font-size: 12px;
-      margin-top: 20px;
-      color: #888;
-    }
+        .right .top #name {
+          margin-bottom: 10px;
+          font-weight: bold;
+          font-size: 32px;
+        }
 
-    .right .content {
-      font-size: 16px;
-    }
+        .right .top #address {
+          font-size: 12px;
+          margin-top: 20px;
+          color: #888;
+        }
 
-    .right .content #abilities {
-      margin-top: 10px;
-    }
+        .right .content {
+          font-size: 16px;
+        }
 
-    .right .button {
-      box-sizing: border-box;
-      padding: 10px 15px;
-      background: #1D1D1D;
-      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
-      border-radius: 10em;
-      font-size: 16px;
-      color: #53C78E;
-    }
+        .right .content #abilities {
+          margin-top: 10px;
+        }
 
-    /* 第二个 namecard
-    只有头像和用户名 */
-    #namecard2 {
-      width: 600px;
-      height: 400px;
-      background: #0C0F17;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-evenly;
-      align-items: center;
-    }
+        .right .button {
+          box-sizing: border-box;
+          padding: 10px 15px;
+          background: #1D1D1D;
+          box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+          border-radius: 10em;
+          font-size: 16px;
+          color: #53C78E;
+        }
 
-    #namecard2 .image-wrapper {
-      width: 251px;
-      height: 251px;
-      border-radius: 50%;
-      overflow: hidden;
-    }
+        /* 第二个 namecard
+        只有头像和用户名 */
+        #namecard2 {
+          width: 600px;
+          height: 400px;
+          background: #0C0F17;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-evenly;
+          align-items: center;
+        }
 
-    #namecard2 .text {
-      height: 39px;
-      font-family: 'Inter';
-      font-weight: 400;
-      font-size: 32px;
-      line-height: 39px;
-      color: #FFFFFF;
-    }
+        #namecard2 .image-wrapper {
+          width: 251px;
+          height: 251px;
+          border-radius: 50%;
+          overflow: hidden;
+        }
 
-    /* 第三个 namecard */
-    #namecard3 {
-      width: 600px;
-      height: 400px;
-      box-sizing: border-box;
-      padding: 40px;
-      background: #0C0F17;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #fff;
-    }
+        #namecard2 .text {
+          height: 39px;
+          font-family: 'Inter';
+          font-weight: 400;
+          font-size: 32px;
+          line-height: 39px;
+          color: #FFFFFF;
+        }
 
-    #namecard3 .article {
-      width: 70%;
-      background: linear-gradient(to right, #79D5A8, #D5F97D);
-      box-sizing: border-box;
-      border-radius: 4px;
-      padding: 1px;
-      cursor: pointer;
-    }
+        /* 第三个 namecard */
+        #namecard3 {
+          width: 600px;
+          height: 400px;
+          box-sizing: border-box;
+          padding: 40px;
+          background: #0C0F17;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: #fff;
+        }
 
-    #namecard3 .article .text {
-      display: inline-block;
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      border-radius: 4px;
-      background-color: #0C0F17;
-    }
-    
-    #namecard3 .article:not(:first-child) {
-      margin-top: 1em;
-    }
-    
-    #namecard3 .article-1 .text:hover {
-      background-color: #fff;
-      color: #007aff;
-    }
+        #namecard3 .article {
+          width: 70%;
+          background: linear-gradient(to right, #79D5A8, #D5F97D);
+          box-sizing: border-box;
+          border-radius: 4px;
+          padding: 1px;
+          cursor: pointer;
+        }
 
-    #namecard3 .article-2 .text:hover {
-      background-color: #fff;
-      color: #34c759;
-    }
+        #namecard3 .article .text {
+          display: inline-block;
+          width: 100%;
+          height: 100%;
+          box-sizing: border-box;
+          padding: 10px;
+          border-radius: 4px;
+          background-color: #0C0F17;
+        }
 
-    #namecard3 .article-3 .text:hover {
-      background-color: #fff;
-      color: #ff2d55;
-    }
+        #namecard3 .article:not(:first-child) {
+          margin-top: 1em;
+        }
 
-    /* 所有图片与父元素宽高相同 */
-    img {
-      width: 100%;
-      height: 100%;
-    }
+        #namecard3 .article-1 .text:hover {
+          background-color: #fff;
+          color: #007aff;
+        }
 
-    /* 设置所有链接的通用样式 */
-    a:link {
-      color: white;
-      text-decoration: none;
-    }
+        #namecard3 .article-2 .text:hover {
+          background-color: #fff;
+          color: #34c759;
+        }
 
-    a:visited {
-      color: white;
-      text-decoration: none;
-    }
+        #namecard3 .article-3 .text:hover {
+          background-color: #fff;
+          color: #ff2d55;
+        }
 
-    a:hover {
-      color: white;
-      text-decoration: none;
-    }
-  </style>
-</head>
+        /* 所有图片与父元素宽高相同 */
+        img {
+          width: 100%;
+          height: 100%;
+        }
+
+        /* 设置所有链接的通用样式 */
+        a:link {
+          color: white;
+          text-decoration: none;
+        }
+
+        a:visited {
+          color: white;
+          text-decoration: none;
+        }
+
+        a:hover {
+          color: white;
+          text-decoration: none;
+        }
+      </style>
+    </head>
     <body>
-        <div class="actions">
-            <button class="button" onclick="copy()">copy as html!</button>
-            <button class="button" onclick="flip()">flip page!</button>
-          </div>
-          <div id="container">
-            <div id="namecard" class="card" style="display: flex;">
-              <div class="left">
-                <div id="avatar" onclick="copy()">
-                    <img src={assigns.data[:avatar]} />
-                </div>
+      <div class="actions">
+        <button class="button" onclick="copy()">copy as html!</button>
+        <button class="button" onclick="flip()">flip page!</button>
+      </div>
+      <div id="container">
 
-                <div class="footer">
-                    <div class="social-icons">
-                        <%= if !is_nil(assigns.data[:github_link]) do %>
-                            <a class="social-icon" target="_blank" href={assigns.data[:github_link]}>
-                            <img src="https://cdn.cdnlogo.com/logos/g/55/github.svg">
-                            </a>
-                        <% end %>
-                        <%= if !is_nil(assigns.data[:mirror_link]) do %>
-                            <a class="social-icon" target="_blank" href={assigns.data[:mirror_link]}>
-                            <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
-                            </a>
-                        <% end %>
-                        <%= if !is_nil(assigns.data[:twitter]) do %>
-                            <a class="social-icon" target="_blank" href={assigns.data[:twitter]}>
-                            <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
-                            </a>
-                        <% end %>
-                    </div>
-                    <div class="email"><%= assigns.data[:email] %></div>
-                    <div class="speedrun-infos">
-                        <a class="speedrun-info" target="_blank" href="#">speedrun level: 3</a>
-                        <a class="speedrun-info" target="_blank" href="https://speedrun-noncegeek.surge.sh/builders/0x9Fd4cAbe74b06992203CAdDb10536CEA6e55Cac5">speedrun profile</a>
-                    </div>
-                </div>
-
-                <div class="right">
-                    <div class="top">
-                      <div id="name"><%= assigns.data[:name] %> </div>
-                      <a id="address" target="_blank"
-                        href={"https://zapper.fi/account/#{assigns.addr}"}>
-                        <%= assigns.addr %>
-                      </a>
-                    </div>
-                    <div class="content">
-                      <div id="about_me">
-                        <%= @data.about_me %>
-                      </div>
-                      <div id="abilities">
-                        <%= @data.abilities %>
-                      </div>
-                    </div>
-                    <div class="buttons">
-                        <%=  Enum.with_index(@data.fields, fn element, index -> %>
-                            <button id={"button-#{index}"}><span><%= element %></span></button>
-                        <% end) %>
-                    </div>
-                  </div>
-                </div>
-            
-                <div id="namecard2" class="card" style="display: none;">
-                  <div class="image-wrapper">
-                    <a href="https://noncegeek.com" target=_blank">
-                      <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2rb87iw5ij20je0j8t9t.jpg">
-                    </a>
-                  </div>
-                  <p class="text">leeduckgo@NonceGeekDAO</p>
-                </div>
-            
-                <div id="namecard3" class="card" style="display: none;">
-                  <div class="article article-1">
-                    <a class="text" href="#" target="_blank">A beginner's guide to NFTs</a>
-                  </div>
-                  <div class="article article-2">
-                    <a class="text" href="#" target="_blank">Why Dark Forest Matters: A Good Game, not a Crypto Game</a>
-                  </div>
-                  <div class="article article-3">
-                    <a class="text" href="#" target="_blank">The Fat CryptoPunks Thesis</a>
-                  </div>
-                </div>
-
+        <!-- page 0x01 -->
+        <div id="namecard" class="card" style="display: flex;">
+          <div class="left">
+            <div id="avatar" onclick="copy()">
+              <img src={assigns.data[:avatar]}>
+            </div>
+            <div class="footer">
+              <div class="social-icons">
+                
+                <%= if !is_nil(assigns.data[:githubLink]) do %>
+                <a class="social-icon" target="_blank" href={assigns.data[:githubLink]}>
+                  <img src="https://cdn.cdnlogo.com/logos/g/55/github.svg">
+                </a>
+                <% end %>
+                <%= if !is_nil(assigns.data[:mirrorLink]) do %>
+                <a class="social-icon" target="_blank" href={assigns.data[:mirrorLink]}>
+                  <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
+                </a>
+                <% end %>
+                <%= if !is_nil(assigns.data[:twitter]) do %>
+                <a class="social-icon" target="_blank" href={assigns.data[:twitter]}>
+                  <img src="https://cdn.cdnlogo.com/logos/t/96/twitter-icon.svg">
+                </a>
+                <% end %>
               </div>
+              <div class="email"><%= assigns.data[:email] %></div>
+              <div class="speedrun-infos">
+                <a class="speedrun-info" target="_blank" href="#">speedrun level: 3</a>
+                <a class="speedrun-info" target="_blank" href={"https://speedrun-noncegeek.surge.sh/builders/#{assigns.addr}"}>speedrun profile</a>
+              </div>
+            </div>
+          </div>
+          <div class="right">
+            <div class="top">
+              <div id="name"><%= assigns.data[:name] %></div>
+              <a id="address" target="_blank"
+                href={"https://zapper.fi/account/#{assigns.addr}"}>
+                <%= assigns.addr %>
+              </a>
+            </div>
+            <div class="content">
+              <div id="about_me">
+                <%= @data.about_me %>
+              </div>
+              <div id="abilities">
+              <%= @data.abilities %>
+              </div>
+            </div>
+            <div class="buttons">
+              <%=  Enum.with_index(@data.fields, fn element, index -> %>
+                <button id={"button-#{index}"} class="button"><%= element %></button>
+              <% end) %>
+            </div>
+          </div>
+        </div>
 
-        <script>
-            function copy() {
-              var payload = document.documentElement.innerHTML;
-              let index = payload.indexOf("<title>");
-              let copyBtn = "<button onclick='copy()'>copy as html!</button>"
-              full_html = "<html><head>" + payload.slice(index).replace() + "</html>";
-        
-              navigator.clipboard.writeText(full_html);
-            }
-        
-            // 函数能够正常运行的前提：
-            // 最初只有一个 .card 元素的 display 是 flex
-            // 其余都是 none
-            function flip() {
-              var face = document.querySelectorAll('.card')
-              
-              for (var i = 0; i < face.length; i++) {
-        
-                // 找到当前显示的那个 namecard 的序号
-                if (face[i].style.display === 'flex') {
-        
-                  // 记录下一个 namecard 的序号
-                  var j = (i + 1) % face.length
-        
-                  // 设置下一个 namecard 的 display 为 flex
-                  // 其余的都设置为 none
-                  for (var k = 0; k < face.length; k++) {
-                    if (k === j) {
-                      face[k].style.display = 'flex'
-                    } else {
-                      face[k].style.display = 'none'
-                    }
-                  }
-        
-                  // 设置完毕，结束循环
-                  return
+
+        <!--page 0x02 -->
+        <%= if !is_nil(assigns[:data_dao]) do%>
+
+
+          <div id="namecard2" class="card" style="display: none;">
+            <div class="image-wrapper">
+              <a href={assigns.data_dao.soulcard_homepage} target="_blank">
+                <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2rb87iw5ij20je0j8t9t.jpg">
+              </a>
+            </div>
+            <p class="text">leeduckgo@<%= assigns.data_dao.name %></p>
+          </div>
+        <% end %>
+
+        <!--page 0x02-1 -->
+        <%= if !is_nil(assigns[:data_dao_2]) do%>
+
+
+        <div id="namecard2" class="card" style="display: none;">
+            <div class="image-wrapper">
+            <a href={assigns.data_dao_2.soulcard_homepage} target="_blank">
+                <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2rb87iw5ij20je0j8t9t.jpg">
+            </a>
+            </div>
+            <p class="text">leeduckgo@<%= assigns.data_dao_2.name %></p>
+        </div>
+        <% end %>
+
+        <!--page 0x03 -->
+        <%= if !is_nil(assigns[:mirrors]) do%>
+          <div id="namecard3" class="card" style="display: none;">
+          <%=  Enum.with_index(@mirrors, fn mirror, index -> %>
+            <div class="article article-1">
+              <a class="text" href={"https://mirror.xyz/#{@addr}/#{mirror.original_digest}"} target="_blank"><%= mirror.title%></a>
+            </div>
+          <% end) %>
+          </div>
+        <% end %>
+      </div>
+
+      <script>
+        function copy() {
+          var payload = document.documentElement.innerHTML;
+          let index = payload.indexOf("<title>");
+          let copyBtn = "<button onclick='copy()'>copy as html!</button>"
+          full_html = "<html><head>" + payload.slice(index).replace() + "</html>";
+
+          navigator.clipboard.writeText(full_html);
+        }
+
+        // 函数能够正常运行的前提：
+        // 最初只有一个 .card 元素的 display 是 flex
+        // 其余都是 none
+        function flip() {
+          var face = document.querySelectorAll('.card')
+
+          for (var i = 0; i < face.length; i++) {
+
+            // 找到当前显示的那个 namecard 的序号
+            if (face[i].style.display === 'flex') {
+
+              // 记录下一个 namecard 的序号
+              var j = (i + 1) % face.length
+
+              // 设置下一个 namecard 的 display 为 flex
+              // 其余的都设置为 none
+              for (var k = 0; k < face.length; k++) {
+                if (k === j) {
+                  face[k].style.display = 'flex'
+                } else {
+                  face[k].style.display = 'none'
                 }
               }
+
+              // 设置完毕，结束循环
+              return
             }
-          </script>
+          }
+        }
+      </script>
 
-    </body>
-</html>
+      <iframe hidden="" height="0" width="0" src="/phoenix/live_reload/frame"></iframe>
+      </body>
 
+    </html>

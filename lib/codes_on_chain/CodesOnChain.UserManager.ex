@@ -5,6 +5,7 @@ defmodule CodesOnChain.UserManager do
   """
   require Logger
   alias Components.{KVHandler, Verifier, ModuleHandler}
+  alias Components.Ipfs
   @valid_time 3600 # 1 hour
 
   def get_module_doc(), do: @moduledoc
@@ -24,7 +25,7 @@ defmodule CodesOnChain.UserManager do
         addr
         |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
         |> do_create_user(role, info)
-      handle_role(role, addr)
+      handle_role(role, addr, info)
       KVHandler.put(addr, payload, ModuleHandler.get_module_name(__MODULE__))
     else
       error ->
@@ -32,7 +33,31 @@ defmodule CodesOnChain.UserManager do
     end
   end
 
-  def handle_role(role, addr) do
+  def handle_role("dao", addr, %{ipfs: cid}) do
+
+    {:ok, res} = Ipfs.API.get(%Ipfs.Connection{}, cid)
+    name =
+      res
+      |> Poison.decode!()
+      |> Map.get("name")
+
+    payloads =
+      "dao_list"
+      |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
+      |> handle_kv_value()
+      |> add_if_not_exist(addr)
+    name_payloads =
+      "dao_name_list"
+      |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
+      |> handle_kv_value()
+      |> add_if_not_exist(name)
+
+    KVHandler.put("dao_list", payloads, ModuleHandler.get_module_name(__MODULE__))
+    KVHandler.put("dao_name_list", name_payloads, ModuleHandler.get_module_name(__MODULE__))
+
+  end
+
+  def handle_role(role, addr, _info) do
     payloads =
       "#{role}_list"
       |> KVHandler.get(ModuleHandler.get_module_name(__MODULE__))
@@ -41,6 +66,18 @@ defmodule CodesOnChain.UserManager do
     KVHandler.put("#{role}_list", payloads, ModuleHandler.get_module_name(__MODULE__))
   end
 
+  def get_role_list("dao") do
+    payload = KVHandler.get("dao_list", ModuleHandler.get_module_name(__MODULE__))
+    payload_name = KVHandler.get("dao_name_list", ModuleHandler.get_module_name(__MODULE__))
+    payload
+    |> Enum.zip(payload_name)
+    |> Enum.map(fn {elem, elem_name} ->
+      %{
+        name: elem_name,
+        addr: elem
+      }
+    end)
+  end
   def get_role_list(role), do: KVHandler.get("#{role}_list", ModuleHandler.get_module_name(__MODULE__))
 
   def handle_kv_value(nil), do: []

@@ -1,6 +1,6 @@
 defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   use FunctionServerBasedOnArweaveWeb, :live_view
-
+  alias FunctionServerBasedOnArweave.CodeFetchers.NFT
   alias FunctionServerBasedOnArweave.OnChainCode
   alias  ArweaveSdkEx.CodeRunner
   require Logger
@@ -29,17 +29,31 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:params, [])
       |> assign(:selected_code, selected_code_name)
       |> assign(:code_text, code_text)
+      |> assign(:code_type, type)
       |> assign(:explorer_link, build_explorer_link(tx_id, type))
       |> assign(:auth, auth)
 
+    socket = handle_socket(socket, tx_id, type)
     {:ok, socket}
+
   end
- defp has_auth(nil) do
+
+  def handle_socket(socket, tx_id, "nft") do
+    creators =
+      tx_id
+      |> String.to_integer()
+      |> NFT.get_creators()
+    assign(socket, :code_creators, creators)
+  end
+
+  def handle_socket(socket, _, _), do: socket
+
+  defp has_auth(nil) do
       false
- end
- defp has_auth(_) do
+  end
+  defp has_auth(_) do
       true
- end
+  end
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}
@@ -56,13 +70,17 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       ) do
     {tx_id, code_text, type} = build_code(code_name)
 
-    {
-      :noreply,
+    socket =
       socket
       |> assign(:selected_code, code_name)
       |> assign(:code_text, code_text)
+      |> assign(:code_type, type)
       |> assign(:explorer_link, build_explorer_link(tx_id, type))
       |> push_event("highlight", %{})
+      |> handle_socket(tx_id, type)
+    {
+      :noreply,
+      socket
     }
   end
 
@@ -156,6 +174,10 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
   def build_explorer_link(tx_id, "gist") do
     "#{@gist_prefix}/#{tx_id}"
+  end
+
+  def build_explorer_link(token_id, "nft") do
+    "#{token_id}"
   end
 
 

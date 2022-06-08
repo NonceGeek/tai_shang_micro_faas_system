@@ -9,7 +9,6 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   require Logger
 
   @rejected_func_list [:__info__, :module_info]
-  @sleep_time 2_000
 
   schema "on_chain_code" do
     field :name, :string
@@ -66,8 +65,10 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     Gist.get_from_gist(tx_id)
   end
 
-  def do_create_or_query_by_tx_id(tx_id, "nft") do
-    NFT.get_from_nft(tx_id)
+  def do_create_or_query_by_tx_id(token_id, "nft") do
+    token_id
+    |> String.to_integer()
+    |> NFT.get_from_nft()
   end
 
   def create_by_payload_and_tx_id(code, tx_id, type) do

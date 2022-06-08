@@ -15,9 +15,18 @@
 <%= label f, :code_list %>
 
 <%= select f, :code_name, @code_names,  value: @selected_code, class: "form-field" %>
-
+<br><br>
+<%= if @code_type in ["ar", "gist"] do %>
 <p><b>check code on explorer: </b></p>
   <%= raw(Earmark.as_html!("> #{@explorer_link}"))%>
+<% else %>
+
+<p><b>contract addr:</b> </p>
+<%= raw(Earmark.as_html!("[#{Constants.get_contract_addr()}](#{Constants.get_eth_explorer()}/address/#{Constants.get_contract_addr()})"))%>
+<p><b>nft id:</b>  <%= @explorer_link %></p>
+<p><b>creators: </b> <%= @code_creators %></p>
+<% end %>
+
 <div id="code-loaded">
 <%= raw(Earmark.as_html!("```elixir \n" <> @code_text <> "\n```")) %>
 </div>

@@ -33,23 +33,72 @@ defmodule CodesOnChain.SoulCardRenderLive do
     )
   end
 
+
+  @impl true
+  def mount(%{
+      "addr" => addr,
+      "dao_addr" => dao_addr,
+      "dao_addr_2" => dao_addr_2
+    }, _session, socket) do
+
+
+    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
+    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
+    %{dao: %{ipfs: dao_ipfs_cid_2}} = KVHandler.get(dao_addr_2, "UserManager")
+
+    {:ok, data} = SoulCardRender.get_data(ipfs_cid)
+    {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
+    %{gist_id: template_gist_id} = data_dao
+
+    {:ok, data_dao_2} = SoulCardRender.get_data(dao_ipfs_cid_2)
+
+    # todo: fetch mirror dynamic
+
+
+    socket =
+      if Map.fetch(data, :mirrorLink) != :error do
+        if Map.fetch!(data, :mirrorLink) != false do
+          handle_mirror_status(socket, Map.fetch!(data, :mirrorLink), addr)
+        end
+      else
+        socket
+      end
+
+    {
+      :ok,
+      socket
+      |> assign(:data, handle_data(data, :user))
+      |> assign(:addr, addr)
+      |> assign(:data_dao, data_dao)
+      |> assign(:data_dao_2, data_dao_2)
+      |> assign(:template_gist_id, @template_gist_id_example)
+      # |> assign(:template_gist_id, template_gist_id)
+    }
+  end
+
   @impl true
   def mount(%{
       "addr" => addr,
       "dao_addr" => dao_addr}, _session, socket) do
     # TODO: check if the addr is created
 
-
     %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
     %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
 
-    {:ok, data = %{mirror_link: status}} = SoulCardRender.get_data(ipfs_cid)
+    {:ok, data} = SoulCardRender.get_data(ipfs_cid)
     {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
     %{gist_id: template_gist_id} = data_dao
 
     # todo: fetch mirror dynamic
 
-    socket = handle_mirror_status(socket, status, addr)
+    socket =
+      if Map.fetch(data, :mirrorLink) != :error do
+        if Map.fetch!(data, :mirrorLink) != false do
+          handle_mirror_status(socket, Map.fetch!(data, :mirrorLink), addr)
+        end
+      else
+        socket
+      end
 
     {
       :ok,
@@ -79,12 +128,21 @@ defmodule CodesOnChain.SoulCardRenderLive do
     {:ok, data} = SoulCardRender.get_data(ipfs_cid)
     # {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
 
+    socket =
+      if Map.fetch(data, :mirrorLink) != :error do
+        if Map.fetch!(data, :mirrorLink) != false do
+          handle_mirror_status(socket, Map.fetch!(data, :mirrorLink), addr)
+        end
+      else
+        socket
+      end
     {
       :ok,
       socket
       |> assign(:data, handle_data(data, :user))
       |> assign(:addr, addr)
       |> assign(:template_gist_id, @template_gist_id_example)
+
     }
   end
 

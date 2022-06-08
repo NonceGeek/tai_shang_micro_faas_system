@@ -11,9 +11,12 @@ config :function_server_based_on_arweave,
   ecto_repos: [FunctionServerBasedOnArweave.Repo],
   arweave_endpoint: "https://arweave.net",
   arweave_explorer: "https://viewblock.io/arweave/tx",
-  contract_addr: "0xD1e91A4Bf55111dD3725E46A64CDbE7a2cC97D8a",
-  contract_endpoint: "https://rpc.api.moonbase.moonbeam.network",
-  eth_explorer: "https://moonbase.moonscan.io",
+  # contract_addr: "0xD1e91A4Bf55111dD3725E46A64CDbE7a2cC97D8a",
+  # contract_endpoint: "https://rpc.api.moonbase.moonbeam.network",
+  # eth_explorer: "https://moonbase.moonscan.io",
+  contract_addr: "0xE25827DedD435aD3C4B90bD5BaBEf3CF462884Be",
+  contract_endpoint: "https://dev.kardiachain.io",
+  eth_explorer: "https://explorer-dev.kardiachain.io",
   gallery: "https://moonbeam.nftscan.com/search"
 
 # Configures the endpoint
