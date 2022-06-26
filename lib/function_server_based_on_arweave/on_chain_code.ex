@@ -115,7 +115,11 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # module_name = get_module_name_from_code(code)
     # module_name.module_info
   end
-
+   def remove_code_by_gist() do
+     get_all
+     |> Enum.filter(fn %{type: type} ->  type == "gist" end)
+     |> Enum.map(fn x -> Repo.delete(x) end)
+  end
   def remove_code_by_name(name) do
     name
     |> get_by_name()

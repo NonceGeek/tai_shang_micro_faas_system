@@ -101,6 +101,19 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_func, Enum.fetch!(func_names, 0))
     }
   end
+def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
+     %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
+     case type do
+       "ar" -> :ignore;
+       "gist" -> OnChainCode.remove_code_by_gist()
+     end
+    {
+      :noreply,
+      socket
+      |> redirect(to: "/")
+    }
+ end
+
  def handle_event("remove_code", _params, %{assigns: assigns} = socket) do
      OnChainCode.remove_code_by_name(assigns.selected_code)
     {
