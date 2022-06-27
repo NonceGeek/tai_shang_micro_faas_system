@@ -104,8 +104,8 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
      %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
      case type do
-       "ar" -> :ignore;
-       "gist" -> OnChainCode.remove_code_by_gist()
+       "gist" -> OnChainCode.remove_code_by_gist(tx_id)
+       _-> :ignore
      end
     {
       :noreply,
