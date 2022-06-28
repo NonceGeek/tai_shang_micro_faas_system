@@ -35,6 +35,9 @@
 
 <%= if assigns[:auth] do %>
 <button phx-click="remove_code" phx-value-name={@selected_code} class="btn-primary" type="button">Remove Code</button>
+<%= if assigns[:code_type] == "gist" do %>
+<button phx-click="remove_all_code" phx-value-name={@selected_code} class="btn-primary" type="button">Remove All Code</button>
+<% end %>
 <% end %>
 <br><br>
 <%= if !is_nil(assigns[:func_names]) do %>

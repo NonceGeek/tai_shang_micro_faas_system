@@ -39,7 +39,6 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
       ele = get_all_by_tx_id(tx_id)
 
       if ele == [] do
-        do_create_or_query_by_tx_id(tx_id, type)
         {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
         Logger.info(code)
 
@@ -115,7 +114,11 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # module_name = get_module_name_from_code(code)
     # module_name.module_info
   end
-
+   def remove_code_by_gist(tx_id) do
+     get_all
+     |> Enum.filter(fn %{tx_id: tx_id1} ->  tx_id1 == tx_id end)
+     |> Enum.map(fn x -> Repo.delete(x) end)
+  end
   def remove_code_by_name(name) do
     name
     |> get_by_name()

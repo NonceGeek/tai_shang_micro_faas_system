@@ -65,7 +65,6 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through [:browser,:protected, :admin]
     live "/add_func", FuncAdderLive.Index, :index
-    live "/remove_code", CodeRemoveLive.Index, :index
   end
 
   scope "/api/v1", FunctionServerBasedOnArweaveWeb do
