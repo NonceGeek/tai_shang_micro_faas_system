@@ -1,0 +1,22 @@
+{
+  "name": "leeduckgo", 
+  "email": "leeduckgo@gmail.com",
+  "about_me": "hello world!",
+  "abilities": "full-stack",
+  "twitter": "https://twitter.com/Web3dAppCamp",
+  "ins": "https://xxx",
+  "github": "https://github.com/leeduckgo", 
+  "website": "https://noncegeek.com",
+  "fields": ["elixir", "react"],
+  "github_link": "https://github.com/leeduckgo",
+  "mirror_link": true,
+  "design_link": "https://xxx",
+  "speedruns": ["ng"],
+  "addrs": 
+  [
+    {
+      "chain_name": "ethereum",
+      "addr": "0x73c7448760517E3E6e416b2c130E3c6dB2026A1d"
+    }
+  ]
+}

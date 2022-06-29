@@ -3,11 +3,11 @@ defmodule CodesOnChain.SoulCardRenderLive do
     Test to impl a dynamic webpage by snippet!
   """
   use FunctionServerBasedOnArweaveWeb, :live_view
-  alias CodesOnChain.SoulCardRender
+  alias CodesOnChain.{SoulCardRender, SpeedRunFetcher}
   alias Components.GistHandler
   alias Components.KVHandler.KVRouter
   alias Components.{KVHandler, MirrorHandler}
-  alias Components.ModuleHandler
+
 
   @template_gist_id_example "1a301c084577fde54df73ced3139a3cb"
   @default_avatar "https://noncegeek.com/avatars/leeduckgo.jpeg"
@@ -34,67 +34,45 @@ defmodule CodesOnChain.SoulCardRenderLive do
   end
 
 
+  @doc """
+    cond:
+    * has dao_addrs
+    * if only addr
+  """
   @impl true
   def mount(%{
-      "addr" => addr,
-      "dao_addr" => dao_addr,
-      "dao_addr_2" => dao_addr_2
-    }, _session, socket) do
-
-
-    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
-    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
-    %{dao: %{ipfs: dao_ipfs_cid_2}} = KVHandler.get(dao_addr_2, "UserManager")
-
-    {:ok, data} = SoulCardRender.get_data(ipfs_cid)
-    {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
-    %{gist_id: template_gist_id} = data_dao
-
-    {:ok, data_dao_2} = SoulCardRender.get_data(dao_ipfs_cid_2)
-
-    # todo: fetch mirror dynamic
-
-
-    socket =
-      if Map.fetch(data, :mirrorLink) != :error do
-        if Map.fetch!(data, :mirrorLink) != false do
-          handle_mirror_status(socket, Map.fetch!(data, :mirrorLink), addr)
-        end
-      else
-        socket
-      end
-
-    {
-      :ok,
-      socket
-      |> assign(:data, handle_data(data, :user))
-      |> assign(:addr, addr)
-      |> assign(:data_dao, data_dao)
-      |> assign(:data_dao_2, data_dao_2)
-      |> assign(:template_gist_id, @template_gist_id_example)
-      # |> assign(:template_gist_id, template_gist_id)
-    }
+    "addr" => addr,
+    "dao_addr_1" => _dao_addr,
+  } = params, _session, socket) do
+    params
+    |> fetch_dao_addrs_and_roles()
+    |> fetch_dao_infoes()
+    |> do_mount(addr, socket)
   end
 
   @impl true
   def mount(%{
-      "addr" => addr,
-      "dao_addr" => dao_addr}, _session, socket) do
+      "addr" => addr}, _session, socket) do
     # TODO: check if the addr is created
+    do_mount([], addr, socket)
+  end
 
+
+  def fetch_dao_infoes(dao_addr_and_role_list) do
+    Enum.map(dao_addr_and_role_list, fn {dao_addr, role} ->
+      %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
+      {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
+      {data_dao, role}
+    end)
+  end
+
+  def do_mount(dao_infoes_roles_list, addr, socket) do
     %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
-    %{dao: %{ipfs: dao_ipfs_cid}} = KVHandler.get(dao_addr, "UserManager")
-
-    {:ok, data} = SoulCardRender.get_data(ipfs_cid)
-    {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
-    %{gist_id: template_gist_id} = data_dao
-
-    # todo: fetch mirror dynamic
-
+    {:ok, %{speedruns: speedrun_sources} = data} = SoulCardRender.get_data(ipfs_cid)
     socket =
-      if Map.fetch(data, :mirrorLink) != :error do
-        if Map.fetch!(data, :mirrorLink) != false do
-          handle_mirror_status(socket, Map.fetch!(data, :mirrorLink), addr)
+      if Map.fetch(data, :mirror_link) != :error do
+        if Map.fetch!(data, :mirror_link) != false do
+          handle_mirror_status(socket, Map.fetch!(data, :mirror_link), addr)
         end
       else
         socket
@@ -105,46 +83,51 @@ defmodule CodesOnChain.SoulCardRenderLive do
       socket
       |> assign(:data, handle_data(data, :user))
       |> assign(:addr, addr)
-      |> assign(:data_dao, data_dao)
       |> assign(:template_gist_id, @template_gist_id_example)
-      # |> assign(:template_gist_id, template_gist_id)
+      |> assign(:dao_infoes_roles_list, dao_infoes_roles_list)
+      |> assign(:speedruns, handle_speedruns(addr, speedrun_sources))
     }
   end
+
+  def handle_speedruns(addr, speedrun_sources) do
+    IO.puts inspect speedrun_sources
+    speedrun_sources
+    |> Enum.map(fn source ->
+      SpeedRunFetcher.fetch_data(addr, source)
+    end)
+    |> Enum.map(&(handle_res(&1)))
+    |> Enum.reject(&(is_nil(&1)))
+  end
+
+  def handle_res({:error, _msg}), do: nil
+  def handle_res({:ok, msg}), do: msg
+
+  def fetch_dao_addrs_and_roles(params) do
+    params
+    |> Enum.map(fn {key, addr} ->
+      case String.split(key, "_") do
+        ["dao", "addr", index] ->
+          zip_dao_and_role(params, addr, index)
+        _ ->
+          :pass
+      end
+    end)
+    |> Enum.reject(&(&1==:pass))
+  end
+
+  def zip_dao_and_role(params, addr, index) do
+    role = Map.get(params, "role_#{index}")
+    do_zip_dao_and_role(addr, role)
+  end
+
+  def do_zip_dao_and_role(addr, nil), do: {addr, nil}
+  def do_zip_dao_and_role(addr, role), do: {addr, role}
 
   def handle_mirror_status(socket, true, addr) do
     assign(socket, :mirrors, MirrorHandler.get_articles(addr, @article_num))
   end
 
   def handle_mirror_status(socket, false, _addr), do: socket
-
-  @impl true
-  def mount(%{
-      "addr" => addr}, _session, socket) do
-    # TODO: check if the addr is created
-
-
-    %{user: %{ipfs: ipfs_cid}} = KVHandler.get(addr, "UserManager")
-
-    {:ok, data} = SoulCardRender.get_data(ipfs_cid)
-    # {:ok, data_dao} = SoulCardRender.get_data(dao_ipfs_cid)
-
-    socket =
-      if Map.fetch(data, :mirrorLink) != :error do
-        if Map.fetch!(data, :mirrorLink) != false do
-          handle_mirror_status(socket, Map.fetch!(data, :mirrorLink), addr)
-        end
-      else
-        socket
-      end
-    {
-      :ok,
-      socket
-      |> assign(:data, handle_data(data, :user))
-      |> assign(:addr, addr)
-      |> assign(:template_gist_id, @template_gist_id_example)
-
-    }
-  end
 
   def handle_data(data, :user) do
     avatar = Map.get(data, :avatar)

@@ -22,6 +22,8 @@ defmodule Components.ExHttp do
       {:ok, body} ->
         {:ok, body}
 
+      {:error, 404} ->
+        {:error, 404}
       {:error, _} ->
         Process.sleep(500)
         http_get(url, retries - 1)
@@ -49,7 +51,8 @@ defmodule Components.ExHttp do
     |> case do
       {:ok, body} ->
         {:ok, body}
-
+      {:error, 404} ->
+        {:error, 404}
       {:error, _} ->
         Process.sleep(500)
         http_post(url, data, retries - 1)
@@ -69,7 +72,11 @@ defmodule Components.ExHttp do
     end
   end
 
-  # 404 or sth else
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 404, body: _}}) do
+    Logger.error("Reason: 404")
+    {:error, 404}
+  end
+  # else
   defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: _}}) do
     Logger.error("Reason: #{status_code} ")
     {:error, :network_error}
