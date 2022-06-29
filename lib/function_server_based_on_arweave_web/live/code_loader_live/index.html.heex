@@ -34,6 +34,9 @@
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
 
 <%= if assigns[:auth] do %>
+<%= if assigns[:code_type] == "gist" do %>
+<button phx-click="update_code" phx-value-name={@selected_code} class="btn-primary" type="button">Update Code</button>
+<% end %>
 <button phx-click="remove_code" phx-value-name={@selected_code} class="btn-primary" type="button">Remove Code</button>
 <%= if assigns[:code_type] == "gist" do %>
 <button phx-click="remove_all_code" phx-value-name={@selected_code} class="btn-primary" type="button">Remove All Code</button>
