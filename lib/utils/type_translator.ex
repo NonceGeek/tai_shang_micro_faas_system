@@ -64,4 +64,13 @@ defmodule TypeTranslator do
       |> String.replace("0x", "")
       |> Base.decode16!(case: :mixed)
     end
+
+    def get_data(func_str, params) do
+      payload =
+        func_str
+        |> ABI.encode(params)
+        |> Base.encode16(case: :lower)
+
+      "0x" <> payload
+    end
   end
