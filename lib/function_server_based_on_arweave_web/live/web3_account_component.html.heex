@@ -1,0 +1,39 @@
+<div id="web3-account" x-ref="web3Account" x-data="web3Account" phx-hook="Web3Account"
+   x-init="() => { $watch('account.addr', addr => $dispatch('web3-changed', { addr })); $watch('network.chainId', chainId => $dispatch('web3-changed', { chainId })) }"
+   @messageverified="handleVerifiedResult($event.detail.result)"
+   >
+   <div x-show="missingEthereum" x-transition>
+        Please install the MetaMask!.
+   </div>
+   <strong x-text="network.name"></strong>
+   <span>
+      <span style="position: relative;">
+         <span style="vertical-align: middle; padding-left: 5px; font-size: 28px;">
+            <a class="ant-typography" x-bind:href="`https://etherscan.io/address/${account.addr}`" target="_blank" rel="noopener noreferrer" style="color: rgb(34, 34, 34);">
+               <span x-text="account.addr"></span>
+            </a>
+         </span>
+      </span>
+      <span x-text="account.balance" style="vertical-align: middle; font-size: 24px; padding: 8px; cursor: pointer;"></span>
+   </span>
+   <template x-if="!isLogin">
+      <button @click="login" type="button" class="ant-btn ant-btn-round ant-btn-lg" style="vertical-align: top; margin-left: 8px; margin-top: 4px;">Login</button>
+   </template>
+   <template x-if="isLogin">
+      <button @click="logout" type="button" class="ant-btn ant-btn-round ant-btn-lg" style="vertical-align: top; margin-left: 8px; margin-top: 4px;">Logout</button>
+   </template>
+   <div>
+   <template x-if="messageVerified === 1">
+      <strong style="color: blue;">Message sent and signature verified!</strong>
+   </template>
+   <template x-if="messageVerified === -1">
+      <strong style="color: red;">Message signature is invalid!</strong>
+   </template>
+   </div>
+   <template x-if="isLogin">
+      <div>
+         <textarea x-model="message"></textarea>
+         <button @click="signMessage($refs.web3Account)" type="button" class="ant-btn ant-btn-round ant-btn-lg" style="vertical-align: top; margin-left: 8px; margin-top: 4px;">Sign and Send</button>
+      </div>
+   </template>
+</div>
