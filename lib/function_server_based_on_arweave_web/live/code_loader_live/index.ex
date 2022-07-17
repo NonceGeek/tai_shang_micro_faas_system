@@ -101,7 +101,17 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:selected_func, Enum.fetch!(func_names, 0))
     }
   end
-def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
+
+  def handle_event("update_code", _params, %{assigns: assigns} = socket) do
+    OnChainCode.update_code_by_name(assigns.selected_code)
+    {
+      :noreply,
+      socket
+      |> redirect(to: "/")
+    }
+  end
+
+  def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
      %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
      case type do
        "gist" -> OnChainCode.remove_code_by_gist(tx_id)
@@ -112,16 +122,17 @@ def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
       socket
       |> redirect(to: "/")
     }
- end
+  end
 
- def handle_event("remove_code", _params, %{assigns: assigns} = socket) do
+  def handle_event("remove_code", _params, %{assigns: assigns} = socket) do
      OnChainCode.remove_code_by_name(assigns.selected_code)
     {
       :noreply,
       socket
       |> redirect(to: "/")
     }
- end
+  end
+
   @impl true
   def handle_event("run", params, socket) do
     params_atom = ExStructTranslator.to_atom_struct(params)
@@ -202,5 +213,4 @@ def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
   #     |> String.to_atom()
   #     |> apply(func_name_atom, params)
   # end
-
 end

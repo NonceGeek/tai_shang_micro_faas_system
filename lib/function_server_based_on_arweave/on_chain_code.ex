@@ -37,15 +37,12 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   def create_or_query_by_tx_id(tx_id, type \\ "ar") do
     try do
       ele = get_all_by_tx_id(tx_id)
-
       if ele == [] do
         {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
-        Logger.info(code)
-
         if type == "gist" do
-          code |> Enum.each(fn x -> Ele.create_by_payload_and_tx_id(x, tx_id, type) end)
+          code |> Enum.each(fn x -> Ele.create_or_update_by_payload_and_tx_id(x, tx_id, type) end)
         else
-          Ele.create_by_payload_and_tx_id(code, tx_id, type)
+          Ele.create_or_update_by_payload_and_tx_id(code, tx_id, type)
         end
       else
         {:ok, ele}
@@ -70,7 +67,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     |> NFT.get_from_nft()
   end
 
-  def create_by_payload_and_tx_id(code, tx_id, type) do
+  def create_or_update_by_payload_and_tx_id(code, tx_id, type, record \\ nil) do
     # Code.eval_string(code)
     Logger.info(code)
     name = get_module_name_from_code(code)
@@ -81,20 +78,35 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # TODO: Code.eval_string_is_slow, so it's better to recompile module after file write.
     Code.eval_string(code)
     description = get_description_from_code(code)
-    # create it in database
-    Ele.create(%{
-      name: name,
-      tx_id: tx_id,
-      description: description,
-      code: code,
-      type: type
-    })
+    if is_nil(record) do
+      Ele.create(%{
+        name: name,
+        tx_id: tx_id,
+        description: description,
+        code: code,
+        type: type
+      })
+    else
+      Ele.update(record, %{
+        name: name,
+        tx_id: tx_id,
+        description: description,
+        code: code,
+        type: type
+      })
+    end
   end
 
   def create(attrs \\ %{}) do
     %Ele{}
     |> Ele.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def update(%Ele{} = ele, attrs) do
+    ele
+    |> changeset(attrs)
+    |> Repo.update()
   end
 
   @doc false
@@ -114,7 +126,25 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     # module_name = get_module_name_from_code(code)
     # module_name.module_info
   end
-   def remove_code_by_gist(tx_id) do
+
+  def update_code_by_name(name) do
+    record = get_by_name(name)
+    with false <- is_nil(record) do
+      type = record.type
+      tx_id = record.tx_id
+      {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
+      if type == "gist" do
+        code = code |> Enum.find(fn x -> get_module_name_from_code(x) == name end)
+        if is_binary(code) do
+          Ele.create_or_update_by_payload_and_tx_id(code, tx_id, "gist", record)
+        end
+      else
+        Ele.create_or_update_by_payload_and_tx_id(code, tx_id, type, record)
+      end
+    end
+  end
+
+  def remove_code_by_gist(tx_id) do
      get_all
      |> Enum.filter(fn %{tx_id: tx_id1} ->  tx_id1 == tx_id end)
      |> Enum.map(fn x -> Repo.delete(x) end)
