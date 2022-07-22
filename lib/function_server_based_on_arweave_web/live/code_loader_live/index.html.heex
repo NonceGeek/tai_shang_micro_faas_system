@@ -1,3 +1,14 @@
+<script>
+function copyAsMarkdown() {
+  const funDoc = document.getElementById('code-loader-form_function_doc').value;
+  const tmp = document.createElement('textarea');
+  tmp.value = funDoc;
+  document.body.appendChild(tmp);
+  tmp.select();
+  document.execCommand("Copy");
+  document.body.removeChild(tmp);
+}
+</script>
 <div style="width:60%;margin: 0 auto;">
 <center><h1>Code Loader</h1></center>
 <center>
@@ -48,10 +59,23 @@
   <%= select f, :func_name, @func_names,  value: @selected_func, class: "form-field" %>
 
   <%= label f, :input_list %>
-  <%=  text_input f, :input_list, class: "form-field", value: "[]", placeholder: "[]" %>
+  <%= text_input f, :input_list, class: "form-field", value: "[]", placeholder: "[]" %>
   <br><br>
-  <%# <button phx-click="run_code" class="btn-primary">Run Code</button> %>
   <button type="submit" phx-disable-with="Runing...">Run Code</button>
+  <button phx-click="show_api_info" phx-value-name={@selected_code} class="btn-info" type="button">show the api info</button>
+  <%= if !is_nil(@fun_doc) do %>
+  <div>
+    <%= raw(Earmark.as_html!(@fun_doc)) %>
+  </div>
+  <%= hidden_input f, :function_doc, class: "form-field", value: @fun_doc %>
+  <button type="button" onclick="copyAsMarkdown()" class="btn-info">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+      <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"></path>
+      <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"></path>
+    </svg>
+    Copy as Markdown
+  </button>
+  <%= end %>
   <p>
     <%= inspect(assigns[:output]) %>
   </p>

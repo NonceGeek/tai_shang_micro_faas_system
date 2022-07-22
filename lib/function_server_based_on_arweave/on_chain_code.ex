@@ -162,7 +162,9 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     |> Enum.reject(fn {key, _value} ->
       key in @rejected_func_list
     end)
-    |> Enum.into(%{})
+    |> Enum.map(fn {name, arity} ->
+      "#{name}/#{arity}"
+    end)
   end
 
   def get_module_info(name) do
