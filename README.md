@@ -1,5 +1,7 @@
 # Tai Shang Micro FaaS System
 
+[![OSCS Status](https://www.oscs1024.com/platform/badge/WeLightProject/tai_shang_micro_faas_system.svg?size=small)](https://www.oscs1024.com/project/WeLightProject/tai_shang_micro_faas_system?ref=badge_small)
+
 > Online Server: https://faas.noncegeek.com
 > 
 > Intro Video: https://youtu.be/8gQ4qHgQfSg
