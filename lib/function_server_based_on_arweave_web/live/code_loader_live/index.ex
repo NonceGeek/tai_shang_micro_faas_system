@@ -32,6 +32,8 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:code_type, type)
       |> assign(:explorer_link, build_explorer_link(tx_id, type))
       |> assign(:auth, auth)
+      |> assign(:fun_doc, nil)
+      |> assign(:output, "")
 
     socket = handle_socket(socket, tx_id, type)
     {:ok, socket}
@@ -84,15 +86,31 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     }
   end
 
+  def handle_event(
+        "changed",
+        %{
+          "_target" => ["form", "func_name"],
+          "form" => %{
+            "code_name" => _code_name,
+            "func_name" => func_name,
+            "input_list" => _input_list
+          }
+        },
+        socket
+      ) do
+
+    {
+      :noreply,
+      socket |> assign(:selected_func, func_name)
+    }
+  end
+
   def handle_event("load_code", _params, %{assigns: assigns} = socket) do
     OnChainCode.load_code(assigns.code_text)
 
     func_names =
       assigns.selected_code
       |> OnChainCode.get_functions()
-      |> Enum.map(fn {key, _value} ->
-        key
-      end)
 
     {
       :noreply,
@@ -100,6 +118,62 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:func_names, func_names)
       |> assign(:selected_func, Enum.fetch!(func_names, 0))
     }
+  end
+
+  def handle_event("show_api_info", _params, %{assigns: assigns} = socket) do
+    OnChainCode.load_code(assigns.code_text)
+
+    module_name = String.replace(assigns.selected_code, "CodesOnChain.", "")
+    [fun_name, fun_arity] = String.split(assigns.selected_func, "/")
+
+    # fun_params = fetch_ast(assigns.code_text, String.to_atom(fun_name)) |> Enum.map(&format_fun_param/1)
+
+    {:docs_v1, _, :elixir, _, _, _, fun_docs} = Code.fetch_docs("Elixir.#{assigns.selected_code}" |> String.to_atom())
+
+    {_, _, [signature], %{"en" => fun_doc}, _} = Enum.find(fun_docs, "", fn doc ->
+      {{_kind, function_name, arity}, _, _, %{"en" => _fun_doc}, _} = doc
+      function_name == String.to_atom(fun_name) && arity == String.to_integer(fun_arity)
+    end)
+    fun_params = signature |> String.replace(fun_name, "") |> String.replace("(", "") |> String.replace(")", "")
+
+    fun_spec = """
+    ### 函数注释
+    #{fun_doc}
+
+    ### 调用该函数的 curl 命令格式：
+
+    ```bash
+    curl --location --request POST 'https://faas.noncegeek.com/api/v1/run \\
+    --header 'Content-Type: application/json' \\
+    --data-raw '{
+        "name": "#{module_name}",
+        "func_name": "#{fun_name}",
+        "params": [#{fun_params}]
+    }'
+    ```
+
+    其中，`params` 数组里需提供 #{fun_arity} 个参数。
+    """
+
+    {
+      :noreply,
+      socket
+      |> assign(:fun_doc, fun_spec)
+    }
+  end
+
+  def fetch_ast(module_code, fun) do
+    module_code
+    |> Code.string_to_quoted!()
+    |> tap(&inspect/1)
+    |> Macro.prewalk(fn
+      {:def, _, [{^fun, _, params} | _]} -> throw(params)
+      other -> other
+    end)
+
+    []
+  catch
+    result -> result
   end
 
   def handle_event("update_code", _params, %{assigns: assigns} = socket) do
@@ -112,7 +186,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   end
 
   def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
-     %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
+     %{tx_id: tx_id, code: _code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
      case type do
        "gist" -> OnChainCode.remove_code_by_gist(tx_id)
        _-> :ignore
@@ -160,6 +234,8 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
         output =
           try do
             Logger.info("#{code_name}, #{func_name}, #{inspect(input_list)}")
+            func_name = String.split(func_name, "/") |> Enum.fetch!(0)
+
             CodeRunner.run_func(
               code_name,
               func_name,
