@@ -143,9 +143,11 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     ### 调用该函数的 curl 命令格式：
 
     ```bash
-    curl --location --request POST 'https://faas.noncegeek.com/api/v1/run?name=#{module_name}&func_name=#{fun_name}' \\
+    curl --location --request POST 'https://faas.noncegeek.com/api/v1/run \\
     --header 'Content-Type: application/json' \\
     --data-raw '{
+        "name": "#{module_name}",
+        "func_name": "#{fun_name}",
         "params": [#{fun_params}]
     }'
     ```
