@@ -126,14 +126,15 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     module_name = String.replace(assigns.selected_code, "CodesOnChain.", "")
     [fun_name, fun_arity] = String.split(assigns.selected_func, "/")
 
-    fun_params = fetch_ast(assigns.code_text, String.to_atom(fun_name)) |> Enum.map(&format_fun_param/1)
+    # fun_params = fetch_ast(assigns.code_text, String.to_atom(fun_name)) |> Enum.map(&format_fun_param/1)
 
     {:docs_v1, _, :elixir, _, _, _, fun_docs} = Code.fetch_docs("Elixir.#{assigns.selected_code}" |> String.to_atom())
 
-    {_, _, _signature, %{"en" => fun_doc}, _} = Enum.find(fun_docs, "", fn doc ->
-      {{_kind, function_name, arity}, _, _signature, %{"en" => _fun_doc}, _} = doc
+    {_, _, [signature], %{"en" => fun_doc}, _} = Enum.find(fun_docs, "", fn doc ->
+      {{_kind, function_name, arity}, _, _, %{"en" => _fun_doc}, _} = doc
       function_name == String.to_atom(fun_name) && arity == String.to_integer(fun_arity)
     end)
+    fun_params = signature |> String.replace(fun_name, "") |> String.replace("(", "") |> String.replace(")", "")
 
     fun_spec = """
     ### 函数注释
@@ -145,7 +146,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     curl --location --request POST 'https://faas.noncegeek.com/api/v1/run?name=#{module_name}&func_name=#{fun_name}' \\
     --header 'Content-Type: application/json' \\
     --data-raw '{
-        "params": [#{Enum.join(fun_params, ", ")}]
+        "params": [#{fun_params}]
     }'
     ```
 
@@ -173,18 +174,6 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     result -> result
   end
 
-  defp format_fun_param({name, _, _}) do
-    name
-  end
-
-  defp format_fun_param(str) when is_binary(str) do
-    "\"#{str}\""
-  end
-
-  defp format_fun_param(primitive) do
-    primitive
-  end
-
   def handle_event("update_code", _params, %{assigns: assigns} = socket) do
     OnChainCode.update_code_by_name(assigns.selected_code)
     {
@@ -195,7 +184,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   end
 
   def handle_event("remove_all_code", _params, %{assigns: assigns} = socket) do
-     %{tx_id: tx_id, code: code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
+     %{tx_id: tx_id, code: _code, type: type} = OnChainCode.get_by_name(assigns.selected_code)
      case type do
        "gist" -> OnChainCode.remove_code_by_gist(tx_id)
        _-> :ignore
