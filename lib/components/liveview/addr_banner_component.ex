@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweaveWeb.AddrBannerComponent do
+defmodule Components.Liveview.AddrBannerComponent do
   use FunctionServerBasedOnArweaveWeb, :live_component
   require Logger
   @impl true

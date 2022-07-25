@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweaveWeb.SigVerifierComponent do
+defmodule Components.Liveview.SigVerifierComponent do
   use FunctionServerBasedOnArweaveWeb, :live_component
   require Logger
 
