@@ -1,8 +1,8 @@
 <html>
 
-  <head>
-    <title>SoulCard@<%= @addr%></title>
-    <style>
+      <head>
+        <title>SoulCard@<%= @addr%></title>
+        <style>
       /* 重置浏览器自定义的样式 */
       * {
         margin: 0;
@@ -136,29 +136,80 @@
       #namecard2 {
         width: 600px;
         height: 400px;
+        box-sizing: border-box;
+        padding: 20px;
         background: #0C0F17;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
+        align-items: flex-start;
+      }
+
+      #namecard2 .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      #namecard2 .top .top-left.dao-homepage {
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
       }
 
-      #namecard2 .image-wrapper {
-        width: 251px;
-        height: 251px;
-        border-radius: 50%;
+      .top-left.dao-homepage .dao-logo {
+        width: 100px;
+        height: 100px;
+        border-radius: 5px;
         overflow: hidden;
       }
 
-      #namecard2 .text {
-        height: 39px;
+      .top-left.dao-homepage .dao-name {
+        margin-top: 10px;
+        width: 100px;
+        height: 2em;
+        border-radius: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        color: #A112BB;
+      }
+
+      #namecard2 .top .top-right.infos {
+        margin-left: 30px;
+        width: 300px;
+      }
+
+      .top-right.infos .text {
         font-family: 'Inter';
         font-weight: 400;
         font-size: 32px;
         line-height: 39px;
+        text-align: right;
         color: #FFFFFF;
       }
 
+      .top-right.infos .text.main {
+        margin-bottom: 20px;
+      }
+
+      .bottom.nfts .nfts-title {
+        font-family: 'Inter';
+        font-weight: 400;
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: #FFFFFF;
+      }
+
+      .bottom.nfts .nfts-imgs {
+        width: 50px;
+        display: flex;
+        justify-content: flex-start;
+        gap: 10%;
+      }
       /* 第三个 namecard */
       #namecard3 {
         width: 600px;
@@ -232,145 +283,162 @@
         color: white;
         text-decoration: none;
       }
-    </style>
-  </head>
-  <body>
-    <div class="actions">
-      <button class="button" onclick="copy()">copy as html!</button>
-      <button class="button" onclick="flip()">flip page!</button>
-    </div>
-    <div id="container">
-
-      <!-- page 0x01 -->
-      <div id="namecard" class="card" style="display: flex;">
-        <div class="left">
-          <div id="avatar" onclick="copy()">
-            <img src={assigns.data[:avatar]}>
-          </div>
-          <div class="footer">
-            <div class="social-icons">
-
-              <%= if !is_nil(assigns.data[:github_link]) do %>
-              <a class="social-icon" target="_blank" href={assigns.data[:github_link]}>
-                <img src="https://cdn.cdnlogo.com/logos/g/55/github.svg">
-              </a>
-              <% end %>
-              <%= if !is_nil(assigns.data[:mirror_link]) do %>
-              <a class="social-icon" target="_blank" href={assigns.data[:mirror_link]}>
-                <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
-              </a>
-              <% end %>
-              <%= if !is_nil(assigns.data[:twitter]) do %>
-              <a class="social-icon" target="_blank" href={assigns.data[:twitter]}>
-                <img src="https://cdn.cdnlogo.com/logos/t/96/twitter-icon.svg">
-              </a>
-              <% end %>
-            </div>
-            <div class="email"><%= assigns.data[:email] %></div>
-            <div class="speedrun-infos">
-              <a class="speedrun-info" target="_blank" href="#">speedrun level: 3</a>
-              <a class="speedrun-info" target="_blank" href={"https://speedrun-noncegeek.surge.sh/builders/#{assigns.addr}"}>speedrun profile</a>
-            </div>
-          </div>
+        </style>
+      </head>
+      <body>
+        <div class="actions">
+          <button class="button" onclick="copy()">copy as html!</button>
+          <button class="button" onclick="flip()">flip page!</button>
         </div>
-        <div class="right">
-          <div class="top">
-            <div id="name"><%= assigns.data[:name] %></div>
-            <a id="address" target="_blank"
-              href={"https://zapper.fi/account/#{assigns.addr}"}>
-              <%= assigns.addr %>
-            </a>
-          </div>
-          <div class="content">
-            <div id="about_me">
-              <%= @data.about_me %>
+        <div id="container">
+
+          <!-- page 0x01 -->
+          <div id="namecard" class="card" style="display: flex;">
+            <div class="left">
+              <div id="avatar" onclick="copy()">
+                <img src={assigns.data[:avatar]}>
+              </div>
+              <div class="footer">
+                <div class="social-icons">
+
+                  <%= if !is_nil(assigns.data[:github_link]) do %>
+                  <a class="social-icon" target="_blank" href={assigns.data[:github_link]}>
+                    <img src="https://cdn.cdnlogo.com/logos/g/55/github.svg">
+                  </a>
+                  <% end %>
+                  <%= if !is_nil(assigns.data[:mirror_link]) do %>
+                  <a class="social-icon" target="_blank" href={assigns.data[:mirror_link]}>
+                    <img src="https://tva1.sinaimg.cn/large/e6c9d24egy1h2p3vznvx3j2069069glf.jpg">
+                  </a>
+                  <% end %>
+                  <%= if !is_nil(assigns.data[:twitter]) do %>
+                  <a class="social-icon" target="_blank" href={assigns.data[:twitter]}>
+                    <img src="https://cdn.cdnlogo.com/logos/t/96/twitter-icon.svg">
+                  </a>
+                  <% end %>
+                </div>
+                <div class="email"><%= assigns.data[:email] %></div>
+                <div class="speedrun-infos">
+                  <%= for elem <- @speedruns do %>
+                    <a class="speedrun-info" target="_blank" href={"#{elem.link}"}>speedrun source: <%= elem.type %></a>
+                    <a class="speedrun-info" target="_blank" href="#">speedrun level: <%= elem.level %></a>
+                    <a class="speedrun-info" target="_blank" href={"#{elem.link}"}>speedrun profile</a>
+                  <% end %>
+                </div>
+              </div>
             </div>
-            <div id="abilities">
-            <%= @data.abilities %>
+            <div class="right">
+              <div class="top">
+                <div id="name"><%= assigns.data[:name] %></div>
+                <a id="address" target="_blank"
+                  href={"https://zapper.fi/account/#{assigns.addr}"}>
+                  <%= assigns.addr %>
+                </a>
+              </div>
+              <div class="content">
+                <div id="about_me">
+                  <%= @data.about_me %>
+                </div>
+                <div id="abilities">
+                <%= @data.abilities %>
+                </div>
+              </div>
+              <div class="buttons">
+                <%=  Enum.with_index(@data.fields, fn element, index -> %>
+                  <button id={"button-#{index}"} class="button"><%= element %></button>
+                <% end) %>
+              </div>
             </div>
           </div>
-          <div class="buttons">
-            <%=  Enum.with_index(@data.fields, fn element, index -> %>
-              <button id={"button-#{index}"} class="button"><%= element %></button>
+
+          <!--page daoes -->
+          <%= Enum.map(@dao_infoes_roles_list, fn {dao_infoes, role} -> %>
+
+            <div id="namecard2" class="card" style="display: none;">
+              <div class="top">
+                <a class="top-left dao-homepage" href={dao_infoes.homepage} target="_blank">
+                  <img class="dao-logo" src={"#{dao_infoes.logo}"}>
+                  <span class="dao-name"><%= dao_infoes.name %></span>
+                </a>
+                <div class="top-right infos">
+                  <p class="text main"><%=assigns.data[:name]%> </p>
+                  <p class="text" style="font-size: 15px"><%= dao_infoes.name %>: <%= dao_infoes.description %></p>
+                  
+                  <%= if !is_nil(role) do %>
+                    <p class="text" style="font-size: 20px">Role in DAO: <%= role %></p>
+                  <% end %>
+                </div>
+              </div>
+              <div class="bottom nfts">
+                <div class="nfts-title">NFTs in DAO</div>
+                <div class="nfts-imgs">
+                  <img class="nfts-img" src= "https://noncegeek.com/avatars/leeduckgo.jpeg" alt="nft">
+                </div>
+              </div>
+            </div>
+
+          <% end) %>
+
+          <!--page 0x03 -->
+          <%= if !is_nil(assigns[:mirrors]) do%>
+            <div id="namecard3" class="card" style="display: none;">
+            The Latest Mirror Article:<br>
+            <%=  Enum.with_index(@mirrors, fn mirror, index -> %>
+              <div class="article article-1">
+                <a class="text" href={"https://mirror.xyz/#{@addr}/#{mirror.original_digest}"} target="_blank"><%= mirror.title%></a>
+              </div>
             <% end) %>
-          </div>
+            <br>
+            The Latest Github PR:<br>
+            <div class="article article-1">
+              <a class="text" href="https://github.com/WeLightProject/Tai-Shang-Soul-Card/pull/38" target="_blank"> add contents to Tai-Shang-Soul-Card</a>
+            </div>
+            </div>
+          <% end %>
         </div>
-      </div>
 
-      <!--page daoes -->
-      <%= Enum.map(@dao_infoes_roles_list, fn {dao_infoes, role} -> %>
-        <div id="namecard2" class="card" style="display: none;">
-          <div class="image-wrapper">
-            <a href={dao_infoes.homepage} target="_blank">
-              <img src={"#{dao_infoes.logo}"}>
-            </a>
-          </div>
-          <p class="text"><%=assigns.data[:name]%> @ <%= dao_infoes.name %></p>
-          <p class="text" style="font-size: 20px"><%= dao_infoes.name %>: <%= dao_infoes.description %></p>
-          <p class="text" style="font-size: 20px">Role in DAO: <%= role %></p>
-        </div>
-      <% end) %>
+        <script>
+          function copy() {
+            var payload = document.documentElement.innerHTML;
+            let index = payload.indexOf("<title>");
+            let copyBtn = "<button onclick='copy()'>copy as html!</button>"
+            full_html = "<html><head>" + payload.slice(index).replace() + "</html>";
 
-      <!--page 0x03 -->
-      <%= if !is_nil(assigns[:mirrors]) do%>
-        <div id="namecard3" class="card" style="display: none;">
-        The Latest Mirror Article:<br>
-        <%=  Enum.with_index(@mirrors, fn mirror, index -> %>
-          <div class="article article-1">
-            <a class="text" href={"https://mirror.xyz/#{@addr}/#{mirror.original_digest}"} target="_blank"><%= mirror.title%></a>
-          </div>
-        <% end) %>
-        <br>
-        The Latest Github PR:<br>
-        <div class="article article-1">
-          <a class="text" href="https://github.com/WeLightProject/Tai-Shang-Soul-Card/pull/38" target="_blank"> add contents to Tai-Shang-Soul-Card</a>
-        </div>
-        </div>
-      <% end %>
-    </div>
+            navigator.clipboard.writeText(full_html);
+          }
 
-    <script>
-      function copy() {
-        var payload = document.documentElement.innerHTML;
-        let index = payload.indexOf("<title>");
-        let copyBtn = "<button onclick='copy()'>copy as html!</button>"
-        full_html = "<html><head>" + payload.slice(index).replace() + "</html>";
+          // 函数能够正常运行的前提：
+          // 最初只有一个 .card 元素的 display 是 flex
+          // 其余都是 none
+          function flip() {
+            var face = document.querySelectorAll('.card')
 
-        navigator.clipboard.writeText(full_html);
-      }
+            for (var i = 0; i < face.length; i++) {
 
-      // 函数能够正常运行的前提：
-      // 最初只有一个 .card 元素的 display 是 flex
-      // 其余都是 none
-      function flip() {
-        var face = document.querySelectorAll('.card')
+              // 找到当前显示的那个 namecard 的序号
+              if (face[i].style.display === 'flex') {
 
-        for (var i = 0; i < face.length; i++) {
+                // 记录下一个 namecard 的序号
+                var j = (i + 1) % face.length
 
-          // 找到当前显示的那个 namecard 的序号
-          if (face[i].style.display === 'flex') {
+                // 设置下一个 namecard 的 display 为 flex
+                // 其余的都设置为 none
+                for (var k = 0; k < face.length; k++) {
+                  if (k === j) {
+                    face[k].style.display = 'flex'
+                  } else {
+                    face[k].style.display = 'none'
+                  }
+                }
 
-            // 记录下一个 namecard 的序号
-            var j = (i + 1) % face.length
-
-            // 设置下一个 namecard 的 display 为 flex
-            // 其余的都设置为 none
-            for (var k = 0; k < face.length; k++) {
-              if (k === j) {
-                face[k].style.display = 'flex'
-              } else {
-                face[k].style.display = 'none'
+                // 设置完毕，结束循环
+                return
               }
             }
-
-            // 设置完毕，结束循环
-            return
           }
-        }
-      }
-    </script>
+        </script>
 
-    <iframe hidden="" height="0" width="0" src="/phoenix/live_reload/frame"></iframe>
-    </body>
+        <iframe hidden="" height="0" width="0" src="/phoenix/live_reload/frame"></iframe>
+        </body>
 
-  </html>
+      </html>

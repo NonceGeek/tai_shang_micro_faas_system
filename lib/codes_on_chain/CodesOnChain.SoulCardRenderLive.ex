@@ -73,6 +73,8 @@ defmodule CodesOnChain.SoulCardRenderLive do
       if Map.fetch(data, :mirror_link) != :error do
         if Map.fetch!(data, :mirror_link) != false do
           handle_mirror_status(socket, Map.fetch!(data, :mirror_link), addr)
+        else
+          socket
         end
       else
         socket
@@ -124,7 +126,12 @@ defmodule CodesOnChain.SoulCardRenderLive do
   def do_zip_dao_and_role(addr, role), do: {addr, role}
 
   def handle_mirror_status(socket, true, addr) do
-    assign(socket, :mirrors, MirrorHandler.get_articles(addr, @article_num))
+    try do
+      assign(socket, :mirrors, MirrorHandler.get_articles(addr, @article_num))
+    rescue
+      _ ->
+        socket
+    end
   end
 
   def handle_mirror_status(socket, false, _addr), do: socket

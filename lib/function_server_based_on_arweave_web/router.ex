@@ -47,6 +47,7 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through :browser
     live "/", CodeLoaderLive.Index, :index
+    live "/test", TestLive, :index
   end
 
   scope "/dynamic/", CodesOnChain do

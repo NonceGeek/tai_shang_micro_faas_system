@@ -1,0 +1,9 @@
+<div id="web3-account" x-ref="web3Account" x-data="web3Account" phx-hook="Web3Account"
+x-init="() => { $watch('account.addr', addr => $dispatch('web3-changed', { addr })); $watch('network.chainId', chainId => $dispatch('web3-changed', { chainId })) }"
+@messageverified="handleVerifiedResult($event.detail.result)"
+>
+    <div>
+        <textarea x-model="message"></textarea>
+        <button @click="signMessage($refs.web3Account)" type="button" class="ant-btn ant-btn-round ant-btn-lg" style="vertical-align: top; margin-left: 8px; margin-top: 4px;">Sign and Send</button>
+    </div>
+</div>
