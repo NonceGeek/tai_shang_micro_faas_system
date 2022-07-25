@@ -17,7 +17,8 @@ config :function_server_based_on_arweave,
   contract_addr: "0xE25827DedD435aD3C4B90bD5BaBEf3CF462884Be",
   contract_endpoint: "https://dev.kardiachain.io",
   eth_explorer: "https://explorer-dev.kardiachain.io",
-  gallery: "https://moonbeam.nftscan.com/search"
+  gallery: "https://moonbeam.nftscan.com/search",
+  my_infura_id: "my_infura_id"
 
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
