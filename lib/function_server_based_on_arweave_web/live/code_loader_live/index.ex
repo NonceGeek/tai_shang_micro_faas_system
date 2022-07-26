@@ -126,15 +126,23 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     module_name = String.replace(assigns.selected_code, "CodesOnChain.", "")
     [fun_name, fun_arity] = String.split(assigns.selected_func, "/")
 
-    # fun_params = fetch_ast(assigns.code_text, String.to_atom(fun_name)) |> Enum.map(&format_fun_param/1)
+    # IO.inspect(fetch_ast(assigns.code_text, String.to_atom(fun_name)))
 
     {:docs_v1, _, :elixir, _, _, _, fun_docs} = Code.fetch_docs("Elixir.#{assigns.selected_code}" |> String.to_atom())
 
-    {_, _, [signature], %{"en" => fun_doc}, _} = Enum.find(fun_docs, "", fn doc ->
-      {{_kind, function_name, arity}, _, _, %{"en" => _fun_doc}, _} = doc
+    {_, _, [signature], fun_doc, _} = Enum.find(fun_docs, "", fn doc ->
+      {{_kind, function_name, arity}, _, _, _, _} = doc
+      {{:function, :get_best_block_height, 1}, 11, ["get_best_block_height(endpoint)"], :none, %{}}
       function_name == String.to_atom(fun_name) && arity == String.to_integer(fun_arity)
     end)
+
     fun_params = signature |> String.replace(fun_name, "") |> String.replace("(", "") |> String.replace(")", "")
+    fun_doc = case fun_doc do
+      %{"en" => doc} ->
+        doc
+      _ ->
+        ""
+    end
 
     fun_spec = """
     ### 函数注释
@@ -165,7 +173,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
   def fetch_ast(module_code, fun) do
     module_code
     |> Code.string_to_quoted!()
-    |> tap(&inspect/1)
+    |> tap(&IO.inspect/1)
     |> Macro.prewalk(fn
       {:def, _, [{^fun, _, params} | _]} -> throw(params)
       other -> other

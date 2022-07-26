@@ -33,7 +33,7 @@ function web3AccountInit() {
         try {
           const provider = new ethers.providers.Web3Provider(window.ethereum)
 
-          this.network = await provider.getNetwork(ethereum.chainId)
+          this.network = await this.getNetwork(ethereum.chainId, provider)
 
           let addr = ethereum.selectedAddress
           if (!addr) {
@@ -57,9 +57,21 @@ function web3AccountInit() {
 
         this.isLogin = true
       },
+      async getNetwork(chainId, provider) {
+        // Not sure why chainId here is null, but provider.getNetwork can get correct one.
+        let network = await provider.getNetwork(chainId)
+        for (const n in NETWORKS) {
+          if (NETWORKS[n].chainId === network.chainId) {
+            return NETWORKS[n]
+          }
+        }
+        return network
+      },
       async networkChanged(chainId) {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
-        this.network = await provider.getNetwork(chainId)
+
+        this.network = await this.getNetwork(chainId, provider)
+
         window.location.reload()
       },
       async accountsChanged(accounts) {
