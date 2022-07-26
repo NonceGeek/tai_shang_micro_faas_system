@@ -1,1 +1,4 @@
-[["/soulcard","SoulCardRenderLive","index"]]
+[
+	["/soulcard","SoulCardRenderLive.Person","index"],
+	["/soulcard/dao","SoulCardRenderLive.DAO","index"]
+]
