@@ -102,7 +102,8 @@ defmodule Components.NFT do
       |> Enum.map(fn x ->
         %{
           :token_id => x,
-          :token_uri => get_contract_token_uri(x, contract_addr, endpoint)
+          :token_uri => get_contract_token_uri(x, contract_addr, endpoint),
+          :token_info => get_contract_token_info(x, contract_addr, endpoint)
         }
       end)
     end
@@ -149,6 +150,15 @@ defmodule Components.NFT do
     case do_get_from_chain(data, contract_addr, endpoint) do
       {:ok, result} -> result |> TypeTranslator.data_to_int()
       {:error, _} -> -1
+    end
+  end
+
+  defp get_contract_token_info(token_id, contract_addr, endpoint) do
+    data = TypeTranslator.get_data("getTokenInfo(uint256)", [token_id])
+
+    case do_get_from_chain(data, contract_addr, endpoint) do
+      {:ok, result} -> result |> TypeTranslator.data_to_str()
+      {:error, _} -> ""
     end
   end
 

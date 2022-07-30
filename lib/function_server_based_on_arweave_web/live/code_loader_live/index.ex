@@ -7,14 +7,14 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
   @gist_prefix "https://api.github.com/gists"
 
+  on_mount {FunctionServerBasedOnArweaveWeb.UserLiveAuth, :pass_through}
+
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     # codes = [
     #   [key: "Code 1", value: "code1"],
     #   [key: "Code 2", value: "code2"]
     # ]
-    auth = has_auth(Map.get(session, "function_server_based_on_arweave_auth"))
-
     code_names =
       OnChainCode.get_all()
       |> Enum.map(& &1.name)
@@ -31,7 +31,6 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:code_text, code_text)
       |> assign(:code_type, type)
       |> assign(:explorer_link, build_explorer_link(tx_id, type))
-      |> assign(:auth, auth)
       |> assign(:fun_doc, nil)
       |> assign(:output, "")
 
@@ -50,12 +49,6 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
   def handle_socket(socket, _, _), do: socket
 
-  defp has_auth(nil) do
-      false
-  end
-  defp has_auth(_) do
-      true
-  end
   @impl true
   def handle_params(_params, _url, socket) do
     {:noreply, socket}

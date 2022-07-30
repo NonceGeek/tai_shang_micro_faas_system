@@ -44,7 +44,7 @@ function copyAsMarkdown() {
 
 <button phx-click="load_code" phx-value-name={@selected_code} class="btn-primary" type="button">Load Code</button>
 
-<%= if assigns[:auth] do %>
+<%= if assigns[:current_user] do %>
 <%= if assigns[:code_type] == "gist" do %>
 <button phx-click="update_code" phx-value-name={@selected_code} class="btn-primary" type="button">Update Code</button>
 <% end %>

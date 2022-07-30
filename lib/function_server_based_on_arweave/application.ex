@@ -20,6 +20,8 @@ defmodule FunctionServerBasedOnArweave.Application do
       # {FunctionServerBasedOnArweave.Worker, arg}
     ]
 
+    :ets.new(:buidler_login, [:set, :public, :named_table, read_concurrency: true])
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: FunctionServerBasedOnArweave.Supervisor]

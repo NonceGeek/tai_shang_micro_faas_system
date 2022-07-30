@@ -42,6 +42,10 @@ function web3AccountInit() {
           }
 
           await this.loadAccount(addr)
+
+          document.dispatchEvent(new CustomEvent('requested_auth', {
+            detail: { chainId: this.network.chainId, addr: this.account.addr }
+          }))
         } catch (e) {
           console.error(e)
         }

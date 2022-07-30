@@ -48,10 +48,24 @@ Hooks.Web3Account = {
     })
   }
 }
+Hooks.AuthAsBuidler = {
+  mounted() {
+    document.addEventListener('requested_auth', event => {
+      this.pushEventTo('#auth_as_buidler', 'auth-as-builder', event.detail)
+    });
+  }
+}
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
+  metadata: {
+    click: (e, el) => {
+      return {
+        detail: e.detail
+      }
+    }
+  },
   dom: {
     onBeforeElUpdated(from, to) {
       if (from._x_dataStack) {
