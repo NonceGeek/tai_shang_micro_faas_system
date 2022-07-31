@@ -17,6 +17,10 @@ defmodule FunctionServerBasedOnArweaveWeb.TestLive do
       <button type="button" phx-click="output_socket">
       Oh
       </button>
+
+      <div>
+        <.live_component module={Components.Liveview.DebugContractComponent} id="debug_contract"/>
+      </div>
     """
   end
 

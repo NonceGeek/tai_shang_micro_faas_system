@@ -95,9 +95,39 @@ function web3AccountInit() {
           this.messageVerified = -1;
         }
         setTimeout(() => { this.messageVerified = 0 }, 2000)
+      },
+      async sendTransaction(addr, func, params) {
+        console.log(addr, func, params)
+        const data = get_data(func, params)
+        console.log(data)
+
+        const transactionParameters = {
+          // nonce: '0x00', // ignored by MetaMask
+          to: addr, // Required except during contract publications.
+          from: ethereum.selectedAddress, // must match user's active address.
+          // value: '0x00', // Only required to send ether to the recipient from the initiating external account.
+          data: data, // Optional, but used for defining smart contract creation and interaction.
+          // chainId: '0x3', // Used to prevent transaction reuse across blockchains. Auto-filled by MetaMask.
+        };
+
+        // txHash is a hex string
+        // As with any RPC call, it may throw an error
+        const txHash = await ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [transactionParameters],
+        });
+        console.log(txHash)
       }
     }))
   })
+}
+
+function get_data(func, params) {
+  const funcName = func.split("(")[0]
+  const ABI = ["function "+func]
+  const iface = new ethers.utils.Interface(ABI);
+  const res = iface.encodeFunctionData(funcName, JSON.parse(params))
+  return res
 }
 
 module.exports = {
