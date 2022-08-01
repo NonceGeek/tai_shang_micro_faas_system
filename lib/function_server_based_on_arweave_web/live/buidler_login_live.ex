@@ -8,14 +8,11 @@ defmodule FunctionServerBasedOnArweaveWeb.BuidlerLoginLive do
   @impl true
   def render(assigns) do
     ~H"""
-      <h1>Login as Buidler</h1>
-
-      <div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
-      <div id="auth_as_buidler" phx-hook="AuthAsBuidler">
+      <div id="auth_as_buidler" phx-hook="AuthAsBuidler" style={@loading_style}>
+        <button class="btn btn-light btn-lg" type="button" disabled>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Authenticating as Buidler ...
+        </button>
       </div>
       <.live_component module={Components.Liveview.AddrBannerComponent} id="addr_banner"/>
     """
@@ -23,7 +20,7 @@ defmodule FunctionServerBasedOnArweaveWeb.BuidlerLoginLive do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, socket}
+    {:ok, socket |> assign(:loading_style, "display: block")}
   end
 
   @impl true
@@ -34,7 +31,7 @@ defmodule FunctionServerBasedOnArweaveWeb.BuidlerLoginLive do
   end
 
   defp auth_as_buidler(socket, _addr, false) do
-    {:noreply, socket}
+    {:noreply, show_not_buidler(socket)}
   end
 
   defp auth_as_buidler(socket, addr, true) do
@@ -44,14 +41,14 @@ defmodule FunctionServerBasedOnArweaveWeb.BuidlerLoginLive do
   end
 
   defp auth_as_buidler(socket, _addr, []) do
-    {:noreply, socket}
+    {:noreply, show_not_buidler(socket)}
   end
 
   defp auth_as_buidler(socket, addr, [nft | _]) do
     # Token Info format: ["noncegeeker", "buidler" * 3, "writer" * 2]
     case String.length(nft.token_info) do
       0 ->
-        {:noreply, socket}
+        {:noreply, show_not_buidler(socket)}
       _ ->
         socket = AuthHelpers.auth_as_buidler(socket, addr)
 
@@ -61,5 +58,12 @@ defmodule FunctionServerBasedOnArweaveWeb.BuidlerLoginLive do
 
         {:noreply, redirect(socket, to: Routes.buidler_path(FunctionServerBasedOnArweaveWeb.Endpoint, :sign_in_from_live_view, lid: id, returns_to: "/"))}
     end
+  end
+
+  defp show_not_buidler(socket) do
+    socket
+    |> assign(:loading_style, "display: none")
+    |> put_flash(:info, "Not a Buidler.")
+    |> push_event("not-a-buidler", %{})
   end
 end

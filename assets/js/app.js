@@ -52,7 +52,12 @@ Hooks.AuthAsBuidler = {
   mounted() {
     document.addEventListener('requested_auth', event => {
       this.pushEventTo('#auth_as_buidler', 'auth-as-builder', event.detail)
-    });
+    })
+    this.handleEvent('not-a-buidler', event => {
+      setTimeout(() => {
+        document.getElementsByClassName('alert alert-info')[0].style.display = 'none';
+      }, 2000)
+    })
   }
 }
 
