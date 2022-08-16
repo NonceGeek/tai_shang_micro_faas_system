@@ -65,8 +65,8 @@ defmodule CodesOnChain.Meeting do
       files
       |> Map.get(String.to_atom(file_name))
       |> Map.get(:content)
-      |> Poison.decode!()
-      |> ExStructTranslator.to_atom_struct()
+      # |> Poison.decode!()
+      # |> ExStructTranslator.to_atom_struct()
 
     %{admins: downcase(admins), members: downcase(members)}
   end

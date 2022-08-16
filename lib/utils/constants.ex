@@ -23,4 +23,8 @@ defmodule Constants do
     Application.fetch_env!(:function_server_based_on_arweave, :gallery)
   end
 
+  def get_ipfs_node() do
+    Application.fetch_env!(:function_server_based_on_arweave, :ipfs_node)
+  end
+
 end

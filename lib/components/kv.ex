@@ -101,19 +101,22 @@ defmodule Components.KVHandler.KVRouter do
       [["/uri1", "TestLive", "index"]]
   """
   def put_routes(routes) do
+    get_routes()
+    |> Kernel.++(routes)
+    |> refresh_routes()
 
-    payload =
-      get_routes()
-      |> Kernel.++(routes)
-      |> Poison.encode!()
+  end
 
-    File.write!(
-      "priv/extra_routes.json",
-      payload
-    )
+  def del_routes(path) do
+    get_routes()
+    |> Enum.reject(fn [routes, _module, _fun] -> routes == path end)
+    |> refresh_routes()
+  end
+
+  def refresh_routes(payload) do
+    File.write!("priv/extra_routes.json", Poison.encode!(payload))
 
     Code.eval_file("lib/function_server_based_on_arweave_web/router.ex")
     # IEx.Helpers.r(FunctionServerBasedOnArweaveWeb.Router)
   end
-
 end

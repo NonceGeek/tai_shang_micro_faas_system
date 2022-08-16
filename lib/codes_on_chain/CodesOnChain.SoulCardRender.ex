@@ -6,6 +6,14 @@ defmodule CodesOnChain.SoulCardRender do
 
   def get_module_doc(), do: @moduledoc
 
+  def check_format(:dao, data) do
+    try do
+      {:ok, :todo}
+    rescue
+    _ ->
+      {:error, "your data is inregular: #{inspect(data)}"}
+    end
+  end
   @doc """
     Get data from IPFS with ipfs_cid.
   """
