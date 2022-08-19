@@ -77,4 +77,10 @@ defmodule FunctionServerBasedOnArweaveWeb.LiveHelpers do
     |> JS.hide(to: "#modal", transition: "fade-out")
     |> JS.hide(to: "#modal-content", transition: "fade-out-scale")
   end
+
+  defp random(bytes_count) do
+    bytes_count
+    |> :crypto.strong_rand_bytes()
+    |> Base.url_encode64(padding: false)
+  end
 end

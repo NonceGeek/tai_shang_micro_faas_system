@@ -44,10 +44,13 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
 
     pow_routes()
   end
+
   scope "/", FunctionServerBasedOnArweaveWeb do
     pipe_through :browser
     live "/", CodeLoaderLive.Index, :index
     live "/test", TestLive, :index
+    live "/buidler_login", BuidlerLoginLive, :index
+    get "/sign_in_from_live_view", BuidlerController, :sign_in_from_live_view
   end
 
   scope "/dynamic/", CodesOnChain do
@@ -64,7 +67,7 @@ defmodule FunctionServerBasedOnArweaveWeb.Router do
   end
 
   scope "/", FunctionServerBasedOnArweaveWeb do
-    pipe_through [:browser,:protected, :admin]
+    pipe_through [:browser, :protected, :admin]
     live "/add_func", FuncAdderLive.Index, :index
   end
 
