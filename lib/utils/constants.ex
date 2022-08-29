@@ -24,7 +24,17 @@ defmodule Constants do
   end
 
   def get_ipfs_node() do
-    Application.fetch_env!(:function_server_based_on_arweave, :ipfs_node)
+    %{
+      write_ipfs_node: Application.fetch_env!(:function_server_based_on_arweave, :write_ipfs_node),
+      read_ipfs_node: Application.fetch_env!(:function_server_based_on_arweave, :read_ipfs_node)
+    }
+  end
+
+  def get_ipfs_api_keys() do
+    [
+      Application.fetch_env!(:function_server_based_on_arweave, :ipfs_project_id),
+      Application.fetch_env!(:function_server_based_on_arweave, :ipfs_api_key_secret),
+    ]
   end
 
 end

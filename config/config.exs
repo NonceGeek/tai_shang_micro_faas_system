@@ -19,7 +19,11 @@ config :function_server_based_on_arweave,
   eth_explorer: "https://explorer-dev.kardiachain.io",
   gallery: "https://moonbeam.nftscan.com/search",
   my_infura_id: "",
-  ipfs_node: "https://ipfs.io"
+  # ipfs_node: "https://ipfs.io"
+  write_ipfs_node: "https://ipfs.infura.io",
+  read_ipfs_node: "https://leeduckgo.infura-ipfs.io",
+  ipfs_project_id: "2DywRf468SVsu4rA8PYjQ5bwO0j",
+  ipfs_api_key_secret: System.get_env("IPFS_API_KEY_SECRET")
 
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,

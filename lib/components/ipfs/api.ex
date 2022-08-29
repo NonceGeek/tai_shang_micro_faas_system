@@ -430,13 +430,15 @@ defmodule Components.Ipfs.API do
   end
 
   defp request_send_file(url, content) do
+    [username, pwd] = Constants.get_ipfs_api_keys()
+    options = [hackney: [basic_auth: {username, pwd}]]
     url
     |> (fn url ->
           boundary = "a831rwxi1a3gzaorw1w2z49dlsor"
 
           HTTPoison.request(:post, url, create_add_body(content, boundary), [
             {"Content-Type", "multipart/form-data; boundary=#{boundary}"}
-          ])
+          ], options)
         end).()
     |> process_response
   end

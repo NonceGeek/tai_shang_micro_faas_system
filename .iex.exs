@@ -7,7 +7,7 @@ block_to_ascii_emoji_translator =
   File.read!("examples/block_to_game_map_translator.ex")
 alias FunctionServerBasedOnArweave.DataToChain
 
-conn = %Components.Ipfs.Connection{}
+read_conn = Components.Ipfs.Connection.conn(:read)
 
 dao_info_exp = %{
     "description" => "it's just a cool DAO.",
