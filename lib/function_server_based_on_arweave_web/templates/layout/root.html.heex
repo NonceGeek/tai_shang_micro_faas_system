@@ -29,7 +29,8 @@
                 <span><%= link "Sign out", to: Routes.pow_session_path(@conn, :delete), method: :delete %></span>
               <% else %>
                 <span><%= link "Sign in", to: Routes.pow_session_path(@conn, :new) %> 
-                <!--<%= link "Login as Buidler", to: "/buidler_login" %></span>-->
+                <!--<%= link "Login as Buidler", to: "/buidler_login" %>-->
+                </span>
               <% end %>
             </li>
             <li>v0.1.0</li>
