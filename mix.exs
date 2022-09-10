@@ -75,6 +75,8 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:recon, "~> 2.5"},
 
       {:cors_plug, "~> 2.0"},
+
+      {:tentacat, "~> 2.2"}
     ]
   end
 
