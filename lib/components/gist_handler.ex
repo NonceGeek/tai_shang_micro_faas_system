@@ -3,6 +3,20 @@ defmodule Components.GistHandler do
   require Logger
   @prefix "https://api.github.com/gists"
 
+  def build_url(username, gist_id) do
+    "https://gist.github.com/#{username}/#{gist_id}"
+  end
+  def build_header(), do: [{"Authorization", "Bearer #{Constants.get_constant(:github_token)}"}]
+  def create_gist(payload) do
+    headers = build_header()
+    ExHttp.http_post(@prefix, payload, headers)
+  end
+
+  def update_gist(gist_id, new_payload) do
+    url = "#{@prefix}/#{gist_id}"
+    headers = build_header()
+    ExHttp.http_post(url, new_payload, headers)
+  end
   @doc """
     Example:\n
     ```

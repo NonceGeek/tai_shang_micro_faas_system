@@ -14,8 +14,27 @@ defmodule CodesOnChain.UserManager do
     Create a new User after verify the ETH signatue and the msg sender.
     info format:
     {
-      "ipfs_link": ipfs_link, or "gist_id": gist_id,
+      "ipfs(optional)": ipfs_link for payload,
+      "github_id": github_id(the unique one),
+      "gist_id": gist_id,
+      # or
+      # "payload": payload,
     }
+
+    it will generate item in kv table:
+
+    - key: addr
+    - value: {
+      type(dao/user): {
+        ipfs: ipfs,
+        github_id: github_id,
+        gist_id: gist_id,
+        #  or
+        # payload: payload,
+        ipfs(optional): cid
+      }
+    }
+    - created by: __MODULE__
   """
   def create_user(info, role, addr, msg, signature) do
     # update user info when the key does not exist
@@ -29,13 +48,35 @@ defmodule CodesOnChain.UserManager do
         |> do_create_user(role, info)
 
       handle_role(role, addr, info) # update role lists by role type
+      judge_gist_then_put(addr, payload)
 
-      KVHandler.put(addr, payload, ModuleHandler.get_module_name(__MODULE__))
     else
       error ->
         {:error, inspect(error)}
     end
   end
+
+  def judge_gist_then_put(addr, payload) do
+    with true <- judge_gist(payload) do
+      KVHandler.put(addr, payload, ModuleHandler.get_module_name(__MODULE__))
+    else
+      _ ->
+        {:error, "gist is not belong to that github acct"}
+    end
+  end
+
+  @doc """
+    to make sure the gist belong to that github acct.
+  """
+  def judge_gist(payload) do
+    %{github_id: github_id, gist_id: gist_id} =
+      ExStructTranslator.to_atom_struct(payload)
+
+    %{owner: %{id: id}} =
+      GistHandler.get_gist(gist_id)
+    id == github_id
+  end
+
 
 
   defp do_create_user(nil, role, info) do

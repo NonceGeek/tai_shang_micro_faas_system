@@ -5,6 +5,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   alias FunctionServerBasedOnArweave.CodeFetchers.Gist
   alias FunctionServerBasedOnArweave.CodeFetchers.NFT
   alias FunctionServerBasedOnArweave.Repo
+  alias Components.Ipfs
 
   require Logger
 
@@ -15,7 +16,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     field :tx_id, :string
     field :description, :string
     field :code, :string
-    field :type, :string, default: "ar"
+    field :type, :string, default: "ar" # ar/ipfs/gist
     # field :method_name, :string
     # field :output, :string
 
@@ -53,12 +54,18 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     end
   end
 
+  @spec do_create_or_query_by_tx_id(String.t(), String.t()) :: {:error, binary} | {:ok, %{content: map()}}
   def do_create_or_query_by_tx_id(tx_id, "ar") do
     ArweaveSdkEx.get_content_in_tx(Constants.get_arweave_node(), tx_id)
   end
 
   def do_create_or_query_by_tx_id(tx_id, "gist") do
     Gist.get_from_gist(tx_id)
+  end
+
+  def do_create_or_query_by_tx_id(cid, "ipfs") do
+    {:ok, result} = Ipfs.get_data(cid)
+    {:ok, %{content: result}}
   end
 
   def do_create_or_query_by_tx_id(token_id, "nft") do
@@ -145,7 +152,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
   end
 
   def remove_code_by_gist(tx_id) do
-     get_all
+     get_all()
      |> Enum.filter(fn %{tx_id: tx_id1} ->  tx_id1 == tx_id end)
      |> Enum.map(fn x -> Repo.delete(x) end)
   end
