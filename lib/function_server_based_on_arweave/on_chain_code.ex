@@ -37,38 +37,57 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   def create_or_query_by_tx_id(tx_id, type \\ "ar") do
     try do
-      ele = get_all_by_tx_id(tx_id)
-      if ele == [] do
-        {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
-        if type == "gist" do
-          code |> Enum.each(fn x -> Ele.create_or_update_by_payload_and_tx_id(x, tx_id, type) end)
-        else
-          Ele.create_or_update_by_payload_and_tx_id(code, tx_id, type)
-        end
-      else
-        {:ok, ele}
-      end
+      # ele = get_all_by_tx_id(tx_id)
+      # IO.puts inspect ele
+      # if ele == [] do
+      #   {:ok, %{content: code}} = fetch_by_tx_id(tx_id, type)
+      #   create_or_update(code, tx_id, type)
+      # else
+      #   {:ok, %{content: code}} = fetch_by_tx_id(tx_id, type)
+      #   create_or_update(code, tx_id, type)
+      # end
+      {:ok, %{content: code}} = fetch_by_tx_id(tx_id, type)
+      create_or_update(code, tx_id, type)
     rescue
       error ->
         {:error, inspect(error)}
     end
   end
 
-  @spec do_create_or_query_by_tx_id(String.t(), String.t()) :: {:error, binary} | {:ok, %{content: map()}}
-  def do_create_or_query_by_tx_id(tx_id, "ar") do
+  def create_or_update(codes, tx_id, type) do
+    if type == "gist" do
+      # TODO: Update Logic that if exist then update else create
+       Enum.each(codes, fn code ->
+        record =
+          code
+          |> get_module_name_from_code()
+          |> get_by_name()
+        Ele.create_or_update_by_payload_and_tx_id(code, tx_id, type, record)
+      end)
+    else
+      record =
+        codes
+        |> get_module_name_from_code()
+        |> get_by_name()
+      Ele.create_or_update_by_payload_and_tx_id(codes, tx_id, type, record)
+    end
+  end
+
+  @spec fetch_by_tx_id(String.t(), String.t()) :: {:error, binary} | {:ok, %{content: map()}}
+  def fetch_by_tx_id(tx_id, "ar") do
     ArweaveSdkEx.get_content_in_tx(Constants.get_arweave_node(), tx_id)
   end
 
-  def do_create_or_query_by_tx_id(tx_id, "gist") do
+  def fetch_by_tx_id(tx_id, "gist") do
     Gist.get_from_gist(tx_id)
   end
 
-  def do_create_or_query_by_tx_id(cid, "ipfs") do
+  def fetch_by_tx_id(cid, "ipfs") do
     {:ok, result} = Ipfs.get_data(cid)
     {:ok, %{content: result}}
   end
 
-  def do_create_or_query_by_tx_id(token_id, "nft") do
+  def fetch_by_tx_id(token_id, "nft") do
     token_id
     |> String.to_integer()
     |> NFT.get_from_nft()
@@ -76,7 +95,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   def create_or_update_by_payload_and_tx_id(code, tx_id, type, record \\ nil) do
     # Code.eval_string(code)
-    Logger.info(code)
+    Logger.info("fetching code: #{code}")
     name = get_module_name_from_code(code)
     # save file to local
     File.write!("lib/codes_on_chain/#{name}.ex", code)
@@ -139,7 +158,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     with false <- is_nil(record) do
       type = record.type
       tx_id = record.tx_id
-      {:ok, %{content: code}} = do_create_or_query_by_tx_id(tx_id, type)
+      {:ok, %{content: code}} = fetch_by_tx_id(tx_id, type)
       if type == "gist" do
         code = code |> Enum.find(fn x -> get_module_name_from_code(x) == name end)
         if is_binary(code) do
