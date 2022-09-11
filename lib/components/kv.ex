@@ -28,8 +28,12 @@ defmodule Components.KVHandler do
   import Ecto.Query
 
   def get(k, created_by) do
-    result = Repo.one(from kv in KV, where: kv.key == ^k and kv.created_by == ^created_by)
+    result = get_item(k, created_by)
     do_get(result)
+  end
+
+  def get_item(k, created_by) do
+    Repo.one(from kv in KV, where: kv.key == ^k and kv.created_by == ^created_by)
   end
 
   defp do_get(nil), do: nil
@@ -53,14 +57,16 @@ defmodule Components.KVHandler do
 
   def put(k, v, module_name) do
     v_str = Poison.encode!(v)
+    kv =
+      case Repo.one(from p in KV, where: p.key == ^k) do
+        nil ->
+          %KV{key: k, value: v_str, created_by: module_name}
+        val ->
+          val
+      end
 
-    case Repo.one(from p in KV, where: p.key == ^k) do
-      nil ->
-        %KV{key: k, value: v_str, created_by: module_name}
-      val ->
-        val
-    end
-    |> KV.changeset(%{ value: v_str})
+    kv
+    |> KV.changeset(%{value: v_str})
     |> Repo.insert_or_update()
   end
 

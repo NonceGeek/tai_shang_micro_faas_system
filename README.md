@@ -6,7 +6,7 @@
 > 
 > Intro Video: https://youtu.be/8gQ4qHgQfSg
 
-<img width="300" alt="image" src="https://user-images.githubusercontent.com/12784118/156332875-41467bba-7ffe-4e86-9248-0440075e338c.png">
+<img width="300" alt="image" src="https://tva1.sinaimg.cn/large/e6c9d24egy1h62attjjh1j20p80gsmy0.jpg">
 
 To start your Phoenix server:
 
