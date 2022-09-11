@@ -23,7 +23,8 @@ config :function_server_based_on_arweave,
   write_ipfs_node: "https://ipfs.infura.io",
   read_ipfs_node: System.get_env("WRITE_IPFS_NODE"),
   ipfs_project_id: "2DywRf468SVsu4rA8PYjQ5bwO0j",
-  ipfs_api_key_secret: System.get_env("IPFS_API_KEY_SECRET")
+  ipfs_api_key_secret: System.get_env("IPFS_API_KEY_SECRET"),
+  github_token: System.get_env("GITHUB_TOKEN")
 
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,

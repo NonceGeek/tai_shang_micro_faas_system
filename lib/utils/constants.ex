@@ -30,6 +30,10 @@ defmodule Constants do
     }
   end
 
+  def get_github_token() do
+    Application.fetch_env!(:function_server_based_on_arweave, :github_token)
+  end
+
   def get_ipfs_api_keys() do
     [
       Application.fetch_env!(:function_server_based_on_arweave, :ipfs_project_id),
