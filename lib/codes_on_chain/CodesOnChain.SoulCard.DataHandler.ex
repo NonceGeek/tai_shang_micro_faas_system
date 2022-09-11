@@ -14,6 +14,10 @@ defmodule CodesOnChain.SoulCard.DataHandler do
 
   end
 
+  def analyze_github(github_acct) do
+
+  end
+
     @doc """
     see USER regular data in:
 
