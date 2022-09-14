@@ -1,6 +1,6 @@
 
   defmodule Components.MsgHandler do
-    @valid_time 36000 # 10 hour
+    @valid_time 36000 # 10 hour #todo: it's more make sense to make it as param
     # +---------------------+
     # | msg with timestamps |
     # +---------------------+

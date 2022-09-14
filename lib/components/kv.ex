@@ -17,7 +17,8 @@ defmodule Components.KV do
     kv
     |> cast(attrs, [:key, :value, :created_by])
     |> validate_required([:key, :value, :created_by])
-    |> unique_constraint(:key_and_created_by, name: :key_and_created_by)
+    # |> unique_constraint(:key_and_created_by, name: :key_and_created_by)
+    # todo: optimize
   end
 end
 

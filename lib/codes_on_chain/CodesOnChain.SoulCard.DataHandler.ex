@@ -195,6 +195,7 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       Enum.each(awesome_things_info, fn %{title: _title, link: _link} ->
         :pass
       end)
+      {:ok, :pass}
     rescue
       _ ->
         {:error, "awesome_things_info is inregular"}
