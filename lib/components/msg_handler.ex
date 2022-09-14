@@ -1,6 +1,6 @@
 
   defmodule Components.MsgHandler do
-    @valid_time 3600 # 1 hour
+    @valid_time 36000 # 10 hour
     # +---------------------+
     # | msg with timestamps |
     # +---------------------+

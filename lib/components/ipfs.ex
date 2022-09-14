@@ -3,7 +3,13 @@ defmodule Components.Ipfs do
       get/set data with IPFS
     """
     alias Components.Ipfs.{Connection, API}
+
     def get_data(ipfs_cid) do
+      conn = Connection.conn(:read)
+      API.get(conn, ipfs_cid)
+    end
+
+    def get_json_data(ipfs_cid) do
       conn = Connection.conn(:read)
       {:ok, payload} =
         API.get(conn, ipfs_cid)

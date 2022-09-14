@@ -1,7 +1,13 @@
 defmodule Components.GithubFetcher do
   alias Tentacat.Repositories.Contributors
+  alias Components.ExHttp
 
+  @github_api "https://api.github.com"
   @client Tentacat.Client.new()
+
+  def get_repos(username) do
+    ExHttp.http_get("#{@github_api}/users/#{username}/repos")
+  end
 
   def get_contributors(owner, repo) do
     try do
