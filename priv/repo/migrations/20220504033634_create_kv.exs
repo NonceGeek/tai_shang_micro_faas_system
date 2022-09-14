@@ -10,6 +10,6 @@ defmodule FunctionServerBasedOnArweave.Repo.Migrations.CreateKV do
       timestamps()
     end
 
-    create unique_index(:kv, [:key, :created_by], name: :k_and_created_by)
+    create unique_index(:kv, [:key, :created_by], name: :key_and_created_by)
   end
 end
