@@ -26,6 +26,9 @@ config :function_server_based_on_arweave,
   ipfs_api_key_secret: System.get_env("IPFS_API_KEY_SECRET"),
   github_token: System.get_env("GITHUB_TOKEN")
 
+config :cors_plug,
+  max_age: 2592000,
+  methods: ["GET", "POST"]
 # Configures the endpoint
 config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
   url: [host: "localhost"],
