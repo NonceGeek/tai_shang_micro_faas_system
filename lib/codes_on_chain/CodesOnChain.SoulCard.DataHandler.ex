@@ -238,7 +238,7 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       addr
       |> UserManager.get_user()
       |> Map.get(String.to_atom(role))
-    do_render(addr, payload, "user", template)
+    do_render(addr, payload, role, template)
   end
 
   def do_render(addr,  %{payload: payload}, "user", template) do
@@ -253,6 +253,25 @@ defmodule CodesOnChain.SoulCard.DataHandler do
     |> handle_daos_joined(daos_joined)
     |> handle_white_list(addr, github_link)
     |> handle_addr(addr)
+  end
+
+  def do_render(addr,  %{payload: payload}, "dao", template) do
+    %{
+      basic_info: basic_info,
+      awesome_things: awesome_things,
+      core_members: _core_members,
+      members: _members,
+      partners: partners
+    } = payload
+    template
+    |> handle_basic_info(basic_info, "dao")
+    |> handle_awesome_things(awesome_things)
+    |> handle_partners(partners)
+    |> handle_addr(addr)
+  end
+
+  def handle_partners(template, partners) do
+    String.replace(template, "{partners}", Poison.encode!(partners))
   end
 
   def handle_basic_info(template, basic_info, "user") do
@@ -270,7 +289,33 @@ defmodule CodesOnChain.SoulCard.DataHandler do
         "skills" ->
           String.replace(acc, "{#{k_str}}", Poison.encode!(v))
         _ ->
-          String.replace(acc, "{#{k_str}}", v)
+          if k_str in ["name", "avatar", "slogan", "location"] do
+            String.replace(acc, "{#{k_str}}", v)
+          else
+            acc
+          end
+      end
+    end)
+  end
+
+  def handle_basic_info(template, basic_info, "dao") do
+    Enum.reduce(basic_info, template, fn {k, v}, acc ->
+      k_str = Atom.to_string(k)
+      case k_str do
+        "social_links" ->
+          Enum.reduce(v, acc, fn {k_2, v_2}, acc_2 ->
+            k_str_2 =
+              k_2
+              |> Atom.to_string()
+              |> String.replace(" ", "")
+            String.replace(acc_2, "{#{k_str_2}}", v_2)
+          end)
+        _ ->
+          if k_str in ["name", "avatar", "slogan", "location", "homepage"] do
+            String.replace(acc, "{#{k_str}}", v)
+          else
+            acc
+          end
       end
     end)
   end
