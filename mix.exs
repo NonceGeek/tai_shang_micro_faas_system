@@ -62,7 +62,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:ex_struct_translator, "~> 0.1.1"},
 
       # eth
-      {:eth_wallet, "~> 0.0.14"},
+      {:eth_wallet, "~> 0.1.0"},
 
       # handle_uri
       {:ex_url, "~> 1.4"},

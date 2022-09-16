@@ -154,6 +154,7 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       {:error, "data's basic structure is inregular."}
     end
   end
+
   def check_data_format(basic_info_data, :basic_info) do
     try do
       %{
