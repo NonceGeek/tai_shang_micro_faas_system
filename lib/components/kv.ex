@@ -59,7 +59,7 @@ defmodule Components.KVHandler do
   def put(k, v, module_name) do
     v_str = Poison.encode!(v)
     kv =
-      case Repo.one(from p in KV, where: p.key == ^k) do
+      case Repo.one(from p in KV, where: p.key == ^k and p.created_by == ^module_name) do
         nil ->
           %KV{key: k, value: v_str, created_by: module_name}
         val ->

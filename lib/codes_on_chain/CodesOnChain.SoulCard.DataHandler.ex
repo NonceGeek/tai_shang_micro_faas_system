@@ -3,8 +3,8 @@ defmodule CodesOnChain.SoulCard.DataHandler do
     Handle SoulCard Data!
   """
 
-  alias Components.{KVHandler, ModuleHandler, GithubFetcher, MsgHandler}
-
+  alias Components.{KVHandler, ModuleHandler, GithubFetcher, MsgHandler, Ipfs}
+  alias CodesOnChain.SoulCard.{TemplateManager, UserManager}
   @white_map %{
     WeLightProject: [
       "tai_shang_micro_faas_system",
@@ -43,7 +43,7 @@ defmodule CodesOnChain.SoulCard.DataHandler do
         {owner, %{repo_list: res, if_in_owner: if_in_owner}}
       end)
       |> Enum.into(%{})
-    KVHandler.put(addr, payload, ModuleHandler.get_module_name(__MODULE__))
+    # KVHandler.put(addr, payload, ModuleHandler.get_module_name(__MODULE__))
 
     payload
   end
@@ -217,5 +217,102 @@ defmodule CodesOnChain.SoulCard.DataHandler do
   # +-
 
   defdelegate rand_msg,  to: MsgHandler
+
+  # +-
+  # | funcs about render and save.
+  # +-
+
+  def render_and_put_to_ipfs(addr, role, template_id) do
+    {:ok, %{"Hash" => hash}} =
+      addr
+      |> render(role, template_id)
+      |> Ipfs.put_data()
+    "https://leeduckgo233.infura-ipfs.io/#{hash}"
+  end
+  def render(addr, role, template_id) do
+    template =
+      template_id
+      |> TemplateManager.get_by_id()
+      |> Base.decode64!()
+    payload =
+      addr
+      |> UserManager.get_user()
+      |> Map.get(String.to_atom(role))
+    do_render(addr, payload, "user", template)
+  end
+
+  def do_render(addr,  %{payload: payload}, "user", template) do
+    %{
+      basic_info: %{social_links: %{github_link: github_link}} = basic_info,
+      awesome_things: awesome_things,
+      daos_joined: daos_joined
+    } = payload
+    template
+    |> handle_basic_info(basic_info, "user")
+    |> handle_awesome_things(awesome_things)
+    |> handle_daos_joined(daos_joined)
+    |> handle_white_list(addr, github_link)
+    |> handle_addr(addr)
+  end
+
+  def handle_basic_info(template, basic_info, "user") do
+    Enum.reduce(basic_info, template, fn {k, v}, acc ->
+      k_str = Atom.to_string(k)
+      case k_str do
+        "social_links" ->
+          Enum.reduce(v, acc, fn {k_2, v_2}, acc_2 ->
+            k_str_2 =
+              k_2
+              |> Atom.to_string()
+              |> String.replace(" ", "")
+            String.replace(acc_2, "{#{k_str_2}}", v_2)
+          end)
+        "skills" ->
+          String.replace(acc, "{#{k_str}}", Poison.encode!(v))
+        _ ->
+          String.replace(acc, "{#{k_str}}", v)
+      end
+    end)
+  end
+
+  def handle_awesome_things(template, awesome_things) do
+    String.replace(template, "{awesome_things}", Poison.encode!(awesome_things))
+  end
+
+  def handle_daos_joined(template, daos_joined) do
+    payloads = Enum.map(daos_joined, fn dao_addr ->
+      %{dao: %{payload: %{basic_info: %{name: name, avatar: avatar}}}} =
+        UserManager.get_user(dao_addr)
+      %{
+        name: name,
+        avatar: avatar
+      }
+    end)
+    String.replace(template, "{daos_joined}", Poison.encode!(payloads))
+  end
+
+  def get_github_username(github_link) do
+    github_link
+    |> String.split("/")
+    |> Enum.fetch!(-1)
+  end
+
+  def handle_white_list(template, addr, github_link) do
+    username = get_github_username(github_link)
+    payloads =
+      addr
+      |> analyze_github(username)
+      |> Enum.reduce([], fn {_k, %{repo_list: repo_list}}, acc ->
+        acc ++ repo_list
+      end)
+      |> Enum.map(fn %{name: name} ->
+        %{title: name, link: "https://baidu.com"}
+      end)
+      String.replace(template, "{project_whitelist}", Poison.encode!(payloads))
+  end
+
+  def handle_addr(template, addr) do
+    String.replace(template, "{addr}", addr)
+  end
 
 end

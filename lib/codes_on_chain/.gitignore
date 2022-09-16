@@ -3,10 +3,4 @@
 !.gitignore
 !CodesOnChain.Syncer.ex
 !CodesOnChain.NftRender.NType.ex
-!CodesOnChain.SpeedRunFetcher.ex
-!CodesOnChain.SoulCardRenderLive.ex
-!CodesOnChain.SoulCardRender.ex
-!CodesOnChain.DAOManager.ex
-!CodesOnChain.UserManager.ex
-!CodesOnChain.Meeting.ex
-!CodesOnChain.SoulCard.DataHandler.ex
+!CodesOnChain.SoulCard*
