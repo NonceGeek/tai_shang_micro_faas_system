@@ -18,24 +18,36 @@ defmodule FunctionServerBasedOnArweaveWeb.FuncAdderLive.Index do
       "cid" => cid
     }
   }, socket) do
-    {type, id} = build_type(tx_id, gist_id, cid)
-    with {:ok, _ele} <- OnChainCode.create_or_query_by_tx_id(id, type) do
-      {
-        :noreply,
-        socket
-        |> put_flash(:info, "Add Code in #{tx_id} success!")
+    if tx_id == "" and gist_id == "" and cid == "" do
+      {:noreply,
+        put_flash(socket, :info, "recompile success!")
       }
     else
-      error ->
+      {type, id} = build_type(tx_id, gist_id, cid)
+      with {:ok, _ele} <- OnChainCode.create_or_query_by_tx_id(id, type) do
         {
           :noreply,
           socket
-          |> put_flash(:error, "Opps: #{inspect(error)}")
+          |> put_flash(:info, "Add Code in #{tx_id} success!")
         }
+      else
+        error ->
+          {
+            :noreply,
+            socket
+            |> put_flash(:error, "Opps: #{inspect(error)}")
+          }
+      end
     end
+
 
   end
 
+  @impl true
+  def handle_event("re_compile", _params, socket) do
+    IO.puts inspect IEx.Helpers.recompile()
+    {:noreply, socket}
+  end
   @impl true
   def handle_event(_key, _params, socket) do
     {:noreply, socket}
