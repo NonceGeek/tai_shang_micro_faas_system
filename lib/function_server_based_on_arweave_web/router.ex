@@ -1,4 +1,7 @@
 defmodule FunctionServerBasedOnArweaveWeb.Router do
+  @moduledoc """
+    test.
+  """
   alias Components.KVHandler.KVRouter
   use FunctionServerBasedOnArweaveWeb, :router
   use Pow.Phoenix.Router

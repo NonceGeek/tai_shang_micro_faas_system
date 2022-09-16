@@ -227,7 +227,7 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       addr
       |> render(role, template_id)
       |> Ipfs.put_data()
-    "https://leeduckgo233.infura-ipfs.io/#{hash}"
+    "https://leeduckgo233.infura-ipfs.io/ipfs/#{hash}"
   end
   def render(addr, role, template_id) do
     template =
