@@ -3,6 +3,27 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.Gist do
   require Logger
   @prefix "https://api.github.com/gists"
 
+  # to optimize
+  def get_from_gist(payload, "ipfs") do
+    try do
+      %{"files" => files} = payload
+      # {_file_name, %{"content" => content}} = Enum.fetch!(files, 0)
+
+      content_list =
+        files
+        |> Enum.map(fn x ->
+          {_file_name, %{"content" => content}} = x
+          content
+        end)
+
+      # same format as get from arweave.
+      {:ok, %{content: content_list}}
+    rescue
+      _ ->
+        {:error, "error in gist fetching"}
+    end
+  end
+
   def get_from_gist(gist_id) do
     try do
       {:ok, %{"files" => files}} = do_get_from_gist(gist_id)

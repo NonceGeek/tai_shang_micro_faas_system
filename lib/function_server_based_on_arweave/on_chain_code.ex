@@ -48,22 +48,30 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
       # end
       {:ok, %{content: code}} = fetch_by_tx_id(tx_id, type)
       create_or_update(code, tx_id, type)
+
     rescue
       error ->
         {:error, inspect(error)}
     end
   end
 
+  # TODO: Optimize Here.
   def create_or_update(codes, tx_id, type) do
-    if type == "gist" do
+    if type in ["gist", "ipfs"] do
       # TODO: Update Logic that if exist then update else create
-       Enum.each(codes, fn code ->
-        record =
-          code
-          |> get_module_name_from_code()
-          |> get_by_name()
-        Ele.create_or_update_by_payload_and_tx_id(code, tx_id, type, record)
-      end)
+       try do
+        :ok = Enum.each(codes, fn code ->
+          record =
+            code
+            |> get_module_name_from_code()
+            |> get_by_name()
+          Ele.create_or_update_by_payload_and_tx_id(code, tx_id, type, record)
+        end)
+        {:ok, "add all codes in gist success"}
+      rescue
+        error ->
+          {:error, inspect(error)}
+      end
     else
       record =
         codes
@@ -84,7 +92,9 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   def fetch_by_tx_id(cid, "ipfs") do
     {:ok, result} = Ipfs.get_data(cid)
-    {:ok, %{content: result}}
+    result
+    |> Poison.decode!()
+    |> Gist.get_from_gist("ipfs")
   end
 
   def fetch_by_tx_id(token_id, "nft") do
@@ -93,6 +103,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     |> NFT.get_from_nft()
   end
 
+  @spec create_or_update_by_payload_and_tx_id(binary, any, any, any) :: {:ok, any} | {:error, any}
   def create_or_update_by_payload_and_tx_id(code, tx_id, type, record \\ nil) do
     # Code.eval_string(code)
     Logger.info("fetching code: #{code}")
@@ -112,14 +123,14 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
         code: code,
         type: type
       })
-    else
-      Ele.update(record, %{
-        name: name,
-        tx_id: tx_id,
-        description: description,
-        code: code,
-        type: type
-      })
+      else
+        Ele.update(record, %{
+          name: name,
+          tx_id: tx_id,
+          description: description,
+          code: code,
+          type: type
+        })
     end
   end
 

@@ -26,6 +26,8 @@ Enum.map(tx_ids_on_arweave, fn tx_id ->
   OnChainCode.create_or_query_by_tx_id(tx_id)
 end)
 
+tx_id_on_ipfs =
+  []
 tx_ids_on_gist =
   []
   # ["8634a21477ea60785783cc0642ba4133"] # Contract Syncer

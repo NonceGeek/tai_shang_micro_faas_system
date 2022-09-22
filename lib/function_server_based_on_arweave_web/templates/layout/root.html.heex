@@ -29,7 +29,7 @@
                 <span><%= link "Sign out", to: Routes.pow_session_path(@conn, :delete), method: :delete %></span>
               <% else %>
                 <span><%= link "Sign in", to: Routes.pow_session_path(@conn, :new) %> 
-                <!--<%= link "Login as Buidler", to: "/buidler_login" %>-->
+                <%= link "Login as Buidler", to: "/buidler_login" %>
                 </span>
               <% end %>
             </li>
@@ -49,7 +49,7 @@
             </li>
               <%= if Pow.Plug.current_user(@conn) do %>
             <li class="nav-item">
-              <a class="nav-link active" href="/add_func">Add new Funtion by Tx id</a>
+              <a class="nav-link active" href="/add_func">Add Snippets</a>
             </li>
             <% end %>
             <!--<li class="nav-item">

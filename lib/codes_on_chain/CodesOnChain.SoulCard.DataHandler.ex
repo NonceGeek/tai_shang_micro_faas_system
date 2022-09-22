@@ -71,8 +71,12 @@ defmodule CodesOnChain.SoulCard.DataHandler do
   def do_analyze_github(username_or_userid, owner, repo_list) do
     Enum.reduce(repo_list, {[], false}, fn repo, {acc, if_in_owner} ->
       if_in = GithubFetcher.in_repo?(username_or_userid, owner, repo)
-      {acc ++ [%{name: repo, if_in: if_in}], if_in_owner or if_in}
+      {acc ++ [%{name: repo, if_in: if_in, link: build_github_link(owner, repo)}], if_in_owner or if_in}
     end)
+  end
+
+  def build_github_link(owner, repo) do
+    "https://github.com/#{owner}/#{repo}"
   end
 
 
@@ -110,8 +114,8 @@ defmodule CodesOnChain.SoulCard.DataHandler do
     data_handled = ExStructTranslator.to_atom_struct(data)
     with {:ok,  [basic_info, awesome_things, daos_joined]} <- check_data_format(data_handled),
     {:ok, _data} <- check_data_format(basic_info, :basic_info),
-    {:ok, _data} <- check_data_format(awesome_things, :awesome_things),
-    {:ok, _data} <- check_keys_list_data_format(daos_joined, :daos_joined) do
+    {:ok, _data} <- check_data_format(awesome_things, :awesome_things) do
+    # {:ok, _data} <- check_keys_list_data_format(daos_joined, :daos_joined) do
       {:ok, "all check is passed!"}
     else
       error ->
@@ -227,7 +231,11 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       addr
       |> render(role, template_id)
       |> Ipfs.put_data()
-    "https://leeduckgo233.infura-ipfs.io/ipfs/#{hash}"
+    ifps_link = "https://leeduckgo233.infura-ipfs.io/ipfs/#{hash}"
+
+    payload = UserManager.get_user(addr)
+    payload_new = Map.put(payload, :ipfs_link, ifps_link)
+    KVHandler.put(addr, payload_new, "SoulCard.UserManager")
   end
   def render(addr, role, template_id) do
     template =
@@ -239,6 +247,7 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       |> UserManager.get_user()
       |> Map.get(String.to_atom(role))
     do_render(addr, payload, role, template)
+
   end
 
   def do_render(addr,  %{payload: payload}, "user", template) do
@@ -284,12 +293,14 @@ defmodule CodesOnChain.SoulCard.DataHandler do
               k_2
               |> Atom.to_string()
               |> String.replace(" ", "")
+              |> handle_spec_str()
             String.replace(acc_2, "{#{k_str_2}}", v_2)
           end)
         "skills" ->
           String.replace(acc, "{#{k_str}}", Poison.encode!(v))
         _ ->
           if k_str in ["name", "avatar", "slogan", "location"] do
+            k_str = handle_spec_str(k_str)
             String.replace(acc, "{#{k_str}}", v)
           else
             acc
@@ -308,10 +319,12 @@ defmodule CodesOnChain.SoulCard.DataHandler do
               k_2
               |> Atom.to_string()
               |> String.replace(" ", "")
+              |> handle_spec_str()
             String.replace(acc_2, "{#{k_str_2}}", v_2)
           end)
         _ ->
           if k_str in ["name", "avatar", "slogan", "location", "homepage"] do
+            k_str = handle_spec_str(k_str)
             String.replace(acc, "{#{k_str}}", v)
           else
             acc
@@ -325,13 +338,17 @@ defmodule CodesOnChain.SoulCard.DataHandler do
   end
 
   def handle_daos_joined(template, daos_joined) do
-    payloads = Enum.map(daos_joined, fn dao_addr ->
-      %{dao: %{payload: %{basic_info: %{name: name, avatar: avatar}}}} =
-        UserManager.get_user(dao_addr)
-      %{
-        name: name,
-        avatar: avatar
-      }
+    payloads = Enum.map(daos_joined, fn dao_info ->
+      if is_binary(dao_info) do
+        %{dao: %{payload: %{basic_info: %{name: name, avatar: avatar}}}} =
+          UserManager.get_user(dao_info)
+        %{
+          name: name,
+          avatar: avatar
+        }
+      else
+        dao_info
+      end
     end)
     String.replace(template, "{daos_joined}", Poison.encode!(payloads))
   end
@@ -350,14 +367,20 @@ defmodule CodesOnChain.SoulCard.DataHandler do
       |> Enum.reduce([], fn {_k, %{repo_list: repo_list}}, acc ->
         acc ++ repo_list
       end)
-      |> Enum.map(fn %{name: name} ->
-        %{title: name, link: "https://baidu.com"}
+      |> Enum.map(fn %{name: name, link: link} ->
+        %{title: name, link: link}
       end)
       String.replace(template, "{project_whitelist}", Poison.encode!(payloads))
   end
 
   def handle_addr(template, addr) do
     String.replace(template, "{addr}", addr)
+  end
+
+  def handle_spec_str(str) do
+    Enum.reduce(["\"","\'"], str, fn spec_str, acc ->
+      String.replace(acc, spec_str, "\\" <> "#{spec_str}")
+    end)
   end
 
 end
