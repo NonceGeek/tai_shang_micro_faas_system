@@ -27,7 +27,7 @@ function copyAsMarkdown() {
 
 <%= select f, :code_name, @code_names,  value: @selected_code, class: "form-field" %>
 <br><br>
-<%= if @code_type in ["ar", "gist"] do %>
+<%= if @code_type in ["ar", "gist", "ipfs"] do %>
 <p><b>check code on explorer: </b></p>
   <%= raw(Earmark.as_html!("> #{@explorer_link}"))%>
 <% else %>

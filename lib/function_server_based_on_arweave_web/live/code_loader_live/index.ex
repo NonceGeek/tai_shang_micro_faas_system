@@ -34,6 +34,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
       |> assign(:fun_doc, nil)
       |> assign(:output, "")
 
+    IO.puts inspect(type)
     socket = handle_socket(socket, tx_id, type)
     {:ok, socket}
 
@@ -271,6 +272,10 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
 
   def build_explorer_link(tx_id, "ar") do
     "#{Constants.get_arweave_explorer()}/#{tx_id}"
+  end
+
+  def build_explorer_link(tx_id, "ipfs") do
+    "#{tx_id}"
   end
 
   def build_explorer_link(tx_id, "gist") do
