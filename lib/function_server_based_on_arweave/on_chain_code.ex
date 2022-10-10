@@ -57,7 +57,7 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   # TODO: Optimize Here.
   def create_or_update(codes, tx_id, type) do
-    if type in ["gist", "ipfs"] do
+    if type in ["gist", "ipfs", "ar"] do
       # TODO: Update Logic that if exist then update else create
        try do
         :ok = Enum.each(codes, fn code ->
@@ -72,12 +72,12 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
         error ->
           {:error, inspect(error)}
       end
-    else
-      record =
-        codes
-        |> get_module_name_from_code()
-        |> get_by_name()
-      Ele.create_or_update_by_payload_and_tx_id(codes, tx_id, type, record)
+    # else
+    #   record =
+    #     codes
+    #     |> get_module_name_from_code()
+    #     |> get_by_name()
+    #   Ele.create_or_update_by_payload_and_tx_id(codes, tx_id, type, record)
     end
   end
 
