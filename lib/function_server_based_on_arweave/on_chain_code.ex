@@ -83,7 +83,14 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
 
   @spec fetch_by_tx_id(String.t(), String.t()) :: {:error, binary} | {:ok, %{content: map()}}
   def fetch_by_tx_id(tx_id, "ar") do
-    ArweaveSdkEx.get_content_in_tx(Constants.get_arweave_node(), tx_id)
+    [tx_id_pure, url] =
+      tx_id
+      |> Binary.reverse()
+      |> String.split("/", parts: 2)
+      |> Enum.map(&(Binary.reverse(&1)))
+    {:ok, %{content: content}}=
+      ArweaveSdkEx.get_content_in_tx(url, tx_id_pure)
+    {:ok, %{content: handle_ar_content(content)}}
   end
 
   def fetch_by_tx_id(tx_id, "gist") do
@@ -102,6 +109,12 @@ defmodule FunctionServerBasedOnArweave.OnChainCode do
     |> String.to_integer()
     |> NFT.get_from_nft()
   end
+
+  def handle_ar_content(content) do
+    %{"files" => files} = Poison.decode!(content)
+    Gist.handle_files(files)
+  end
+
 
   @spec create_or_update_by_payload_and_tx_id(binary, any, any, any) :: {:ok, any} | {:error, any}
   def create_or_update_by_payload_and_tx_id(code, tx_id, type, record \\ nil) do

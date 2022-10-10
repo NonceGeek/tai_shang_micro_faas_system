@@ -9,12 +9,7 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.Gist do
       %{"files" => files} = payload
       # {_file_name, %{"content" => content}} = Enum.fetch!(files, 0)
 
-      content_list =
-        files
-        |> Enum.map(fn x ->
-          {_file_name, %{"content" => content}} = x
-          content
-        end)
+      content_list = handle_files(files)
 
       # same format as get from arweave.
       {:ok, %{content: content_list}}
@@ -29,12 +24,7 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.Gist do
       {:ok, %{"files" => files}} = do_get_from_gist(gist_id)
       # {_file_name, %{"content" => content}} = Enum.fetch!(files, 0)
 
-      content_list =
-        files
-        |> Enum.map(fn x ->
-          {_file_name, %{"content" => content}} = x
-          content
-        end)
+      content_list = handle_files(files)
 
       # same format as get from arweave.
       {:ok, %{content: content_list}}
@@ -42,6 +32,13 @@ defmodule FunctionServerBasedOnArweave.CodeFetchers.Gist do
       _ ->
         {:error, "error in gist fetching"}
     end
+  end
+
+  def handle_files(files) do
+    Enum.map(files, fn x ->
+      {_file_name, %{"content" => content}} = x
+      content
+    end)
   end
 
   def get_from_gist(gist_id, file_name) do
