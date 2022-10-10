@@ -5,6 +5,11 @@
 > Online Server: https://faas.noncegeek.com
 > 
 > Intro Video: https://youtu.be/8gQ4qHgQfSg
+>
+> An Example of Code that saved on IPFS:
+>
+> > CID: QmY6FNgtJf31qHh6jtjVyezS4KsXJLJwJ1W2ipApBq1ub2
+>
 
 <img width="300" alt="image" src="https://tva1.sinaimg.cn/large/e6c9d24egy1h62attjjh1j20p80gsmy0.jpg">
 
