@@ -145,7 +145,7 @@ defmodule FunctionServerBasedOnArweaveWeb.CodeLoaderLive.Index do
     ### 调用该函数的 curl 命令格式：
 
     ```bash
-    curl --location --request POST 'https://faas.noncegeek.com/api/v1/run \\
+    curl --location --request POST 'https://faasbyleeduckgo.gigalixirapp.com/api/v1/run' \\
     --header 'Content-Type: application/json' \\
     --data-raw '{
         "name": "#{module_name}",
