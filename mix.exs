@@ -55,6 +55,10 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:ethereumex, "~> 0.9"},
       {:ecto, "~> 3.7.1", override: true},
 
+      # move
+      {:web3_move_ex, "~> 0.1.3"},
+
+
       # markdown
       {:earmark, "~> 1.4"},
 
