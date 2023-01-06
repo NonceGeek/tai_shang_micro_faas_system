@@ -66,7 +66,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 Based on Arweave's FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Arweave Network and loaded into Runtime to provide functional service support for other applications. Plugin is used for uploading code snippets.
 
-![去中心化FaaS系统的实现-en-zzf (3)](https://tva1.sinaimg.cn/large/e6c9d24egy1h0c241bwi9j21cc0jsq59.jpg)
+![去中心化FaaS系统的实现-en-zzf (8)](https://tva1.sinaimg.cn/large/008vxvgGgy1h9gxyxrpvaj31fn0k7ju8.jpg)
 
 ## 0x02 Background
 
