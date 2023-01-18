@@ -77,10 +77,9 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:pow, "~> 1.0.26"},
       # trace
       {:recon, "~> 2.5"},
-
       {:cors_plug, "~> 2.0"},
-
-      {:tentacat, "~> 2.2"}
+      {:tentacat, "~> 2.2"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]
   end
 
