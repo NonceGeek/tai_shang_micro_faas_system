@@ -3,7 +3,7 @@ defmodule Components.GithubFetcher do
   alias Components.ExHttp
 
   @github_api "https://api.github.com"
-  @client Tentacat.Client.new(%{access_token: Constants.get_github_token()})
+  @client Tentacat.Client.new(%{access_token: Application.fetch_env!(:tai_shang_micro_faas_system, :github_token)})
 
   def get_repos(username) do
     ExHttp.http_get("#{@github_api}/users/#{username}/repos")
