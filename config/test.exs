@@ -5,23 +5,23 @@ import Config
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Repo,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Repo,
   username: "postgres",
   password: "postgres",
-  database: "function_server_based_on_arweave_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "tai_shang_micro_faas_system_test#{System.get_env("MIX_TEST_PARTITION")}",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "27600lMLENi4k2cAUOlT6bmJb6mIZf2kn/+ktLcRJxYExCGUzzN3WWpwFlJHltnQ",
   server: false
 
 # In test we don't send emails.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Mailer,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Mailer,
   adapter: Swoosh.Adapters.Test
 
 # Print only warnings and errors during test

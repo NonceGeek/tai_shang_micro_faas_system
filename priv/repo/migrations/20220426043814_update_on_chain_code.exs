@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Repo.Migrations.UpdateOnChainCode do
+defmodule TaiShangMicroFaasSystem.Repo.Migrations.UpdateOnChainCode do
   use Ecto.Migration
 
   def change do

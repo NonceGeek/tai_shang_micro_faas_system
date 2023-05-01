@@ -1,7 +1,7 @@
 defmodule Components.Contract do
   alias Components.Contract, as: Ele
   alias Components.NFT
-  alias FunctionServerBasedOnArweave.Repo
+  alias TaiShangMicroFaasSystem.Repo
   use Ecto.Schema
   import Ecto.Changeset
 

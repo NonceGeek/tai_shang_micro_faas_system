@@ -12,7 +12,7 @@ defmodule CodesOnChain.BlockToAsciiEmojiTranslator do
   }
 
   # module in FaaS System.
-  alias FunctionServerBasedOnArweave.CodeRunnerSpec
+  alias TaiShangMicroFaasSystem.CodeRunnerSpec
   def get_module_doc, do: @moduledoc
 
 

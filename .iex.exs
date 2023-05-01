@@ -5,7 +5,7 @@ endpoint_provider =
 
 block_to_ascii_emoji_translator =
   File.read!("examples/block_to_game_map_translator.ex")
-alias FunctionServerBasedOnArweave.DataToChain
+alias TaiShangMicroFaasSystem.DataToChain
 
 read_conn = Components.Ipfs.Connection.conn(:read)
 

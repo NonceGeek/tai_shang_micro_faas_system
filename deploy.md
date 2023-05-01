@@ -181,13 +181,13 @@ clean_cache=true
 ```elixir
 ## ...
 
-config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
   http: [port: {:system, "PORT"}], # Possibly not needed, but doesn't hurt
   url: [host: System.get_env("APP_NAME") <> ".gigalixirapp.com", port: 443],
   secret_key_base: Map.fetch!(System.get_env(), "SECRET_KEY_BASE"),
   server: true
 
-config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Repo,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
   ssl: true,
@@ -284,7 +284,7 @@ You may need to change your check_origin setting in order for websockets to pass
 Verify your `runtime.exs`:
 
 ```elixir
-  config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+  config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.

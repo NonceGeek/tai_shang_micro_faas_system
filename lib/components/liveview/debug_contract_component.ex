@@ -1,5 +1,5 @@
 defmodule Components.Liveview.DebugContractComponent do
-  use FunctionServerBasedOnArweaveWeb, :live_component
+  use TaiShangMicroFaasSystemWeb, :live_component
   require Logger
 
   alias TypeTranslator

@@ -1,2 +1,2 @@
 ExUnit.start()
-Ecto.Adapters.SQL.Sandbox.mode(FunctionServerBasedOnArweave.Repo, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(TaiShangMicroFaasSystem.Repo, :manual)

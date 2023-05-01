@@ -1,7 +1,7 @@
-defmodule FunctionServerBasedOnArweave.CodeFetchers.GistTest do
+defmodule TaiShangMicroFaasSystem.CodeFetchers.GistTest do
   use ExUnit.Case, async: true
 
-  alias FunctionServerBasedOnArweave.CodeFetchers.Gist
+  alias TaiShangMicroFaasSystem.CodeFetchers.Gist
 
   test "get from gist" do
     tx_id = "1c67667fdceb4246e17b492511082ccb"

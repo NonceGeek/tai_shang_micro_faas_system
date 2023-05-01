@@ -1,5 +1,5 @@
-defmodule FunctionServerBasedOnArweaveWeb.LayoutViewTest do
-  use FunctionServerBasedOnArweaveWeb.ConnCase, async: true
+defmodule TaiShangMicroFaasSystemWeb.LayoutViewTest do
+  use TaiShangMicroFaasSystemWeb.ConnCase, async: true
 
   # When testing helpers, you may want to import Phoenix.HTML and
   # use functions such as safe_to_string() to convert the helper

@@ -1,6 +1,6 @@
 defmodule Components.Config do
   defmodule Networks do
-    @my_infura_id Application.fetch_env!(:function_server_based_on_arweave, :my_infura_id)
+    @my_infura_id Application.fetch_env!(:tai_shang_micro_faas_system, :my_infura_id)
     @external_resource "priv/networks.json"
 
     def get_full_networks(), do: get_networks_from_f()

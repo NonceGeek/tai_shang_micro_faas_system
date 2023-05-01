@@ -1,5 +1,5 @@
 defmodule Components.Liveview.SigVerifierComponent do
-  use FunctionServerBasedOnArweaveWeb, :live_component
+  use TaiShangMicroFaasSystemWeb, :live_component
   require Logger
 
   @impl true

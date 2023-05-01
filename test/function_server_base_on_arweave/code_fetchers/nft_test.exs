@@ -1,7 +1,7 @@
-defmodule FunctionServerBasedOnArweave.CodeFetchers.NFTTest do
+defmodule TaiShangMicroFaasSystem.CodeFetchers.NFTTest do
   use ExUnit.Case
 
-  alias FunctionServerBasedOnArweave.CodeFetchers.NFT
+  alias TaiShangMicroFaasSystem.CodeFetchers.NFT
   test "get from nft" do
     {r, _} = NFT.get_from_nft("1")
     assert r == :ok

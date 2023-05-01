@@ -2,7 +2,7 @@ defmodule CodesOnChain.SoulCardRenderLive do
   @moduledoc """
     Test to impl a dynamic webpage by snippet!
   """
-  use FunctionServerBasedOnArweaveWeb, :live_view
+  use TaiShangMicroFaasSystemWeb, :live_view
   alias CodesOnChain.{SoulCardRender, SpeedRunFetcher}
   alias Components.GistHandler
   alias Components.KVHandler.KVRouter

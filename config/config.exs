@@ -7,8 +7,8 @@
 # General application configuration
 import Config
 
-config :function_server_based_on_arweave,
-  ecto_repos: [FunctionServerBasedOnArweave.Repo],
+config :tai_shang_micro_faas_system,
+  ecto_repos: [TaiShangMicroFaasSystem.Repo],
   arweave_endpoint: "https://arweave.net",
   arweave_explorer: "https://viewblock.io/arweave/tx",
   # contract_addr: "0xD1e91A4Bf55111dD3725E46A64CDbE7a2cC97D8a",
@@ -24,27 +24,29 @@ config :function_server_based_on_arweave,
   read_ipfs_node: System.get_env("WRITE_IPFS_NODE"),
   ipfs_project_id: "2DywRf468SVsu4rA8PYjQ5bwO0j",
   ipfs_api_key_secret: System.get_env("IPFS_API_KEY_SECRET"),
-  github_token: System.get_env("GITHUB_TOKEN")
+  github_token: System.get_env("GITHUB_TOKEN"),
+  did_mainnet: "0x61b96051f553d767d7e6dfcc04b04c28d793c8af3d07d3a43b4e2f8f4ca04c9f",
+  did_testnet: "0xc71124a51e0d63cfc6eb04e690c39a4ea36774ed4df77c00f7cbcbc9d0505b2c"
 
 config :cors_plug,
   max_age: 2592000,
   methods: ["GET", "POST"]
 # Configures the endpoint
-config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    view: FunctionServerBasedOnArweaveWeb.ErrorView,
+    view: TaiShangMicroFaasSystemWeb.ErrorView,
     accepts: ~w(html json),
     layout: false
   ],
-  pubsub_server: FunctionServerBasedOnArweave.PubSub,
+  pubsub_server: TaiShangMicroFaasSystem.PubSub,
   live_view: [signing_salt: "mbnVB7Pw"]
 
 # Authentication
-config :function_server_based_on_arweave, :pow,
-  user: FunctionServerBasedOnArweave.Users.User,
-  repo: FunctionServerBasedOnArweave.Repo,
-  web_module: FunctionServerBasedOnArweaveWeb
+config :tai_shang_micro_faas_system, :pow,
+  user: TaiShangMicroFaasSystem.Users.User,
+  repo: TaiShangMicroFaasSystem.Repo,
+  web_module: TaiShangMicroFaasSystemWeb
 
 # Configures the mailer
 #
@@ -53,7 +55,7 @@ config :function_server_based_on_arweave, :pow,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Mailer,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Mailer,
   adapter: Swoosh.Adapters.Local
 
 # Swoosh API client is needed for adapters other than SMTP.

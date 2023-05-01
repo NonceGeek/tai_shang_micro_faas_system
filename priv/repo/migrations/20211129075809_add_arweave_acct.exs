@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Repo.Migrations.AddArweaveAcct do
+defmodule TaiShangMicroFaasSystem.Repo.Migrations.AddArweaveAcct do
   use Ecto.Migration
 
   def change do

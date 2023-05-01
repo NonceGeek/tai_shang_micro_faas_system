@@ -1,3 +1,3 @@
-defmodule FunctionServerBasedOnArweaveWeb.PageViewTest do
-  use FunctionServerBasedOnArweaveWeb.ConnCase, async: true
+defmodule TaiShangMicroFaasSystemWeb.PageViewTest do
+  use TaiShangMicroFaasSystemWeb.ConnCase, async: true
 end

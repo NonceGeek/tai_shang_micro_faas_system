@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Repo.Migrations.CreateKV do
+defmodule TaiShangMicroFaasSystem.Repo.Migrations.CreateKV do
   use Ecto.Migration
 
   def change do

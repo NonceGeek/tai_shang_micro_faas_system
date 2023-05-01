@@ -4,7 +4,7 @@ defmodule CodesOnChain.SoulCardRenderLive.DAO do
       Example page:
 
     """
-    use FunctionServerBasedOnArweaveWeb, :live_view
+    use TaiShangMicroFaasSystemWeb, :live_view
     alias CodesOnChain.{SoulCardRender, SpeedRunFetcher}
     alias Components.{GistHandler, Verifier}
     alias Components.Verifier.MsgHandler

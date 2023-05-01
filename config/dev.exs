@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Repo,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Repo,
   username: "postgres",
   # password: "postgres",
   password: "123456",
-  database: "function_server_based_on_arweave_dev",
+  database: "tai_shang_micro_faas_system_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :function_server_based_on_arweave, FunctionServerBasedOnArweave.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we use it
 # with esbuild to bundle .js and .css sources.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -54,13 +54,13 @@ config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoi
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :function_server_based_on_arweave, FunctionServerBasedOnArweaveWeb.Endpoint,
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/function_server_based_on_arweave_web/(live|views)/.*(ex)$",
-      ~r"lib/function_server_based_on_arweave_web/templates/.*(eex)$"
+      ~r"lib/tai_shang_micro_faas_system_web/(live|views)/.*(ex)$",
+      ~r"lib/tai_shang_micro_faas_system_web/templates/.*(eex)$"
     ]
   ]
 

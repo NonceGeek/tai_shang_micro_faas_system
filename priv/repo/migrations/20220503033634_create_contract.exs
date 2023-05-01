@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Repo.Migrations.CreateContract do
+defmodule TaiShangMicroFaasSystem.Repo.Migrations.CreateContract do
   use Ecto.Migration
 
   def change do

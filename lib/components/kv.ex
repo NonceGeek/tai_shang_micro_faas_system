@@ -24,7 +24,7 @@ end
 
 defmodule Components.KVHandler do
   alias Components.KV
-  alias FunctionServerBasedOnArweave.Repo
+  alias TaiShangMicroFaasSystem.Repo
 
   import Ecto.Query
 
@@ -123,7 +123,7 @@ defmodule Components.KVHandler.KVRouter do
   def refresh_routes(payload) do
     File.write!("priv/extra_routes.json", Poison.encode!(payload))
 
-    Code.eval_file("lib/function_server_based_on_arweave_web/router.ex")
-    # IEx.Helpers.r(FunctionServerBasedOnArweaveWeb.Router)
+    Code.eval_file("lib/tai_shang_micro_faas_system_web/router.ex")
+    # IEx.Helpers.r(TaiShangMicroFaasSystemWeb.Router)
   end
 end

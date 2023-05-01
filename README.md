@@ -110,7 +110,7 @@ Combining with blockchain, we can construct a new type of FaaS system
 
 See in:
 
-> https://github.com/WeLightProject/function_server_based_on_arweave/wiki/API-Docs
+> https://github.com/WeLightProject/tai_shang_micro_faas_system/wiki/API-Docs
 
 ### 3.3 Upload, Use, and Share the code
 
@@ -144,7 +144,7 @@ TaiShang FaaS is a distributed Open Source FaaS platform. Individuals and develo
 
 See guide in the part 1 in the `README.md`:
 
-> https://github.com/WeLightProject/function_server_based_on_arweave
+> https://github.com/WeLightProject/tai_shang_micro_faas_system
 
 ## 0x04 Snippet Examples
 
@@ -274,7 +274,7 @@ defmodule CodesOnChain.BlockToAsciiEmojiTranslator do
   }
 
   # module in FaaS System.
-  alias FunctionServerBasedOnArweave.CodeRunnerSpec
+  alias TaiShangMicroFaasSystem.CodeRunnerSpec
   def get_module_doc, do: @moduledoc
 
 

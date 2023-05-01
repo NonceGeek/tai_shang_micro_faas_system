@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Repo.Migrations.CreateNFT do
+defmodule TaiShangMicroFaasSystem.Repo.Migrations.CreateNFT do
   use Ecto.Migration
 
   def change do

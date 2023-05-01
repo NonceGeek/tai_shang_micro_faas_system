@@ -1,9 +1,9 @@
-defmodule FunctionServerBasedOnArweave.MixProject do
+defmodule TaiShangMicroFaasSystem.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :function_server_based_on_arweave,
+      app: :tai_shang_micro_faas_system,
       version: "1.0.0",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -19,7 +19,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {FunctionServerBasedOnArweave.Application, []},
+      mod: {TaiShangMicroFaasSystem.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -56,8 +56,7 @@ defmodule FunctionServerBasedOnArweave.MixProject do
       {:ecto, "~> 3.7.1", override: true},
 
       # move
-      {:web3_move_ex, "~> 0.1.3"},
-
+      {:web3_aptos_ex, ">= 1.1.0"},
 
       # markdown
       {:earmark, "~> 1.4"},
@@ -80,7 +79,10 @@ defmodule FunctionServerBasedOnArweave.MixProject do
 
       {:cors_plug, "~> 2.0"},
 
-      {:tentacat, "~> 2.2"}
+      {:tentacat, "~> 2.2"},
+
+      # renamer
+      {:rename_project, "~> 0.1.0", only: :dev},
     ]
   end
 

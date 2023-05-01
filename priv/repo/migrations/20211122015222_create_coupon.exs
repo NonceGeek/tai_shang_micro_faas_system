@@ -1,4 +1,4 @@
-defmodule FunctionServerBasedOnArweave.Repo.Migrations.CreateCoupon do
+defmodule TaiShangMicroFaasSystem.Repo.Migrations.CreateCoupon do
   use Ecto.Migration
 
   def change do

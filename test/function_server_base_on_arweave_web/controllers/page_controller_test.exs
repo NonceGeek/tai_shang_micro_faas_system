@@ -1,5 +1,5 @@
-defmodule FunctionServerBasedOnArweaveWeb.PageControllerTest do
-  use FunctionServerBasedOnArweaveWeb.ConnCase
+defmodule TaiShangMicroFaasSystemWeb.PageControllerTest do
+  use TaiShangMicroFaasSystemWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     # conn = get(conn, "/")

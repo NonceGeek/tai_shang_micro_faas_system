@@ -5,12 +5,12 @@
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     FunctionServerBasedOnArweave.Repo.insert!(%FunctionServerBasedOnArweave.SomeSchema{})
+#     TaiShangMicroFaasSystem.Repo.insert!(%TaiShangMicroFaasSystem.SomeSchema{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias FunctionServerBasedOnArweave.OnChainCode
+alias TaiShangMicroFaasSystem.OnChainCode
 
 tx_ids_on_arweave =
   [
@@ -29,7 +29,7 @@ end)
 tx_id_on_ipfs =
   []
 tx_ids_on_gist =
-  []
+  ["0f1350bdfa4a119e2cbf8cf52d2a109c"]
   # ["8634a21477ea60785783cc0642ba4133"] # Contract Syncer
 Enum.map(tx_ids_on_gist, fn tx_id ->
   OnChainCode.create_or_query_by_tx_id(tx_id, "gist")
@@ -39,13 +39,3 @@ secret_seeds = "priv/repo/secret.seeds.exs"
 if File.exists?(secret_seeds) do
   Code.eval_file(secret_seeds)
 end
-
-alias FunctionServerBasedOnArweave.Users.User
-
-# User.create_admin(
-#   %{
-#     email: "admin@faas.com",
-#     password: "12345678",
-#     password_confirmation: "12345678"
-#   }
-# ) |> IO.inspect()

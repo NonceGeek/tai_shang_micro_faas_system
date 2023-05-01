@@ -1,5 +1,5 @@
 defmodule Components.Liveview.AddrBannerComponent do
-  use FunctionServerBasedOnArweaveWeb, :live_component
+  use TaiShangMicroFaasSystemWeb, :live_component
   require Logger
   @impl true
   def handle_event("web3-changed", %{"addr" => addr}, socket) do
