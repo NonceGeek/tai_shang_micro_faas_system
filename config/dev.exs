@@ -4,7 +4,7 @@ import Config
 config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Repo,
   username: "postgres",
   # password: "postgres",
-  password: "123456",
+  password: "postgres",
   database: "tai_shang_micro_faas_system_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
