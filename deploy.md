@@ -163,7 +163,7 @@ RUST_SKIP_BUILD=1
 
 ```
 node_version=14.15.4
-clean_cache=true
+clean_cache=false
 ```
 
 - Check `assets/package.json`
