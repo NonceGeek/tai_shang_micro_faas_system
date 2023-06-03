@@ -57,6 +57,7 @@ defmodule TaiShangMicroFaasSystem.MixProject do
 
       # move
       {:web3_aptos_ex, ">= 1.1.0"},
+      {:web3_sui_ex, ">= 0.1.1"},
 
       # markdown
       {:earmark, "~> 1.4"},
