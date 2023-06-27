@@ -440,3 +440,15 @@ end
 NonceGeek -- Cool-Oriented Programming.
 
 > https://noncegeek.com/
+
+## 0x06 Contributors
+
+> https://github.com/NonceGeek/tai_shang_micro_faas_system/graphs/contributors
+
+## 0x07 Money History
+
+> TODO
+
+## 0x08 Distributed Rules
+
+> TODO
