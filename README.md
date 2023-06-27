@@ -435,7 +435,7 @@ defmodule CodesOnChain.Verifier do
 end
 ```
 
-## 0x05 Team & Contributors Introduction
+## 0x05 Team
 
 NonceGeek -- Cool-Oriented Programming.
 
