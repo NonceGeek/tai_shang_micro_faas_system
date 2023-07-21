@@ -17,10 +17,6 @@ FaaS Repo：
 
 > https://github.com/WeLightProject/tai_shang_micro_faas_system
 
-![image-20220414170710681](/Users/liaohua/Documents/e6c9d24egy1h19d2l6u24j21bd0u0adt.png)
-
-![去中心化FaaS系统的实现-en-zzf (3)](/Users/liaohua/Documents/e6c9d24egy1h0c241bwi9j21cc0jsq59.png)
-
 # How to deploy TaiShang Micro FaaS System to Gigalixir?
 
 ## 0x00 Prerequisites
