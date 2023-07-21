@@ -451,4 +451,8 @@ NonceGeek -- Cool-Oriented Programming.
 
 ## 0x08 Distributed Rules
 
-> TODO
+<!-- distributed_rules -->
+
+```
+https://github.com/NonceGeek/web3_aptos_ex, 20%
+```
