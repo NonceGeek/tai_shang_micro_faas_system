@@ -11,7 +11,7 @@
 > > CID: QmY6FNgtJf31qHh6jtjVyezS4KsXJLJwJ1W2ipApBq1ub2
 >
 
-<img width="300" alt="image" src="https://tva1.sinaimg.cn/large/e6c9d24egy1h62attjjh1j20p80gsmy0.jpg">
+<img src="pics/faas_logo.jpeg" style="zoom:50%;" />
 
 To start your Phoenix server:
 
