@@ -1,4 +1,8 @@
 defmodule Constants do
+
+  def get_embedbase_key() do
+    Application.fetch_env!(:tai_shang_micro_faas_system, :embedbase_key)
+  end
   def get_arweave_node() do
     Application.fetch_env!(:tai_shang_micro_faas_system, :arweave_endpoint)
   end

@@ -70,7 +70,7 @@ defmodule TaiShangMicroFaasSystem.MixProject do
 
       # handle_uri
       {:ex_url, "~> 1.4"},
-      {:httpoison, "~> 1.5"},
+      {:httpoison, "~> 2.0", override: true},
       {:paginator, "~> 1.1"},
 
       # authentication
@@ -81,6 +81,9 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       {:cors_plug, "~> 2.0"},
 
       {:tentacat, "~> 2.2"},
+
+      # vector dataset interactor
+      {:embedbase_ex, "~> 0.1.0"},
 
       # renamer
       {:rename_project, "~> 0.1.0", only: :dev},

@@ -25,6 +25,7 @@ config :tai_shang_micro_faas_system,
   ipfs_project_id: "2DywRf468SVsu4rA8PYjQ5bwO0j",
   ipfs_api_key_secret: System.get_env("IPFS_API_KEY_SECRET"),
   github_token: System.get_env("GITHUB_TOKEN"),
+  embedbase_key: System.get_env("EMBEDBASE_KEY"),
   did_mainnet: "0x61b96051f553d767d7e6dfcc04b04c28d793c8af3d07d3a43b4e2f8f4ca04c9f",
   did_testnet: "0xc71124a51e0d63cfc6eb04e690c39a4ea36774ed4df77c00f7cbcbc9d0505b2c"
 
