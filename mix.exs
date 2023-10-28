@@ -5,7 +5,7 @@ defmodule TaiShangMicroFaasSystem.MixProject do
     [
       app: :tai_shang_micro_faas_system,
       version: "1.0.0",
-      elixir: "~> 1.10",
+      # elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
