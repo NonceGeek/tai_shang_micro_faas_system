@@ -12,6 +12,7 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       aliases: aliases(),
       deps: deps(),
       description: "micro faas impl with elixir",
+      package: package(),
     ]
   end
 
