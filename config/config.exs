@@ -43,6 +43,8 @@ config :tai_shang_micro_faas_system, TaiShangMicroFaasSystemWeb.Endpoint,
   pubsub_server: TaiShangMicroFaasSystem.PubSub,
   live_view: [signing_salt: "mbnVB7Pw"]
 
+# vectorDB config 
+config :tai_shang_micro_faas_system, TaiShangMicroFaasSystem.Repo, types: TaiShangMicroFaasSystem.PostgrexTypes
 # Authentication
 config :tai_shang_micro_faas_system, :pow,
   user: TaiShangMicroFaasSystem.Users.User,

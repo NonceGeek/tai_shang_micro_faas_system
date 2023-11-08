@@ -23,7 +23,7 @@ defmodule TaiShangMicroFaasSystem.Users.User do
   end
 
   ##
-  ## TaiShangMicroFaasSystem.Users.User.create_admin(%{email: "root@gmail.com", password: "12345678", password_confirmation: "12345678"})
+  # TaiShangMicroFaasSystem.Users.User.create_admin(%{email: "root@gmail.com", password: "12345678", password_confirmation: "12345678"})
   ##
   @spec create_admin(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def create_admin(params) do

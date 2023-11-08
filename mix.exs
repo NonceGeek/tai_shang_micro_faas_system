@@ -10,7 +10,17 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       compilers: [:gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      description: "micro faas impl with elixir",
+    ]
+  end
+
+    defp package do
+    [
+      files: ["lib", "mix.exs", "README.md"],
+      maintainers: ["skyblue"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/NonceGeek/tai_shang_micro_faas_system"}
     ]
   end
 
@@ -85,6 +95,8 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       # vector dataset interactor
       {:embedbase_ex, "~> 0.1.0"},
 
+      # pgVector
+      {:pgvector, "~> 0.2.0"}, 
       # renamer
       {:rename_project, "~> 0.1.0", only: :dev},
     ]
