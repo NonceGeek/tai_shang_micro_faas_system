@@ -50,13 +50,32 @@ defmodule TaiShangMicroFaasSystemWeb.FunctionRunnerController do
   end
 
   def run(conn, payload) do
-    result =
-      payload
-      |> ExStructTranslator.to_atom_struct()
-      |> do_run()
-      |> handle_param()
-    json(conn, %{result: result})
+    # TODO: optimize here.
+    if is_nil(Constants.get_api_key()) do
+      result = 
+        payload
+        |> ExStructTranslator.to_atom_struct()
+        |> do_run()
+        |> handle_param()
+      json(conn, %{result: result})
+    else
+      atomed_payload = 
+      %{api_key: api_key} =
+        ExStructTranslator.to_atom_struct(payload)
+      
+      result =
+      if guide(api_key) do      
+        atomed_payload
+        |> do_run()
+        |> handle_param()
+      else
+        handle_param({:error, "wrong api key!"})
+      end
+      json(conn, %{result: result})
+    end
   end
+
+  def guide(api_key), do: api_key == Constants.get_api_key()
 
   def do_run(%{
       tx_id: tx_id,

@@ -14,8 +14,7 @@ defmodule Components.MovespaceDB do
     end
 
     def insert_vector(vector_db_name, id_in_embedbase, raw_data, meta_data, embedding) do
-        IO.puts "tttttt"
-        IO.puts raw_data
+        IO.puts "insert_vector"
         sql_cmd = """
             INSERT INTO #{vector_db_name} (id_in_embedbase, raw_data, meta_data, embedding) VALUES (
                 '#{id_in_embedbase}',
