@@ -93,7 +93,7 @@ Combining with blockchain, we can construct a new type of FaaS system
 
   All code snippets, functions, and modules are stored in the Arweave blockchain, and dynamically loaded into memory while the FaaS service is running. The functions are transparent, open, and immutable. Therefore, it is possible to share the uploaded functions among users through an open function market, thus making F (in FaaS) a Lego building block.
 
-- **allow web3 state storage**
+- **web3 storage**
 
   Through the functions, users can store the state on each blockchain network, and read the state from it. The authentication is realized through the signature that follows the Ethereum standard, which breaks through the `stateless` limitation of the traditional FaaS system.
 
