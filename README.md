@@ -64,7 +64,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 ## 0x01 Introduction
 
-Web3 Micro FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Gist/Greenfield/IPFS/Arweave Network and loaded into Runtime to provide functional service support for other applications. Plugin is used for uploading code snippets.
+Web3 Micro FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Gist/Greenfield/IPFS/Arweave Network and loaded in runtime, using as light-weight backend programs!dApp-plugins are used for uploading code snippets.
 
 ![去中心化FaaS系统的实现-en-zzf (8)](https://tva1.sinaimg.cn/large/008vxvgGgy1h9gxyxrpvaj31fn0k7ju8.jpg)
 
