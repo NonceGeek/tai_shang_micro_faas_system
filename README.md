@@ -64,7 +64,7 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 ## 0x01 Introduction
 
-Based on Arweave's FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Arweave Network and loaded into Runtime to provide functional service support for other applications. Plugin is used for uploading code snippets.
+Web3 Micro FaaS system, code snippets written in languages such as Elixir/Rust can be pulled from the Gist/Greenfield/IPFS/Arweave Network and loaded in runtime, using as light-weight backend programs!dApp-plugins are used for uploading code snippets.
 
 ![去中心化FaaS系统的实现-en-zzf (8)](https://tva1.sinaimg.cn/large/008vxvgGgy1h9gxyxrpvaj31fn0k7ju8.jpg)
 
@@ -82,9 +82,8 @@ From the perspective of the service purchaser, the use of FaaS saves the rental 
 
   Traditional FaaS can only be used by the demander who upload the functions for their own purpose. The code of the function cannot be guaranteed to be tamper-proof and transparent, and there is no way to record the executing process of the function. Therefore, without the assistance of blockchain technology, it is impossible to have an open function market where users can purchase and use functions based on their needs, or to carry out combining functions across users.  In conclusion, the opaque and closed nature of the function limits the potential of FaaS.
 
-- **Stateless functions**
-
-  In addition, the functions provided by the traditional FaaS is stateless.
+- **not adapted to the needs of Web3**
+Traditional FaaS targets a wide range of scenarios, so there are no components adapted to Web3 to build a Web3 light backend.
 
 ### 2.3 FaaS Based on Blockchain
 
@@ -94,9 +93,11 @@ Combining with blockchain, we can construct a new type of FaaS system
 
   All code snippets, functions, and modules are stored in the Arweave blockchain, and dynamically loaded into memory while the FaaS service is running. The functions are transparent, open, and immutable. Therefore, it is possible to share the uploaded functions among users through an open function market, thus making F (in FaaS) a Lego building block.
 
-- **allow state storage**
+- **web3 storage**
 
   Through the functions, users can store the state on each blockchain network, and read the state from it. The authentication is realized through the signature that follows the Ethereum standard, which breaks through the `stateless` limitation of the traditional FaaS system.
+
+- **a lot of web3 components**
 
 ## 0x03 How to Use
 
