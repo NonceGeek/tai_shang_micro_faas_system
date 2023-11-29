@@ -57,4 +57,7 @@ defmodule Constants do
     Application.fetch_env!(:tai_shang_micro_faas_system, :api_key)
   end
 
+  def get_admin_key() do
+    Application.fetch_env!(:tai_shang_micro_faas_system, :admin_key)
+  end
 end

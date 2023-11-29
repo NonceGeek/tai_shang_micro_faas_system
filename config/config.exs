@@ -28,7 +28,8 @@ config :tai_shang_micro_faas_system,
   embedbase_key: System.get_env("EMBEDBASE_KEY"),
   did_mainnet: "0x61b96051f553d767d7e6dfcc04b04c28d793c8af3d07d3a43b4e2f8f4ca04c9f",
   did_testnet: "0xc71124a51e0d63cfc6eb04e690c39a4ea36774ed4df77c00f7cbcbc9d0505b2c",
-  api_key: System.get_env("API_KEY")
+  api_key: System.get_env("API_KEY"),
+  admin_key: System.get_env("ADMIN_KEY")
 
 config :cors_plug,
   max_age: 2592000,
