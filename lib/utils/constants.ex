@@ -60,4 +60,9 @@ defmodule Constants do
   def get_admin_key() do
     Application.fetch_env!(:tai_shang_micro_faas_system, :admin_key)
   end
+
+  def clipdrop_key() do
+    :tai_shang_micro_faas_system
+    |> Application.fetch_env!(:clipdrop_key)
+  end
 end

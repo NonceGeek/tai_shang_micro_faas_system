@@ -38,6 +38,32 @@ defmodule Components.ExHttp do
     {:error, "POST retires #{@retries} times and not success"}
   end
 
+  def http_post(_url, _data, _, retries) when retries == 0 do
+    {:error, "POST retires #{@retries} times and not success"}
+  end
+
+  def http_post(url, data, heads, retries) do
+    body = Poison.encode!(data)
+
+    url
+    |> HTTPoison.post(
+      body,
+      # [{"User-Agent", @default_user_agent}, {"Content-Type", "text/plain"}]
+      heads,
+      hackney: [headers: [{"User-Agent", @default_user_agent}]]
+    )
+    |> handle_response()
+    |> case do
+      {:ok, body} ->
+        {:ok, body}
+      {:error, 404} ->
+        {:error, 404}
+      {:error, _} ->
+        Process.sleep(500)
+        http_post(url, data, heads, retries - 1)
+    end
+  end
+
   def http_post(url, data, retries) do
     body = Poison.encode!(data)
 
