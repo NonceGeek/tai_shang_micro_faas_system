@@ -100,6 +100,9 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       {:pgvector, "~> 0.2.0"}, 
       # renamer
       {:rename_project, "~> 0.1.0", only: :dev},
+
+      # tesla
+      {:tesla, "~> 1.8.0"}, 
     ]
   end
 
