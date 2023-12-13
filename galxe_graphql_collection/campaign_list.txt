@@ -1,0 +1,21 @@
+query CampaignList(
+  $id: Int
+  $alias: String
+  $campaignInput: ListCampaignInput!
+) {
+  space(id: $id, alias: $alias) {
+    id
+    name
+    alias
+    campaigns(input: $campaignInput) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      list {
+        id
+        name
+      }
+    }
+  }
+}

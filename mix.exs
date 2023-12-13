@@ -103,6 +103,9 @@ defmodule TaiShangMicroFaasSystem.MixProject do
 
       # tesla
       {:tesla, "~> 1.8.0"}, 
+
+      # graphql client
+      {:neuron, "~> 5.1.0"}
     ]
   end
 

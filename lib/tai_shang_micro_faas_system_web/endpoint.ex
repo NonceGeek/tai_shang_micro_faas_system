@@ -22,12 +22,6 @@ defmodule TaiShangMicroFaasSystemWeb.Endpoint do
     gzip: false,
     only: ~w(assets fonts images favicon.ico robots.txt)
 
-  plug Plug.Static,
-    at: "/pic_generated",
-    from: :tai_shang_micro_faas_system,
-    gzip: false,
-    only: ~w(assets fonts images favicon.ico robots.txt)
-
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do

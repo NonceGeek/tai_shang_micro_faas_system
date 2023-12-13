@@ -1,0 +1,35 @@
+{
+  "alias": "bnbchain",
+  "campaignInput": {
+    "forAdmin": false,
+    "first": 2,
+    "after": "-1",
+    "excludeChildren": true,
+    "gasTypes": null,
+    "credSources": null,
+    "rewardTypes": null,
+    "chains": null,
+    "statuses": null,
+    "listType": "Newest",
+    "types": [
+      "Drop",
+      "MysteryBox",
+      "Forge",
+      "MysteryBoxWR",
+      "Airdrop",
+      "ExternalLink",
+      "OptIn",
+      "OptInEmail",
+      "PowahDrop",
+      "Parent",
+      "Oat",
+      "Bounty",
+      "Token",
+      "DiscordRole",
+      "Mintlist",
+      "Points",
+      "PointsMysteryBox"
+    ],
+    "searchString": null
+  }
+}
