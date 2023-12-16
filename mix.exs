@@ -31,7 +31,8 @@ defmodule TaiShangMicroFaasSystem.MixProject do
   def application do
     [
       mod: {TaiShangMicroFaasSystem.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools],
+
     ]
   end
 
@@ -63,7 +64,10 @@ defmodule TaiShangMicroFaasSystem.MixProject do
 
       # arweave
       {:arweave_sdk_ex, "~> 0.1.10"},
+
+      # ethereum
       {:ethereumex, "~> 0.9"},
+      {:ex_abi, "~> 0.6.4", override: true},
       {:ecto, "~> 3.7.1", override: true},
 
       # move
@@ -105,7 +109,8 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       {:tesla, "~> 1.8.0"}, 
 
       # graphql client
-      {:neuron, "~> 5.1.0"}
+      {:neuron, "~> 5.1.0"},
+
     ]
   end
 
