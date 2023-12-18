@@ -30,7 +30,11 @@ config :tai_shang_micro_faas_system,
   did_testnet: "0xc71124a51e0d63cfc6eb04e690c39a4ea36774ed4df77c00f7cbcbc9d0505b2c",
   api_key: System.get_env("API_KEY"),
   admin_key: System.get_env("ADMIN_KEY"),
-  clipdrop_key: System.get_env("CLIPDROP_KEY")
+  clipdrop_key: System.get_env("CLIPDROP_KEY"),
+  smart_prompter_endpoint: System.get_env("SMART_PROMPTER_ENDPOINT"),
+  smart_prompter_acct:  System.get_env("SMART_PROMPTER_ACCT"), 
+  smart_prompter_pwd: System.get_env("SMART_PROMPTER_PWD")
+
 
 config :cors_plug,
   max_age: 2592000,

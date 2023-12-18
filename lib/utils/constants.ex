@@ -65,4 +65,20 @@ defmodule Constants do
     :tai_shang_micro_faas_system
     |> Application.fetch_env!(:clipdrop_key)
   end
+
+  # +---------------------+
+  # | smart prompt things |
+  # +---------------------+
+
+  def smart_prompter_endpoint() do
+    Application.fetch_env!(:tai_shang_micro_faas_system, :smart_prompter_endpoint)
+  end
+
+  def smart_prompter_acct() do
+    Application.fetch_env!(:tai_shang_micro_faas_system, :smart_prompter_acct)
+  end
+
+  def smart_prompter_pwd() do
+    Application.fetch_env!(:tai_shang_micro_faas_system, :smart_prompter_pwd)
+  end
 end
