@@ -21,9 +21,9 @@ defmodule TaiShangMicroFaasSystem.CodeFetchers.Gist do
 
   def get_from_gist(gist_id) do
     try do
-      {:ok, %{"files" => files}} = do_get_from_gist(gist_id)
+      {:ok, %{files: files}} = do_get_from_gist(gist_id)
       # {_file_name, %{"content" => content}} = Enum.fetch!(files, 0)
-
+      IO.puts inspect files
       content_list = handle_files(files)
 
       # same format as get from arweave.
@@ -36,7 +36,7 @@ defmodule TaiShangMicroFaasSystem.CodeFetchers.Gist do
 
   def handle_files(files) do
     Enum.map(files, fn x ->
-      {_file_name, %{"content" => content}} = x
+      {_file_name, %{content: content}} = x
       content
     end)
   end
