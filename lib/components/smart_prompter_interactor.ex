@@ -14,6 +14,10 @@ defmodule Components.SmartPrompterInteractor do
     templates:
       %{
         create: "api/prompt_templates"
+      },
+    embedding:
+      %{
+        get: "api/embedding"
       }
   }
   def register(username, password) do
@@ -96,7 +100,7 @@ defmodule Components.SmartPrompterInteractor do
     |> Process.whereis()
     |> Agent.get(fn token -> token end)
   end
-
+ 
     # +--------+
     # | Topics |
     # +--------+
@@ -182,5 +186,15 @@ defmodule Components.SmartPrompterInteractor do
     Enum.reduce(vars, prompt, fn {key, value}, acc ->
       String.replace(acc, "{#{key}}", value)
     end)
+  end
+
+  # +-----------+
+  # | embedding |
+  # +-----------+
+
+  def get_embedding(endpoint, content) do
+    token = get_session(endpoint)
+    path = "#{endpoint}/#{@paths.embedding.get}"
+    ExHttp.http_post(path, %{text: content}, token, 3)
   end
 end
