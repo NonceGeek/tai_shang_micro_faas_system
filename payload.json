@@ -1,0 +1,11 @@
+{
+    "type": "INSERT",
+    "table": "raw_data",
+    "record": {
+      "id_on_chain": 13, "creator": "0x0",
+      "content": "fdsfsdsfdsfd",
+      "created_at": "2023-12-16T22:22:08.542514+00:00"
+    },
+    "schema": "public",
+    "old_record": null
+  }

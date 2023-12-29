@@ -48,12 +48,4 @@ defmodule Components.GalxeGraphQLInteractor do
             {:error, inspect(error)}
         end
     end
-
-    def build_body_query_nft_holder(campaign_id, block, fir, aft) do
-        Poison.encode!(%{query:
-        "query NFTHolders {\n  campaign(id: \"#{campaign_id}\") {\n    nftHolderSnapshot {\n      holders(block: #{block}, first: #{fir}, after: \"#{aft}\") {\n        list {\n          id\n          holder\n        }\n        totalCount\n        edges {\n          node {\n            id\n            holder\n          }\n          cursor\n        }\n        pageInfo {\n          startCursor\n          endCursor\n          hasNextPage\n          hasPreviousPage\n        }\n      }\n    }\n  }\n}\n"
-        })
-    end
-
-    # def build
 end
