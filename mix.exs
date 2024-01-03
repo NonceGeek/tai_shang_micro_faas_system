@@ -111,6 +111,9 @@ defmodule TaiShangMicroFaasSystem.MixProject do
       # graphql client
       {:neuron, "~> 5.1.0"},
 
+      # decimal
+      {:decimal, "~> 2.0"}
+
     ]
   end
 
